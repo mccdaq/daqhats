@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C Test Function Reference &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c.html">C Library Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MCC DAQ HAT Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>C Test Function Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/c_test.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="c-test-function-reference">
+<h1>C Test Function Reference<a class="headerlink" href="#c-test-function-reference" title="Permalink to this headline">¶</a></h1>
+<p>These functions are included for manufacturing test and not targeted for the end user.</p>
+<div class="section" id="mcc-118-test-functions">
+<h2>MCC 118 test functions<a class="headerlink" href="#mcc-118-test-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Function</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_test_clock" title="mcc118_test_clock"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_test_clock()</span></code></a></td>
+<td>Test the CLK pin.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_test_trigger" title="mcc118_test_trigger"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_test_trigger()</span></code></a></td>
+<td>Test the TRIG pin.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="c.mcc118_test_clock">
+<span class="target" id="mcc118_8h_1a21adc96edc8eb72c6cd0b0df27828537"></span>int <code class="descname">mcc118_test_clock</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_test_clock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test the CLK pin. </p>
+<p>This function will return RESULT_BUSY if called while a scan is running.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The CLK pin mode<ul>
+<li>0 = input</li>
+<li>1 = output low</li>
+<li>2 = output high</li>
+<li>3 = output 1 kHz square wave </li>
+</ul>
+</li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the value at the CLK pin after setting the mode. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_test_trigger">
+<span class="target" id="mcc118_8h_1aee169bf587205b28dc8f9e6a64431997"></span>int <code class="descname">mcc118_test_trigger</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;state</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_test_trigger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test the TRIG pin by returning the current state. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">state</span></code>: Receives the TRIG pin state (0 or 1.) </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Measurement Computing.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

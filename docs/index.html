@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MCC DAQ HAT Library documentation &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Hardware Overview" href="overview.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> MCC DAQ HAT Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c.html">C Library Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">MCC DAQ HAT Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>MCC DAQ HAT Library documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="mcc-daq-hat-library-documentation">
+<h1>MCC DAQ HAT Library documentation<a class="headerlink" href="#mcc-daq-hat-library-documentation" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="_static/daqhatLibrary.pdf">PDF version of this document</a></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#mcc-118">MCC 118</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#board-components">Board components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#screw-terminals">Screw terminals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#address-jumpers">Address jumpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#status-led">Status LED</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#header-connector">Header connector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#functional-block-diagram">Functional block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#functional-details">Functional details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#scan-clock">Scan clock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="overview.html#trigger">Trigger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#specifications">Specifications</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html#installing-a-single-board">Installing a single board</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hardware.html#installing-multiple-boards">Installing multiple boards</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#creating-a-c-program">Creating a C program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#creating-a-python-program">Creating a Python program</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="c.html">C Library Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="c.html#global-functions-and-data">Global functions and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="c.html#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="c.html#data-types-and-definitions">Data types and definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="c.html#hat-ids">HAT IDs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="c.html#result-codes">Result Codes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="c.html#hatinfo-structure">HatInfo structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="c.html#analog-input-scan-option-flags">Analog Input / Scan Option Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="c.html#mcc-118-functions-and-data">MCC 118 functions and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="c.html#id1">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="c.html#data-definitions">Data definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="c.html#device-info">Device Info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="c.html#trigger-modes">Trigger Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="c.html#scan-status-flags">Scan Status Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python.html#global-methods-and-data">Global methods and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python.html#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="python.html#data">Data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="python.html#hat-ids">Hat IDs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="python.html#trigger-modes">Trigger modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="python.html#scan-read-option-flags">Scan / read option flags</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="python.html#haterror-class">HatError class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python.html#mcc-118-class">MCC 118 class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="python.html#id1">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="overview.html" class="btn btn-neutral float-right" title="Hardware Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Measurement Computing.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing the DAQ HAT board" href="hardware.html" />
+    <link rel="prev" title="MCC DAQ HAT Library documentation" href="index.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hardware Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-118">MCC 118</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#board-components">Board components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#screw-terminals">Screw terminals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#address-jumpers">Address jumpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#status-led">Status LED</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#header-connector">Header connector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#functional-block-diagram">Functional block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#functional-details">Functional details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#scan-clock">Scan clock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trigger">Trigger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#specifications">Specifications</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c.html">C Library Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MCC DAQ HAT Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Hardware Overview</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hardware-overview">
+<h1>Hardware Overview<a class="headerlink" href="#hardware-overview" title="Permalink to this headline">¶</a></h1>
+<p>The MCC DAQ HATs are Raspberry Pi add-on boards (Hardware Attached on Top). They adhere
+to the Raspberry Pi HAT specification, but also extend it to allow stacking up to
+8 MCC boards on a single Raspberry Pi.</p>
+<p>C and Python libraries, documentation, and examples are provided to allow you to
+develop your own applications.</p>
+<div class="section" id="mcc-118">
+<h2>MCC 118<a class="headerlink" href="#mcc-118" title="Permalink to this headline">¶</a></h2>
+<p>The MCC 118 is an 8-channel analog voltage input board with the following features:</p>
+<ul class="simple">
+<li>12-bit, 100 kS/s A/D converter</li>
+<li>±10 V single-ended analog inputs</li>
+<li>Factory calibration with ±20.8 mV input accuracy</li>
+<li>Bidirectional scan clock</li>
+<li>Onboard sample buffers</li>
+<li>Digital trigger input</li>
+</ul>
+<a class="reference internal image-reference" href="_images/mcc118.jpg"><img alt="MCC 118 circuit board" class="align-center" src="_images/mcc118.jpg" style="width: 612.5px; height: 464.5px;" /></a>
+<div class="section" id="board-components">
+<h3>Board components<a class="headerlink" href="#board-components" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="screw-terminals">
+<h4>Screw terminals<a class="headerlink" href="#screw-terminals" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Ch 0 In</strong> to <strong>Ch 7 In</strong> (CHx): Single-ended analog input terminals.</li>
+<li><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
+Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</li>
+<li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software configurable for edge or level sensitive,
+rising or falling edge, high or low level.</li>
+<li><strong>AGND</strong> (GND): Common ground for the analog input terminals.</li>
+<li><strong>DGND</strong> (GND): Common ground for the clock and trigger terminals.</li>
+</ul>
+</div>
+<div class="section" id="address-jumpers">
+<h4>Address jumpers<a class="headerlink" href="#address-jumpers" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</li>
+</ul>
+</div>
+<div class="section" id="status-led">
+<h4>Status LED<a class="headerlink" href="#status-led" title="Permalink to this headline">¶</a></h4>
+<p>The LED turns on when the board is connected to a Raspberry Pi with external power applied and flashes when communicating
+with the board. The LED may be blinked by the user.</p>
+</div>
+<div class="section" id="header-connector">
+<h4>Header connector<a class="headerlink" href="#header-connector" title="Permalink to this headline">¶</a></h4>
+<p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
+</div>
+</div>
+<div class="section" id="functional-block-diagram">
+<h3>Functional block diagram<a class="headerlink" href="#functional-block-diagram" title="Permalink to this headline">¶</a></h3>
+<a class="reference internal image-reference" href="_images/mcc118-diag.jpg"><img alt="MCC 118 block diagram" class="align-center" src="_images/mcc118-diag.jpg" style="width: 617.4px; height: 348.6px;" /></a>
+</div>
+<div class="section" id="functional-details">
+<h3>Functional details<a class="headerlink" href="#functional-details" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="scan-clock">
+<h4>Scan clock<a class="headerlink" href="#scan-clock" title="Permalink to this headline">¶</a></h4>
+<p>The clock input / output (terminal CLK) is used to output the internal scan clock or apply an external scan clock to the device. The clock input signal may be a 3.3V or 5V TTL or CMOS logic signal, and the output will be 3.3V LVCMOS. A scan occurs for each rising edge of the clock, acquiring one sample from each of the selected channels in the scan. For example, when scanning channels 0, 1, and 2 the conversion activity will be:</p>
+<a class="reference internal image-reference" href="_images/mcc118-clock.png"><img alt="MCC 118 clock mode" class="align-center" src="_images/mcc118-clock.png" style="width: 570.4px; height: 295.6px;" /></a>
+</div>
+<div class="section" id="trigger">
+<h4>Trigger<a class="headerlink" href="#trigger" title="Permalink to this headline">¶</a></h4>
+<p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog input scan until the desired condition is met at the trigger input.  The trigger input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition may be rising edge, falling edge, high level, or low level.</p>
+</div>
+</div>
+<div class="section" id="specifications">
+<h3>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="_static/esmcc118.pdf">MCC 118 Electrical Specifications</a></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hardware.html" class="btn btn-neutral float-right" title="Installing the DAQ HAT board" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="MCC DAQ HAT Library documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Measurement Computing.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

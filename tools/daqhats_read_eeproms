@@ -1,0 +1,75 @@
+#!/bin/sh
+
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
+
+modprobe i2c_dev
+if [ -e "/dev/i2c-0" ]; then
+   BUS=0
+elif [ -e "/dev/i2c-3" ]; then
+   BUS=3
+else
+   dtoverlay i2c-gpio i2c_gpio_sda=0 i2c_gpio_scl=1
+   rc=$?
+   if [ $rc != 0 ]; then
+      echo "Loading of i2c-gpio dtoverlay failed. Do an rpi-update (and maybe apt-get update; apt-get upgrade)."
+      exit $rc
+   fi
+   if [ -e "/dev/i2c-3" ]; then
+      BUS=3
+   else
+      echo "Expected I2C bus (i2c-3) not found."
+   fi
+fi
+
+#dtparam i2c_vc=on
+#BUS=0
+
+modprobe at24
+rc=$?
+if [ "$rc" != 0 ]; then
+   echo "Modprobe of at24 failed. Do an rpi-update."
+   exit $rc
+fi
+
+SYS=/sys/class/i2c-adapter/i2c-$BUS
+
+rm -f /etc/mcc/hats/*.bin
+
+echo "Reading..."
+
+index=0
+while [ "$index" -lt 8 ]
+do
+   address=$((0x50 + $index))
+   devname=$(printf '%s/%s-%04x' $SYS $BUS $address)
+   if [ ! -d "$devname" ]; then
+      printf '24c32 0x%x' $address > $SYS/new_device
+   fi
+
+   # try to read the eeprom
+   dd if=$devname/eeprom of=/dev/null bs=1 count=1 status=none 2> /dev/null
+   rc=$?
+
+   if [ "$rc" -eq 0 ]; then
+      # successs, read the entire eeprom
+      printf "Found HAT at address %d\n" $index
+      if [ "$index" != "0" ]; then
+         if [ ! -e "/etc/mcc/hats" ]; then
+            mkdir -p "/etc/mcc/hats"
+         fi
+         dd if=$devname/eeprom of=/etc/mcc/hats/eeprom_$index.bin status=none
+         sync
+      fi
+   fi
+
+   # remove the device
+   printf '0x%x' $address > $SYS/delete_device
+
+   index=$(($index + 1))
+done
+
+echo "Done"

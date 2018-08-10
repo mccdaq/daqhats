@@ -1,0 +1,1131 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Python Library Reference &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="C Library Reference" href="c.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c.html">C Library Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python Library Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-methods-and-data">Global methods and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#methods">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data">Data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hat-ids">Hat IDs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trigger-modes">Trigger modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scan-read-option-flags">Scan / read option flags</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#haterror-class">HatError class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-118-class">MCC 118 class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Methods</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MCC DAQ HAT Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Python Library Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/python.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="python-library-reference">
+<h1>Python Library Reference<a class="headerlink" href="#python-library-reference" title="Permalink to this headline">¶</a></h1>
+<p>The Python library is organized as a global method for listing the DAQ HAT boards attached
+to your system, and board-specific classes to provide full functionality for each type
+of board.  The Python package is named <em>daqhats</em>.</p>
+<div class="section" id="global-methods-and-data">
+<h2>Global methods and data<a class="headerlink" href="#global-methods-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="methods">
+<h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Method</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.hat_list" title="daqhats.hat_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">hat_list()</span></code></a></td>
+<td>Return a list of detected DAQ HAT boards.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="daqhats.hat_list">
+<code class="descclassname">daqhats.</code><code class="descname">hat_list</code><span class="sig-paren">(</span><em>filter_by_id=0</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.hat_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of detected DAQ HAT boards.</p>
+<p>Scans certain locations for information from the HAT EEPROMs.  Verifies the
+contents are valid HAT EEPROM contents and returns a list of namedtuples
+containing information on the HAT.  Info will only be returned for DAQ HATs.
+The EEPROM contents are stored in /etc/mcc/hats when using the
+daqhats_read_eeproms tool, or in /proc/device-tree in the case of a single
+HAT at address 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filter_by_id</strong> (<em>int</em>) – If this is <a class="reference internal" href="#daqhats.HatIDs.ANY" title="daqhats.HatIDs.ANY"><code class="xref py py-const docutils literal notranslate"><span class="pre">HatIDs.ANY</span></code></a> return all DAQ
+HATs found.  Otherwise, return only DAQ HATs with ID matching this
+value.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of namedtuples, the number of elements match the number of
+DAQ HATs found. Each namedtuple will contain the following field names<ul class="simple">
+<li><strong>address</strong> (int): device address</li>
+<li><strong>id</strong> (int): device product ID, identifies the type of DAQ HAT</li>
+<li><strong>version</strong> (int): device hardware version</li>
+<li><strong>product_name</strong> (str): device product name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="data">
+<h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="hat-ids">
+<h4>Hat IDs<a class="headerlink" href="#hat-ids" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="daqhats.HatIDs">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">HatIDs</code><a class="headerlink" href="#daqhats.HatIDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Known MCC HAT IDs.</p>
+<dl class="attribute">
+<dt id="daqhats.HatIDs.ANY">
+<code class="descname">ANY</code><em class="property"> = 0</em><a class="headerlink" href="#daqhats.HatIDs.ANY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match any MCC ID in <a class="reference internal" href="#daqhats.hat_list" title="daqhats.hat_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">hat_list()</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.HatIDs.MCC_118">
+<code class="descname">MCC_118</code><em class="property"> = 322</em><a class="headerlink" href="#daqhats.HatIDs.MCC_118" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 118 ID</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="trigger-modes">
+<h4>Trigger modes<a class="headerlink" href="#trigger-modes" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="daqhats.TriggerModes">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">TriggerModes</code><a class="headerlink" href="#daqhats.TriggerModes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan trigger input modes.</p>
+<dl class="attribute">
+<dt id="daqhats.TriggerModes.RISING_EDGE">
+<code class="descname">RISING_EDGE</code><em class="property"> = 0</em><a class="headerlink" href="#daqhats.TriggerModes.RISING_EDGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan on a rising edge of TRIG.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.TriggerModes.FALLING_EDGE">
+<code class="descname">FALLING_EDGE</code><em class="property"> = 1</em><a class="headerlink" href="#daqhats.TriggerModes.FALLING_EDGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan on a falling edge of TRIG.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.TriggerModes.ACTIVE_HIGH">
+<code class="descname">ACTIVE_HIGH</code><em class="property"> = 2</em><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_HIGH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan any time TRIG is high.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.TriggerModes.ACTIVE_LOW">
+<code class="descname">ACTIVE_LOW</code><em class="property"> = 3</em><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_LOW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan any time TRIG is low.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="scan-read-option-flags">
+<h4>Scan / read option flags<a class="headerlink" href="#scan-read-option-flags" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="daqhats.OptionFlags">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">OptionFlags</code><a class="headerlink" href="#daqhats.OptionFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan / read option flags. See individual methods for detailed
+descriptions.</p>
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.DEFAULT">
+<code class="descname">DEFAULT</code><em class="property"> = 0</em><a class="headerlink" href="#daqhats.OptionFlags.DEFAULT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use default behavior.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.NOSCALEDATA">
+<code class="descname">NOSCALEDATA</code><em class="property"> = 1</em><a class="headerlink" href="#daqhats.OptionFlags.NOSCALEDATA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read / write unscaled data.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.NOCALIBRATEDATA">
+<code class="descname">NOCALIBRATEDATA</code><em class="property"> = 2</em><a class="headerlink" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read / write uncalibrated data.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.EXTCLOCK">
+<code class="descname">EXTCLOCK</code><em class="property"> = 4</em><a class="headerlink" href="#daqhats.OptionFlags.EXTCLOCK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use an external clock source.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.EXTTRIGGER">
+<code class="descname">EXTTRIGGER</code><em class="property"> = 8</em><a class="headerlink" href="#daqhats.OptionFlags.EXTTRIGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use an external trigger source.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.OptionFlags.CONTINUOUS">
+<code class="descname">CONTINUOUS</code><em class="property"> = 16</em><a class="headerlink" href="#daqhats.OptionFlags.CONTINUOUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run until explicitly stopped.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="haterror-class">
+<h3>HatError class<a class="headerlink" href="#haterror-class" title="Permalink to this headline">¶</a></h3>
+<dl class="exception">
+<dt id="daqhats.HatError">
+<em class="property">exception </em><code class="descclassname">daqhats.</code><code class="descname">HatError</code><span class="sig-paren">(</span><em>address</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exceptions raised for MCC HAT specific errors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> (<em>int</em>) – the address of the board that caused the exception.</li>
+<li><strong>value</strong> (<em>str</em>) – the exception description.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="mcc-118-class">
+<h2>MCC 118 class<a class="headerlink" href="#mcc-118-class" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Methods<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="daqhats.mcc118">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc118</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118" title="Permalink to this definition">¶</a></dt>
+<dd><p>The class for an MCC 118 board.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="47%" />
+<col width="53%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Method</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.blink_led" title="daqhats.mcc118.blink_led"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.blink_led()</span></code></a></td>
+<td>Blink the MCC 118 LED.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.info" title="daqhats.mcc118.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.info()</span></code></a></td>
+<td>Get info about this device type.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.firmware_version" title="daqhats.mcc118.firmware_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.firmware_version()</span></code></a></td>
+<td>Get the firmware version.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.address" title="daqhats.mcc118.address"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.address()</span></code></a></td>
+<td>Read the board’s address.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.serial" title="daqhats.mcc118.serial"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.serial()</span></code></a></td>
+<td>Read the serial number.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.calibration_date" title="daqhats.mcc118.calibration_date"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.calibration_date()</span></code></a></td>
+<td>Read the calibration date.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.calibration_coefficient_read" title="daqhats.mcc118.calibration_coefficient_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.calibration_coefficient_read()</span></code></a></td>
+<td>Read the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.calibration_coefficient_write" title="daqhats.mcc118.calibration_coefficient_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.calibration_coefficient_write()</span></code></a></td>
+<td>Write the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.a_in_read" title="daqhats.mcc118.a_in_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_read()</span></code></a></td>
+<td>Read an analog input channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.trigger_mode" title="daqhats.mcc118.trigger_mode"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.trigger_mode()</span></code></a></td>
+<td>Set the external trigger input mode.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_actual_rate" title="daqhats.mcc118.a_in_scan_actual_rate"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_actual_rate()</span></code></a></td>
+<td>Read the actual sample rate for a requested sample rate.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_start()</span></code></a></td>
+<td>Start a hardware-paced analog input scan.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_buffer_size" title="daqhats.mcc118.a_in_scan_buffer_size"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_buffer_size()</span></code></a></td>
+<td>Read the size of the internal scan data buffer.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_read" title="daqhats.mcc118.a_in_scan_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_read()</span></code></a></td>
+<td>Read scan status / data (list).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_read_numpy" title="daqhats.mcc118.a_in_scan_read_numpy"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_read_numpy()</span></code></a></td>
+<td>Read scan status / data (NumPy array).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_channel_count" title="daqhats.mcc118.a_in_scan_channel_count"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_channel_count()</span></code></a></td>
+<td>Get the number of channels in the current scan.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_stop" title="daqhats.mcc118.a_in_scan_stop"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_stop()</span></code></a></td>
+<td>Stop the scan.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc118.a_in_scan_cleanup" title="daqhats.mcc118.a_in_scan_cleanup"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc118.a_in_scan_cleanup()</span></code></a></td>
+<td>Free scan resources.</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="daqhats.mcc118.info">
+<em class="property">static </em><code class="descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant information about this type of device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names<ul class="simple">
+<li><strong>NUM_AI_CHANNELS</strong> (int): The number of analog input channels
+(8.)</li>
+<li><strong>AI_MIN_CODE</strong> (int): The minimum ADC code (0.)</li>
+<li><strong>AI_MAX_CODE</strong> (int): The maximum ADC code (4095.)</li>
+<li><strong>AI_MIN_VOLTAGE</strong> (float): The voltage corresponding to the
+minimum ADC code (-10.0.)</li>
+<li><strong>AI_MAX_VOLTAGE</strong> (float): The voltage corresponding to the
+maximum ADC code (+10.0 - 1 LSB)</li>
+<li><strong>AI_MIN_RANGE</strong> (float): The minimum voltage of the input range
+(-10.0.)</li>
+<li><strong>AI_MAX_RANGE</strong> (float): The maximum voltage of the input range
+(+10.0.)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.firmware_version">
+<code class="descname">firmware_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.firmware_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the board firmware and bootloader versions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names<ul class="simple">
+<li><strong>version</strong> (string): The firmware version, i.e “1.03”.</li>
+<li><strong>bootloader_version</strong> (string): The bootloader version,
+i.e “1.01”.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.serial">
+<code class="descname">serial</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the serial number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The serial number.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.blink_led">
+<code class="descname">blink_led</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.blink_led" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blink the MCC 118 LED.</p>
+<p>Setting count to 0 will cause the LED to blink continuously until
+blink_led() is called again with a non-zero count.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>count</strong> (<em>int</em>) – The number of times to blink (max 255).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.calibration_date">
+<code class="descname">calibration_date</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.calibration_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the calibration date.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The calibration date in the format “YYYY-MM-DD”.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.calibration_coefficient_read">
+<code class="descname">calibration_coefficient_read</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the calibration coefficients for a single channel.</p>
+<p>The coefficients are applied in the library as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names<ul class="simple">
+<li><strong>slope</strong> (float): The slope.</li>
+<li><strong>offset</strong> (float): The offset.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.calibration_coefficient_write">
+<code class="descname">calibration_coefficient_write</code><span class="sig-paren">(</span><em>channel</em>, <em>slope</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily write the calibration coefficients for a single channel.</p>
+<p>The user can apply their own calibration coefficients by writing to
+these values. The values will reset to the factory values from the
+EEPROM whenever the class is initialized.  This function will fail and
+raise a HatError exception if a scan is active when it is called.</p>
+<p>The coefficients are applied in the library as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>slope</strong> (<em>float</em>) – The new slope value.</li>
+<li><strong>offset</strong> (<em>float</em>) – The new offset value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.trigger_mode">
+<code class="descname">trigger_mode</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.trigger_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the external trigger input mode.</p>
+<p>The available modes are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.TriggerModes.RISING_EDGE" title="daqhats.TriggerModes.RISING_EDGE"><code class="xref py py-const docutils literal notranslate"><span class="pre">TriggerModes.RISING_EDGE</span></code></a>: Start the scan when the TRIG
+input transitions from low to high.</li>
+<li><a class="reference internal" href="#daqhats.TriggerModes.FALLING_EDGE" title="daqhats.TriggerModes.FALLING_EDGE"><code class="xref py py-const docutils literal notranslate"><span class="pre">TriggerModes.FALLING_EDGE</span></code></a>: Start the scan when the TRIG
+input transitions from high to low.</li>
+<li><a class="reference internal" href="#daqhats.TriggerModes.ACTIVE_HIGH" title="daqhats.TriggerModes.ACTIVE_HIGH"><code class="xref py py-const docutils literal notranslate"><span class="pre">TriggerModes.ACTIVE_HIGH</span></code></a>: Start the scan when the TRIG
+input is high.</li>
+<li><a class="reference internal" href="#daqhats.TriggerModes.ACTIVE_LOW" title="daqhats.TriggerModes.ACTIVE_LOW"><code class="xref py py-const docutils literal notranslate"><span class="pre">TriggerModes.ACTIVE_LOW</span></code></a>: Start the scan when the TRIG
+input is low.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mode</strong> (<a class="reference internal" href="#daqhats.TriggerModes" title="daqhats.TriggerModes"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriggerModes</span></code></a>) – The trigger mode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_read">
+<code class="descname">a_in_read</code><span class="sig-paren">(</span><em>channel</em>, <em>options=&lt;OptionFlags.DEFAULT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single reading of an analog input channel and return the
+value.</p>
+<p><strong>options</strong> is an ORed combination of OptionFlags. Valid flags for this
+method are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return a calibrated voltage value.
+Any other flags will override DEFAULT behavior.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Return an ADC code (a value
+between 0 and 4095) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="daqhats.OptionFlags.NOCALIBRATEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOCALIBRATEDATA</span></code></a>: Return data without the
+calibration factors applied.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel</strong> (<em>int</em>) – The analog input channel number, 0-7.</li>
+<li><strong>options</strong> (<em>int</em>) – ORed combination of <a class="reference internal" href="#daqhats.OptionFlags" title="daqhats.OptionFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionFlags</span></code></a>,
+<a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a> if unspecified.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the read value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – the channel number is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_actual_rate">
+<code class="descname">a_in_scan_actual_rate</code><span class="sig-paren">(</span><em>channel_count</em>, <em>sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_actual_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the actual sample rate per channel for a requested sample rate.</p>
+<p>The internal scan clock is generated from a 16 MHz clock source so only
+discrete frequency steps can be achieved.  This function will return the
+actual rate for a requested channel count and rate setting.</p>
+<p>This function does not perform any actions with a board, it simply
+calculates the rate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel_count</strong> (<em>int</em>) – The number of channels in the scan, 1-8.</li>
+<li><strong>sample_rate_per_channel</strong> (<em>float</em>) – The desired per-channel rate of the
+internal sampling clock, max 100,000.0.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the actual sample rate</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – a scan argument is invalid.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_start">
+<code class="descname">a_in_scan_start</code><span class="sig-paren">(</span><em>channel_mask</em>, <em>samples_per_channel</em>, <em>sample_rate_per_channel</em>, <em>options</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a hardware-paced analog input channel scan.</p>
+<p>The scan runs as a separate thread from the user’s code. This function
+will allocate a scan buffer and start the thread that reads data from
+the device into that buffer. The user reads the data from the scan
+buffer and the scan status using the <a class="reference internal" href="#daqhats.mcc118.a_in_scan_read" title="daqhats.mcc118.a_in_scan_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_read()</span></code></a> function.
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_stop" title="daqhats.mcc118.a_in_scan_stop"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_stop()</span></code></a> is used to stop a continuous scan, or to stop
+a finite scan before it completes. The user must call
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_cleanup" title="daqhats.mcc118.a_in_scan_cleanup"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_cleanup()</span></code></a> after the scan has finished and all desired
+data has been read; this frees all resources from the scan and allows
+additional scans to be performed.</p>
+<p>The scan state has defined terminology:</p>
+<ul class="simple">
+<li><strong>Active</strong>: <a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a> has been called and the device
+may be acquiring data or finished with the acquisition. The scan has
+not been cleaned up by calling <a class="reference internal" href="#daqhats.mcc118.a_in_scan_cleanup" title="daqhats.mcc118.a_in_scan_cleanup"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_cleanup()</span></code></a>, so
+another scan may not be started.</li>
+<li><strong>Running</strong>: The scan is active and the device is still acquiring
+data. Certain methods like <a class="reference internal" href="#daqhats.mcc118.a_in_read" title="daqhats.mcc118.a_in_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_read()</span></code></a> will return an error
+because the device is busy.</li>
+</ul>
+<p>The scan options that may be used are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return scaled and calibrated data,
+internal scan clock, no trigger, and finite operation. Any other flags
+will override DEFAULT behavior.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Return ADC codes (values between
+0 and 4095) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="daqhats.OptionFlags.NOCALIBRATEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOCALIBRATEDATA</span></code></a>: Return data without the
+calibration factors applied.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.EXTCLOCK" title="daqhats.OptionFlags.EXTCLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.EXTCLOCK</span></code></a>: Use an external 3.3V or 5V logic
+signal at the CLK input as the scan clock. Multiple devices can be
+synchronized by connecting the CLK pins together and using this flag
+on all but one device so they will be clocked by the single device
+using its internal clock. <strong>sample_rate_per_channel</strong> is only used for
+buffer sizing.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.EXTTRIGGER" title="daqhats.OptionFlags.EXTTRIGGER"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.EXTTRIGGER</span></code></a>: Hold off the scan (after calling
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a>) until the trigger condition is met. The
+trigger is a 3.3V or 5V logic signal applied to the TRIG pin.</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.CONTINUOUS" title="daqhats.OptionFlags.CONTINUOUS"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.CONTINUOUS</span></code></a>: Scans continuously until stopped
+by the user by calling <a class="reference internal" href="#daqhats.mcc118.a_in_scan_stop" title="daqhats.mcc118.a_in_scan_stop"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_stop()</span></code></a> and writes data to a
+circular buffer. The data must be read before being overwritten to
+avoid a buffer overrun error. <strong>samples_per_channel</strong> is only used for
+buffer sizing.</li>
+</ul>
+<p>The scan buffer size will be allocated as follows:</p>
+<p><strong>Finite mode:</strong> Total number of samples in the scan.</p>
+<p><strong>Continuous mode:</strong> Either <strong>samples_per_channel</strong> or the value in the
+table below, whichever is greater.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Sample Rate</th>
+<th class="head">Buffer Size (per channel)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Not specified</td>
+<td>10 kS</td>
+</tr>
+<tr class="row-odd"><td>0-100 S/s</td>
+<td>1 kS</td>
+</tr>
+<tr class="row-even"><td>100-10k S/s</td>
+<td>10 kS</td>
+</tr>
+<tr class="row-odd"><td>10k-100k S/s</td>
+<td>100 kS</td>
+</tr>
+</tbody>
+</table>
+<p>Specifying a very large value for samples_per_channel could use too much
+of the Raspberry Pi memory. If the memory allocation fails, the function
+will raise a HatError with this description. The allocation could
+succeed, but the lack of free memory could cause other problems in the
+Raspberry Pi. If you need to acquire a high number of samples then it is
+better to run the scan in continuous mode and stop it when you have
+acquired the desired amount of data. If a scan is active this method
+will raise a HatError.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel_mask</strong> (<em>int</em>) – A bit mask of the desired channels (0x01 -
+0xFF).</li>
+<li><strong>samples_per_channel</strong> (<em>int</em>) – The number of samples to acquire per
+channel (finite mode,) or or can be used to set a larger scan
+buffer size than the default value (continuous mode.)</li>
+<li><strong>sample_rate_per_channel</strong> (<em>float</em>) – The per-channel rate of the
+internal scan clock, or the expected maximum rate of an external
+scan clock, max 100,000.0.</li>
+<li><strong>options</strong> (<em>int</em>) – An ORed combination of <a class="reference internal" href="#daqhats.OptionFlags" title="daqhats.OptionFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionFlags</span></code></a> flags
+that control the scan.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – a scan is active; memory could not be allocated; the board
+is not initialized, does not respond, or responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – a scan argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_buffer_size">
+<code class="descname">a_in_scan_buffer_size</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_buffer_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the internal scan data buffer size.</p>
+<p>An internal data buffer is allocated for the scan when
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a> is called. This function returns the total
+size of that buffer in samples.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the buffer size in samples</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized or no scan buffer is
+allocated (a scan is not active).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_status">
+<code class="descname">a_in_scan_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read scan status and number of available samples per channel.</p>
+<p>The analog input scan is started with <a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a> and
+runs in the background.  This function reads the status of that
+background scan and the number of samples per channel available in
+the scan thread buffer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names:<ul class="simple">
+<li><strong>running</strong> (bool): True if the scan is running, False if it has
+stopped or completed.</li>
+<li><strong>hardware_overrun</strong> (bool): True if the hardware could not
+acquire and unload samples fast enough and data was lost.</li>
+<li><strong>buffer_overrun</strong> (bool): True if the background scan buffer was
+not read fast enough and data was lost.</li>
+<li><strong>triggered</strong> (bool): True if the trigger conditions have been met
+and data acquisition started.</li>
+<li><strong>samples_available</strong> (int): The number of samples per channel
+currently in the scan buffer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – A scan is not active, the board is not initialized, does
+not respond, or responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_read">
+<code class="descname">a_in_scan_read</code><span class="sig-paren">(</span><em>samples_per_channel</em>, <em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read scan status and data (as a list).</p>
+<p>The analog input scan is started with <a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a> and
+runs in the background.  This function reads the status of that
+background scan and optionally reads sampled data from the scan buffer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>samples_per_channel</strong> (<em>int</em>) – The number of samples per channel to read
+from the scan buffer. Specify a negative number to return all
+available samples immediately and ignore <strong>timeout</strong> or 0 to
+only read the scan status and return no data.</li>
+<li><strong>timeout</strong> (<em>float</em>) – The amount of time in seconds to wait for the
+samples to be read. Specify a negative number to wait
+indefinitely, or 0 to return immediately with the samples that
+are already in the scan buffer (up to <strong>samples_per_channel</strong>.)
+If the timeout is met and the specified number of samples have
+not been read, then the function will return all the available
+samples and the timeout status set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>a namedtuple containing the following field names:</p>
+<ul class="simple">
+<li><strong>running</strong> (bool): True if the scan is running, False if it has
+stopped or completed.</li>
+<li><strong>hardware_overrun</strong> (bool): True if the hardware could not
+acquire and unload samples fast enough and data was lost.</li>
+<li><strong>buffer_overrun</strong> (bool): True if the background scan buffer was
+not read fast enough and data was lost.</li>
+<li><strong>triggered</strong> (bool): True if the trigger conditions have been met
+and data acquisition started.</li>
+<li><strong>timeout</strong> (bool): True if the timeout time expired before the
+specified number of samples were read.</li>
+<li><strong>data</strong> (list of float): The data that was read from the scan
+buffer.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">namedtuple</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – A scan is not active, the board is not initialized, does
+not respond, or responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – Incorrect argument.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_read_numpy">
+<code class="descname">a_in_scan_read_numpy</code><span class="sig-paren">(</span><em>samples_per_channel</em>, <em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_read_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read scan status and data (as a NumPy array).</p>
+<p>This function is similar to <a class="reference internal" href="#daqhats.mcc118.a_in_scan_read" title="daqhats.mcc118.a_in_scan_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_read()</span></code></a> except that the
+<em>data</em> key in the returned namedtuple is a NumPy array of float64 values
+and may be used directly with NumPy functions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>samples_per_channel</strong> (<em>int</em>) – The number of samples per channel to read
+from the scan buffer.  Specify a negative number to read all
+available samples or 0 to only read the scan status and return
+no data.</li>
+<li><strong>timeout</strong> (<em>float</em>) – The amount of time in seconds to wait for the
+samples to be read.  Specify a negative number to wait
+indefinitely, or 0 to return immediately with the samples that
+are already in the scan buffer.  If the timeout is met and the
+specified number of samples have not been read, then the
+function will return with the amount that has been read and the
+timeout status set.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>a namedtuple containing the following field names:</p>
+<ul class="simple">
+<li><strong>running</strong> (bool): True if the scan is running, False if it has
+stopped or completed.</li>
+<li><strong>hardware_overrun</strong> (bool): True if the hardware could not
+acquire and unload samples fast enough and data was lost.</li>
+<li><strong>buffer_overrun</strong> (bool): True if the background scan buffer was
+not read fast enough and data was lost.</li>
+<li><strong>triggered</strong> (bool): True if the trigger conditions have been met
+and data acquisition started.</li>
+<li><strong>timeout</strong> (bool): True if the timeout time expired before the
+specified number of samples were read.</li>
+<li><strong>data</strong> (NumPy array of float64): The data that was read from the
+scan buffer.</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">namedtuple</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – A scan is not active, the board is not initialized, does
+not respond, or responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – Incorrect argument.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_channel_count">
+<code class="descname">a_in_scan_channel_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_channel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the number of channels in the current analog input scan.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the number of channels (0 if no scan is active, 1-8 otherwise)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_stop">
+<code class="descname">a_in_scan_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an analog input scan.</p>
+<p>The device stops acquiring data immediately. The scan data that has been
+read into the scan buffer is available until
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_cleanup" title="daqhats.mcc118.a_in_scan_cleanup"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_cleanup()</span></code></a> is called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.a_in_scan_cleanup">
+<code class="descname">a_in_scan_cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.a_in_scan_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free analog input scan resources after the scan is complete.</p>
+<p>This will free the scan buffer and other resources used by the
+background scan and make it possible to start another scan with
+<a class="reference internal" href="#daqhats.mcc118.a_in_scan_start" title="daqhats.mcc118.a_in_scan_start"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_scan_start()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc118.address">
+<code class="descname">address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the device address.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="c.html" class="btn btn-neutral" title="C Library Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Measurement Computing.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

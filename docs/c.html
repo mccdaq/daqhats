@@ -1,0 +1,1121 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C Library Reference &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Python Library Reference" href="python.html" />
+    <link rel="prev" title="Installing and Using the Library" href="install.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing and Using the Library</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">C Library Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-functions-and-data">Global functions and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-types-and-definitions">Data types and definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hat-ids">HAT IDs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#result-codes">Result Codes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hatinfo-structure">HatInfo structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#analog-input-scan-option-flags">Analog Input / Scan Option Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-118-functions-and-data">MCC 118 functions and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-definitions">Data definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#device-info">Device Info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trigger-modes">Trigger Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#scan-status-flags">Scan Status Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MCC DAQ HAT Library</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>C Library Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/c.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="c-library-reference">
+<h1>C Library Reference<a class="headerlink" href="#c-library-reference" title="Permalink to this headline">¶</a></h1>
+<p>The C library is organized as a global function for listing the DAQ HAT boards attached
+to your system, and board-specific functions to provide full functionality for each
+type of board.  The library may be used with C and C++.</p>
+<div class="section" id="global-functions-and-data">
+<h2>Global functions and data<a class="headerlink" href="#global-functions-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Function</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.hat_list" title="hat_list"><code class="xref c c-func docutils literal notranslate"><span class="pre">hat_list()</span></code></a></td>
+<td>Return a list of detected DAQ HAT boards.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.hat_error_message" title="hat_error_message"><code class="xref c c-func docutils literal notranslate"><span class="pre">hat_error_message()</span></code></a></td>
+<td>Return a text description for a DAQ HAT result.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="c.hat_list">
+<span class="target" id="daqhats_8h_1ab23b9501c36d525c9a9a642c7885bd06"></span>int <code class="descname">hat_list</code><span class="sig-paren">(</span>uint16_t<em>&nbsp;filter_id</em>, struct  <a class="reference internal" href="#c.HatInfo" title="HatInfo">HatInfo</a>  *<em>&nbsp;list</em><span class="sig-paren">)</span><a class="headerlink" href="#c.hat_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of detected DAQ HAT boards.</p>
+<p>It creates the list from the DAQ HAT EEPROM files that are currently on the system. In the case of a single DAQ HAT at address 0 this information is automatically provided by Raspbian. However, when you have a stack of multiple boards you must extract the EEPROM images using the <strong>daqhats_read_eeproms</strong> tool.</p>
+<p>Example usage: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">count</span> <span class="o">=</span> <span class="n">hat_list</span><span class="p">(</span><span class="n">HAT_ID_ANY</span><span class="p">,</span> <span class="n">NULL</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">struct</span> <span class="n">HatInfo</span><span class="o">*</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">(</span><span class="n">struct</span> <span class="n">HatInfo</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> 
+        <span class="n">sizeof</span><span class="p">(</span><span class="n">struct</span> <span class="n">HatInfo</span><span class="p">));</span>
+    <span class="n">hat_list</span><span class="p">(</span><span class="n">HAT_ID_ANY</span><span class="p">,</span> <span class="nb">list</span><span class="p">);</span>
+
+    <span class="o">//</span> <span class="n">perform</span> <span class="n">actions</span> <span class="k">with</span> <span class="nb">list</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="nb">list</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>The number of boards found. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">filter_id</span></code>: An optional <a class="reference internal" href="#daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8"><span class="std std-ref">ID</span></a> filter to only return boards with a specific ID. Use <a class="reference internal" href="#daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8a52d705896d388224ec9cac80d44ccc3c"><span class="std std-ref">HAT_ID_ANY</span></a> to return all boards. </li>
+<li><code class="docutils literal notranslate"><span class="pre">list</span></code>: A pointer to a user-allocated array of struct <a class="reference internal" href="#structHatInfo"><span class="std std-ref">HatInfo</span></a>. The function will fill the structures with information about the detected boards. You may have an array of the maximum number of boards (<a class="reference internal" href="#daqhats_8h_1af19d06df1dc47bdbc0206b8fc7ad7c4d"><span class="std std-ref">MAX_NUMBER_HATS</span></a>) or call this function while passing NULL for list, which will return the count of boards found, then allocate the correct amount of memory and call this function again with a valid pointer. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.hat_error_message">
+<span class="target" id="daqhats_8h_1ab0c4d9e2f684598fb95239d3b9019e5b"></span>const char* <code class="descname">hat_error_message</code><span class="sig-paren">(</span>int<em>&nbsp;result</em><span class="sig-paren">)</span><a class="headerlink" href="#c.hat_error_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a text description for a DAQ HAT result code.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>The error message. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">result</span></code>: The <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a> returned from a DAQ HAT function </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="data-types-and-definitions">
+<h3>Data types and definitions<a class="headerlink" href="#data-types-and-definitions" title="Permalink to this headline">¶</a></h3>
+<dl class="define">
+<dt id="c.MAX_NUMBER_HATS">
+<span class="target" id="daqhats_8h_1af19d06df1dc47bdbc0206b8fc7ad7c4d"></span><code class="descname">MAX_NUMBER_HATS</code> 8<a class="headerlink" href="#c.MAX_NUMBER_HATS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum number of DAQ HATs that may be connected. </p>
+</dd></dl>
+
+<div class="section" id="hat-ids">
+<h4>HAT IDs<a class="headerlink" href="#hat-ids" title="Permalink to this headline">¶</a></h4>
+<dl class="enum">
+<dt id="c.HatIDs">
+<span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8"></span><em class="property">enum </em><code class="descname">HatIDs</code><a class="headerlink" href="#c.HatIDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Known DAQ HAT IDs. </p>
+<p><em>Values:</em></p>
+<dl class="enumvalue">
+<dt id="c.HAT_ID_ANY">
+<span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8a52d705896d388224ec9cac80d44ccc3c"></span><code class="descname">HAT_ID_ANY</code> = 0<a class="headerlink" href="#c.HAT_ID_ANY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Match any DAQ HAT ID in <a class="reference internal" href="#daqhats_8h_1ab23b9501c36d525c9a9a642c7885bd06"><span class="std std-ref">hat_list()</span></a>. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.HAT_ID_MCC_118">
+<span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8a8f4ccb8e4e08760f13f50109654615e4"></span><code class="descname">HAT_ID_MCC_118</code> = 0x0142<a class="headerlink" href="#c.HAT_ID_MCC_118" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 118 ID. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.HAT_ID_MCC_118_BOOTLOADER">
+<span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8a37746a1d99f0112b16de95479eef7e19"></span><code class="descname">HAT_ID_MCC_118_BOOTLOADER</code> = 0x8142<a class="headerlink" href="#c.HAT_ID_MCC_118_BOOTLOADER" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 118 in firmware update mode ID. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="result-codes">
+<h4>Result Codes<a class="headerlink" href="#result-codes" title="Permalink to this headline">¶</a></h4>
+<dl class="enum">
+<dt id="c.ResultCode">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"></span><em class="property">enum </em><code class="descname">ResultCode</code><a class="headerlink" href="#c.ResultCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return values from the library functions. </p>
+<p><em>Values:</em></p>
+<dl class="enumvalue">
+<dt id="c.RESULT_SUCCESS">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"></span><code class="descname">RESULT_SUCCESS</code> = 0<a class="headerlink" href="#c.RESULT_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Success, no errors. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_BAD_PARAMETER">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"></span><code class="descname">RESULT_BAD_PARAMETER</code> = -1<a class="headerlink" href="#c.RESULT_BAD_PARAMETER" title="Permalink to this definition">¶</a></dt>
+<dd><p>A parameter passed to the function was incorrect. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_BUSY">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"></span><code class="descname">RESULT_BUSY</code> = -2<a class="headerlink" href="#c.RESULT_BUSY" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device is busy. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_TIMEOUT">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4ad02c8491b0eab6eab286a00466993805"></span><code class="descname">RESULT_TIMEOUT</code> = -3<a class="headerlink" href="#c.RESULT_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>There was a timeout accessing a resource. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_LOCK_TIMEOUT">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a54f89f36abc33dd9988bab6f2593d09e"></span><code class="descname">RESULT_LOCK_TIMEOUT</code> = -4<a class="headerlink" href="#c.RESULT_LOCK_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>There was a timeout while obtaining a resource lock. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_INVALID_DEVICE">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a2e885005d4bd08f56d98408cc346d7e2"></span><code class="descname">RESULT_INVALID_DEVICE</code> = -5<a class="headerlink" href="#c.RESULT_INVALID_DEVICE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device at the specified address is not the correct type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_RESOURCE_UNAVAIL">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a64760672ed06a947256c161076afac6a"></span><code class="descname">RESULT_RESOURCE_UNAVAIL</code> = -6<a class="headerlink" href="#c.RESULT_RESOURCE_UNAVAIL" title="Permalink to this definition">¶</a></dt>
+<dd><p>A needed resource was not available. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.RESULT_UNDEFINED">
+<span class="target" id="daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4aee38f3e4015c3c821852c2c14304770a"></span><code class="descname">RESULT_UNDEFINED</code> = -10<a class="headerlink" href="#c.RESULT_UNDEFINED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Some other error occurred. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hatinfo-structure">
+<h4>HatInfo structure<a class="headerlink" href="#hatinfo-structure" title="Permalink to this headline">¶</a></h4>
+<dl class="struct">
+<dt id="c.HatInfo">
+<span class="target" id="structHatInfo"></span><em class="property">struct </em><code class="descname">HatInfo</code><a class="headerlink" href="#c.HatInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Contains information about a specific board. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="variable">
+<dt id="c.HatInfo::address">
+<span class="target" id="structHatInfo_1a87bec040f5902f07afa5a6c1fc657ba7"></span>uint8_t <code class="descname">address</code><a class="headerlink" href="#c.HatInfo::address" title="Permalink to this definition">¶</a></dt>
+<dd><p>The board address. </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.HatInfo::id">
+<span class="target" id="structHatInfo_1ab192616ceed94f52e15151cf49e19732"></span>uint16_t <code class="descname">id</code><a class="headerlink" href="#c.HatInfo::id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The product ID, one of <a class="reference internal" href="#daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8"><span class="std std-ref">HatIDs</span></a>. </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.HatInfo::version">
+<span class="target" id="structHatInfo_1a757ca79387cf8113ed440d03f76f103a"></span>uint16_t <code class="descname">version</code><a class="headerlink" href="#c.HatInfo::version" title="Permalink to this definition">¶</a></dt>
+<dd><p>The hardware version. </p>
+</dd></dl>
+
+<dl class="variable">
+<dt>
+<span class="target" id="structHatInfo_1a8b6a099796d7eb2d4a298537d4aaf333"></span><code class="descname">char HatInfo::product_name[256]</code></dt>
+<dd><p>The product name. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="analog-input-scan-option-flags">
+<h4>Analog Input / Scan Option Flags<a class="headerlink" href="#analog-input-scan-option-flags" title="Permalink to this headline">¶</a></h4>
+<p>See individual function documentation for detailed usage information.</p>
+<dl class="define">
+<dt id="c.OPTS_DEFAULT">
+<span class="target" id="daqhats_8h_1ac3262ea2b2658ce9d272e6b1246edd35"></span><code class="descname">OPTS_DEFAULT</code> (0x0000)<a class="headerlink" href="#c.OPTS_DEFAULT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default behavior. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OPTS_NOSCALEDATA">
+<span class="target" id="daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"></span><code class="descname">OPTS_NOSCALEDATA</code> (0x0001)<a class="headerlink" href="#c.OPTS_NOSCALEDATA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read / write unscaled data. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OPTS_NOCALIBRATEDATA">
+<span class="target" id="daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"></span><code class="descname">OPTS_NOCALIBRATEDATA</code> (0x0002)<a class="headerlink" href="#c.OPTS_NOCALIBRATEDATA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read / write uncalibrated data. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OPTS_EXTCLOCK">
+<span class="target" id="daqhats_8h_1a385c1e54c5caa4ddaab2bbed18a974a8"></span><code class="descname">OPTS_EXTCLOCK</code> (0x0004)<a class="headerlink" href="#c.OPTS_EXTCLOCK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use an external clock source. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OPTS_EXTTRIGGER">
+<span class="target" id="daqhats_8h_1aa2c6cc0f41865f0885ab83c6aa446dc1"></span><code class="descname">OPTS_EXTTRIGGER</code> (0x0008)<a class="headerlink" href="#c.OPTS_EXTTRIGGER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use an external trigger source. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OPTS_CONTINUOUS">
+<span class="target" id="daqhats_8h_1af34e1d3813b5909d7b8bf3012a2d829a"></span><code class="descname">OPTS_CONTINUOUS</code> (0x0010)<a class="headerlink" href="#c.OPTS_CONTINUOUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run until explicitly stopped. </p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="mcc-118-functions-and-data">
+<h2>MCC 118 functions and data<a class="headerlink" href="#mcc-118-functions-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="45%" />
+<col width="55%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Function</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_open" title="mcc118_open"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_open()</span></code></a></td>
+<td>Open an MCC 118 for use.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_is_open" title="mcc118_is_open"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_is_open()</span></code></a></td>
+<td>Check if an MCC 118 is open.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_close" title="mcc118_close"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_close()</span></code></a></td>
+<td>Close an MCC 118.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_info" title="mcc118_info"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_info()</span></code></a></td>
+<td>Return information about this device type.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_blink_led" title="mcc118_blink_led"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_blink_led()</span></code></a></td>
+<td>Blink the MCC 118 LED.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_firmware_version" title="mcc118_firmware_version"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_firmware_version()</span></code></a></td>
+<td>Get the firmware version.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_serial" title="mcc118_serial"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_serial()</span></code></a></td>
+<td>Read the serial number.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_calibration_date" title="mcc118_calibration_date"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_calibration_date()</span></code></a></td>
+<td>Read the calibration date.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_calibration_coefficient_read" title="mcc118_calibration_coefficient_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_calibration_coefficient_read()</span></code></a></td>
+<td>Read the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_calibration_coefficient_write" title="mcc118_calibration_coefficient_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_calibration_coefficient_write()</span></code></a></td>
+<td>Write the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_a_in_read" title="mcc118_a_in_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_read()</span></code></a></td>
+<td>Read an analog input value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_trigger_mode" title="mcc118_trigger_mode"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_trigger_mode()</span></code></a></td>
+<td>Set the external trigger input mode.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_a_in_scan_actual_rate" title="mcc118_a_in_scan_actual_rate"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_actual_rate()</span></code></a></td>
+<td>Read the actual sample rate for a set of scan parameters.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_a_in_scan_start" title="mcc118_a_in_scan_start"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_start()</span></code></a></td>
+<td>Start a hardware-paced analog input scan.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_a_in_scan_buffer_size" title="mcc118_a_in_scan_buffer_size"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_buffer_size()</span></code></a></td>
+<td>Read the size of the internal scan data buffer.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_a_in_scan_status" title="mcc118_a_in_scan_status"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_status()</span></code></a></td>
+<td>Read the scan status.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_a_in_scan_read" title="mcc118_a_in_scan_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_read()</span></code></a></td>
+<td>Read scan data and status.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_a_in_scan_channel_count" title="mcc118_a_in_scan_channel_count"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_channel_count()</span></code></a></td>
+<td>Get the number of channels in the current scan.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc118_a_in_scan_stop" title="mcc118_a_in_scan_stop"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_stop()</span></code></a></td>
+<td>Stop the scan.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc118_a_in_scan_cleanup" title="mcc118_a_in_scan_cleanup"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc118_a_in_scan_cleanup()</span></code></a></td>
+<td>Free scan resources.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="c.mcc118_open">
+<span class="target" id="mcc118_8h_1a362f81b0b71d81f7ee1379daa133cac5"></span>int <code class="descname">mcc118_open</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a connection to the MCC 118 device at the specified address. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_close">
+<span class="target" id="mcc118_8h_1a0b597685173dc113d85f78fe80a8120b"></span>int <code class="descname">mcc118_close</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close a connection to an MCC 118 device and free allocated resources. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_is_open">
+<span class="target" id="mcc118_8h_1a3e051e655911d8227fdeb5f540336622"></span>int <code class="descname">mcc118_is_open</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if an MCC 118 is open. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>1 if open, 0 if not open. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_info">
+<span class="target" id="mcc118_8h_1a598d4c30d18daf37ccb66b71011b0c6b"></span>struct <a class="reference internal" href="#c.MCC118DeviceInfo" title="MCC118DeviceInfo">MCC118DeviceInfo</a>* <code class="descname">mcc118_info</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant device information for all MCC 118s. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>Pointer to struct <a class="reference internal" href="#structMCC118DeviceInfo"><span class="std std-ref">MCC118DeviceInfo</span></a>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_blink_led">
+<span class="target" id="mcc118_8h_1a199973ec117aa99fd4ef6e8a004a2476"></span>int <code class="descname">mcc118_blink_led</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;count</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_blink_led" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blink the LED on the MCC 118. </p>
+<p>Passing 0 for count will result in the LED blinking continuously until the board is reset or <a class="reference internal" href="#mcc118_8h_1a199973ec117aa99fd4ef6e8a004a2476"><span class="std std-ref">mcc118_blink_led()</span></a> is called again with a non-zero value for count.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+<li><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of times to blink (0 - 255). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_firmware_version">
+<span class="target" id="mcc118_8h_1a9ab8c7d2d23848158879e3fb6001e475"></span>int <code class="descname">mcc118_firmware_version</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint16_t *<em>&nbsp;version</em>, uint16_t *<em>&nbsp;boot_version</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_firmware_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the board firmware and bootloader versions. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">version</span></code>: Receives the firmware version. The version will be in BCD hexadecimal with the high byte as the major version and low byte as minor, i.e. 0x0103 is version 1.03. </li>
+<li><code class="docutils literal notranslate"><span class="pre">boot_version</span></code>: Receives the bootloader version. The version will be in BCD hexadecimal as above. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_serial">
+<span class="target" id="mcc118_8h_1a5fa34219e9193e9e2c6e4f7e3377c0fb"></span>int <code class="descname">mcc118_serial</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, char *<em>&nbsp;buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 118 serial number. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer</span></code>: Pass a user-allocated buffer pointer to receive the serial number as a string. The buffer must be at least 9 characters in length. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_calibration_date">
+<span class="target" id="mcc118_8h_1adcdbc31afb9bc75cb25b43b8e58f30c6"></span>int <code class="descname">mcc118_calibration_date</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, char *<em>&nbsp;buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_calibration_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 118 calibration date. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer</span></code>: Pass a user-allocated buffer pointer to receive the date as a string (format “YYYY-MM-DD”). The buffer must be at least 11 characters in length. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_calibration_coefficient_read">
+<span class="target" id="mcc118_8h_1a5fe0ea8151d227e3577ea3ce2cb70868"></span>int <code class="descname">mcc118_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 118 calibration coefficients for a single channel. </p>
+<p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 7). </li>
+<li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: Receives the slope. </li>
+<li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: Receives the offset. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_calibration_coefficient_write">
+<span class="target" id="mcc118_8h_1a305cd3c6eef75521f7807a89927c86d9"></span>int <code class="descname">mcc118_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily write the MCC 118 calibration coefficients for a single channel. </p>
+<p>The user can apply their own calibration coefficients by writing to these values. The values will reset to the factory values from the EEPROM whenever <a class="reference internal" href="#mcc118_8h_1a362f81b0b71d81f7ee1379daa133cac5"><span class="std std-ref">mcc118_open()</span></a> is called. This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
+<p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 7). </li>
+<li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: The new slope value. </li>
+<li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: The new offset value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_read">
+<span class="target" id="mcc118_8h_1a2f1b2738ed0f5d9ceca081f6c6deb2e6"></span>int <code class="descname">mcc118_a_in_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint32_t<em>&nbsp;options</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a single reading of an analog input channel and return the value. </p>
+<p>The valid options are:<ul class="simple">
+<li><a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a>: Return ADC code (a value between 0 and 4095) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a>: Return data without the calibration factors applied.</li>
+</ul>
+</p>
+<p>The options parameter is set to 0 or <a class="reference internal" href="#daqhats_8h_1ac3262ea2b2658ce9d272e6b1246edd35"><span class="std std-ref">OPTS_DEFAULT</span></a> for default operation, which is scaled and calibrated data.</p>
+<p>Multiple options may be specified by ORing the flags. For instance, specifying <a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a> | <a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a> will return the value read from the ADC without calibration or converting to voltage.</p>
+<p>The function will return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if called while a scan is running.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number, 0 - 7. </li>
+<li><code class="docutils literal notranslate"><span class="pre">options</span></code>: Options bitmask. </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the analog input value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_trigger_mode">
+<span class="target" id="mcc118_8h_1a943125e28d900d64542d7957081a3f64"></span>int <code class="descname">mcc118_trigger_mode</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_trigger_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the trigger input mode. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: One of the <a class="reference internal" href="#mcc118_8h_1aa534ed76b07c3983382a53e00e53e94a"><span class="std std-ref">trigger mode</span></a> values. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_actual_rate">
+<span class="target" id="mcc118_8h_1a86fe5bed532f934cf55f6a2b17e803c2"></span>int <code class="descname">mcc118_a_in_scan_actual_rate</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;channel_count</em>, double<em>&nbsp;sample_rate_per_channel</em>, double *<em>&nbsp;actual_sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_actual_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the actual sample rate per channel for a requested sample rate. </p>
+<p>The internal scan clock is generated from a 16 MHz clock source so only discrete frequency steps can be achieved. This function will return the actual rate for a requested channel count and rate. This function does not perform any actions with a board, it simply calculates the rate.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"><span class="std std-ref">RESULT_BAD_PARAMETER</span></a> if the scan parameters are not achievable on an MCC 118. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">channel_count</span></code>: The number of channels in the scan. </li>
+<li><code class="docutils literal notranslate"><span class="pre">sample_rate_per_channel</span></code>: The desired sampling rate in samples per second per channel, max 100,000. </li>
+<li><code class="docutils literal notranslate"><span class="pre">actual_sample_rate_per_channel</span></code>: The actual sample rate that would occur when requesting this rate on an MCC 118, or 0 if there is an error. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_start">
+<span class="target" id="mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"></span>int <code class="descname">mcc118_a_in_scan_start</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel_mask</em>, uint32_t<em>&nbsp;samples_per_channel</em>, double<em>&nbsp;sample_rate_per_channel</em>, uint32_t<em>&nbsp;options</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a hardware-paced analog input scan. </p>
+<p>The scan runs as a separate thread from the user’s code. The function will allocate a scan buffer and read data from the device into that buffer. The user reads the data from this buffer and the scan status using the <a class="reference internal" href="#mcc118_8h_1a1056c2b90b530ce6d0729d8ddb760662"><span class="std std-ref">mcc118_a_in_scan_read()</span></a> function. <a class="reference internal" href="#mcc118_8h_1a361841e611dfe77ad25a49f102f3bbcd"><span class="std std-ref">mcc118_a_in_scan_stop()</span></a> is used to stop a continuous scan, or to stop a finite scan before it completes. The user must call <a class="reference internal" href="#mcc118_8h_1ab11473109120c4734e43b340712972f3"><span class="std std-ref">mcc118_a_in_scan_cleanup()</span></a> after the scan has finished and all desired data has been read; this frees all resources from the scan and allows additional scans to be performed.</p>
+<p>The scan state has defined terminology:<ul class="simple">
+<li><strong>Active:</strong> <a class="reference internal" href="#mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"><span class="std std-ref">mcc118_a_in_scan_start()</span></a> has been called and the device may be acquiring data or finished with the acquisition. The scan has not been cleaned up by calling <a class="reference internal" href="#mcc118_8h_1ab11473109120c4734e43b340712972f3"><span class="std std-ref">mcc118_a_in_scan_cleanup()</span></a>, so another scan may not be started.</li>
+<li><strong>Running:</strong> The scan is active and the device is still acquiring data. Certain functions like <a class="reference internal" href="#mcc118_8h_1a2f1b2738ed0f5d9ceca081f6c6deb2e6"><span class="std std-ref">mcc118_a_in_read()</span></a> will return an error because the device is busy.</li>
+</ul>
+</p>
+<p>The valid options are:<ul class="simple">
+<li><a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a>: Returns ADC code (a value between 0 and 4095) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a>: Return data without the calibration factors applied.</li>
+<li><a class="reference internal" href="#daqhats_8h_1a385c1e54c5caa4ddaab2bbed18a974a8"><span class="std std-ref">OPTS_EXTCLOCK</span></a>: Use an external 3.3V or 5V logic signal at the CLK input as the scan clock. Multiple devices can be synchronized by connecting the CLK pins together and using this option on all but one device so they will be clocked by the single device using its internal clock. <strong>sample_rate_per_channel</strong> is only used for buffer sizing.</li>
+<li><a class="reference internal" href="#daqhats_8h_1aa2c6cc0f41865f0885ab83c6aa446dc1"><span class="std std-ref">OPTS_EXTTRIGGER</span></a>: Hold off the scan (after calling <a class="reference internal" href="#mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"><span class="std std-ref">mcc118_a_in_scan_start()</span></a>) until the trigger condition is met. The trigger is a 3.3V or 5V logic signal applied to the TRIG pin.</li>
+<li><a class="reference internal" href="#daqhats_8h_1af34e1d3813b5909d7b8bf3012a2d829a"><span class="std std-ref">OPTS_CONTINUOUS</span></a>: Scans continuously until stopped by the user by calling <a class="reference internal" href="#mcc118_8h_1a361841e611dfe77ad25a49f102f3bbcd"><span class="std std-ref">mcc118_a_in_scan_stop()</span></a> and writes data to a circular buffer. The data must be read before being overwritten to avoid a buffer overrun error. <strong>samples_per_channel</strong> is only used for buffer sizing.</li>
+</ul>
+</p>
+<p>The options parameter is set to 0 or <a class="reference internal" href="#daqhats_8h_1ac3262ea2b2658ce9d272e6b1246edd35"><span class="std std-ref">OPTS_DEFAULT</span></a> for default operation, which is scaled and calibrated data, internal scan clock, no trigger, and finite operation.</p>
+<p>Multiple options may be specified by ORing the flags. For instance, specifying <a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a> | <a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a> will return the values read from the ADC without calibration or converting to voltage.</p>
+<p>The buffer size will be allocated as follows:</p>
+<p><strong>Finite</strong> mode: Total number of samples in the scan</p>
+<p><strong>Continuous</strong> mode (buffer size is per channel): Either <strong>samples_per_channel</strong> or the value in the following table, whichever is greater</p>
+<p><table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Sample Rate</th>
+<th class="head">Buffer Size (per channel)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Not specified</td>
+<td>10 kS</td>
+</tr>
+<tr class="row-odd"><td>0-100 S/s</td>
+<td>1 kS</td>
+</tr>
+<tr class="row-even"><td>100-10k S/s</td>
+<td>10 kS</td>
+</tr>
+<tr class="row-odd"><td>10k-100k S/s</td>
+<td>100 kS</td>
+</tr>
+</tbody>
+</table>
+</p>
+<p>Specifying a very large value for <strong>samples_per_channel</strong> could use too much of the Raspberry Pi memory. If the memory allocation fails, the function will return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a64760672ed06a947256c161076afac6a"><span class="std std-ref">RESULT_RESOURCE_UNAVAIL</span></a>. The allocation could succeed, but the lack of free memory could cause other problems in the Raspberry Pi. If you need to acquire a high number of samples then it is better to run the scan in continuous mode and stop it when you have acquired the desired amount of data. If a scan is already active this function will return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is already active. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel_mask</span></code>: A bit mask of the channels to be scanned. Set each bit to enable the associated channel (0x01 - 0xFF.) </li>
+<li><code class="docutils literal notranslate"><span class="pre">samples_per_channel</span></code>: The number of samples to acquire for each channel in the scan (finite mode,) or can be used to set a larger scan buffer size than the default value (continuous mode.) </li>
+<li><code class="docutils literal notranslate"><span class="pre">sample_rate_per_channel</span></code>: The sampling rate in samples per second per channel, max 100,000. When using an external sample clock set this value to the maximum expected rate of the clock. </li>
+<li><code class="docutils literal notranslate"><span class="pre">options</span></code>: The options bitmask. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_buffer_size">
+<span class="target" id="mcc118_8h_1ab51ae2475203cd8fadedfcfc31dd9506"></span>int <code class="descname">mcc118_a_in_scan_buffer_size</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint32_t *<em>&nbsp;buffer_size_samples</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_buffer_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of the internal scan data buffer. </p>
+<p>An internal data buffer is allocated for the scan when <a class="reference internal" href="#mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"><span class="std std-ref">mcc118_a_in_scan_start()</span></a> is called. This function returns the total size of that buffer in samples.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a64760672ed06a947256c161076afac6a"><span class="std std-ref">RESULT_RESOURCE_UNAVAIL</span></a> if a scan is not currently active, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"><span class="std std-ref">RESULT_BAD_PARAMETER</span></a> if the address is invalid or buffer_size_samples is NULL. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer_size_samples</span></code>: Receives the size of the buffer in samples. Each sample is a <strong>double</strong>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_status">
+<span class="target" id="mcc118_8h_1a81652d8ff8fd4efcea557d8886bbea1e"></span>int <code class="descname">mcc118_a_in_scan_status</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint16_t *<em>&nbsp;status</em>, uint32_t *<em>&nbsp;samples_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads status and number of available samples from an analog input scan. </p>
+<p>The scan is started with <a class="reference internal" href="#mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"><span class="std std-ref">mcc118_a_in_scan_start()</span></a> and runs in a background thread that reads the data from the board into an internal scan buffer. This function reads the status of the scan and amount of data in the scan buffer.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a64760672ed06a947256c161076afac6a"><span class="std std-ref">RESULT_RESOURCE_UNAVAIL</span></a> if a scan has not been started under this instance of the device. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">status</span></code>: Receives the scan status, an ORed combination of the flags:<ul>
+<li><a class="reference internal" href="#mcc118_8h_1a89fa865687f9600cea9b639b7e9a507c"><span class="std std-ref">STATUS_HW_OVERRUN</span></a>: The device scan buffer was not read fast enough and data was lost.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a25928537fb73983bca9c65d869e2cdaf"><span class="std std-ref">STATUS_BUFFER_OVERRUN</span></a>: The thread scan buffer was not read by the user fast enough and data was lost.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a48966b880c7694b5ff8828b02e3b4eb9"><span class="std std-ref">STATUS_TRIGGERED</span></a>: The trigger conditions have been met.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a799b04d03f49612e3e636b56c3972b80"><span class="std std-ref">STATUS_RUNNING</span></a>: The scan is running. </li>
+</ul>
+</li>
+<li><code class="docutils literal notranslate"><span class="pre">samples_per_channel</span></code>: Receives the number of samples per channel available in the scan thread buffer. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_read">
+<span class="target" id="mcc118_8h_1a1056c2b90b530ce6d0729d8ddb760662"></span>int <code class="descname">mcc118_a_in_scan_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint16_t *<em>&nbsp;status</em>, int32_t<em>&nbsp;samples_per_channel</em>, double<em>&nbsp;timeout</em>, double *<em>&nbsp;buffer</em>, uint32_t<em>&nbsp;buffer_size_samples</em>, uint32_t *<em>&nbsp;samples_read_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads status and multiple samples from an analog input scan. </p>
+<p>The scan is started with <a class="reference internal" href="#mcc118_8h_1a7bb6778d908b3513e7e64a1932bf7d38"><span class="std std-ref">mcc118_a_in_scan_start()</span></a> and runs in a background thread that reads the data from the board into an internal scan buffer. This function reads the data from the scan buffer, and returns the current scan status.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a64760672ed06a947256c161076afac6a"><span class="std std-ref">RESULT_RESOURCE_UNAVAIL</span></a> if a scan is not active. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">status</span></code>: Receives the scan status, an ORed combination of the flags:<ul>
+<li><a class="reference internal" href="#mcc118_8h_1a89fa865687f9600cea9b639b7e9a507c"><span class="std std-ref">STATUS_HW_OVERRUN</span></a>: The device scan buffer was not read fast enough and data was lost.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a25928537fb73983bca9c65d869e2cdaf"><span class="std std-ref">STATUS_BUFFER_OVERRUN</span></a>: The thread scan buffer was not read by the user fast enough and data was lost.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a48966b880c7694b5ff8828b02e3b4eb9"><span class="std std-ref">STATUS_TRIGGERED</span></a>: The trigger conditions have been met.</li>
+<li><a class="reference internal" href="#mcc118_8h_1a799b04d03f49612e3e636b56c3972b80"><span class="std std-ref">STATUS_RUNNING</span></a>: The scan is running. </li>
+</ul>
+</li>
+<li><code class="docutils literal notranslate"><span class="pre">samples_per_channel</span></code>: The number of samples per channel to read. Specify <strong>-1</strong> to read all available samples in the scan thread buffer, ignoring <strong>timeout</strong>. If <strong>buffer</strong> does not contain enough space then the function will read as many samples per channel as will fit in <strong>buffer</strong>. </li>
+<li><code class="docutils literal notranslate"><span class="pre">timeout</span></code>: The amount of time in seconds to wait for the samples to be read. Specify a negative number to wait indefinitely or <strong>0</strong> to return immediately with whatever samples are available (up to the value of <strong>samples_per_channel</strong> or <strong>buffer_size_samples</strong>.) </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer</span></code>: The user data buffer that receives the samples. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer_size_samples</span></code>: The size of the buffer in samples. Each sample is a <strong>double</strong>. </li>
+<li><code class="docutils literal notranslate"><span class="pre">samples_read_per_channel</span></code>: Returns the actual number of samples read from each channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_channel_count">
+<span class="target" id="mcc118_8h_1a35206710d53af68e1526314c33851cd1"></span>int <code class="descname">mcc118_a_in_scan_channel_count</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_channel_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of channels in the current analog input scan. </p>
+<p>This function returns 0 if no scan is active.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>The number of channels, 0 - 8. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_stop">
+<span class="target" id="mcc118_8h_1a361841e611dfe77ad25a49f102f3bbcd"></span>int <code class="descname">mcc118_a_in_scan_stop</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops an analog input scan. </p>
+<p>The scan is stopped immediately. The scan data that has been read into the scan buffer is available until <a class="reference internal" href="#mcc118_8h_1ab11473109120c4734e43b340712972f3"><span class="std std-ref">mcc118_a_in_scan_cleanup()</span></a> is called.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc118_a_in_scan_cleanup">
+<span class="target" id="mcc118_8h_1ab11473109120c4734e43b340712972f3"></span>int <code class="descname">mcc118_a_in_scan_cleanup</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc118_a_in_scan_cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Free analog input scan resources after the scan is complete. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="data-definitions">
+<h3>Data definitions<a class="headerlink" href="#data-definitions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="device-info">
+<h4>Device Info<a class="headerlink" href="#device-info" title="Permalink to this headline">¶</a></h4>
+<dl class="struct">
+<dt id="c.MCC118DeviceInfo">
+<span class="target" id="structMCC118DeviceInfo"></span><em class="property">struct </em><code class="descname">MCC118DeviceInfo</code><a class="headerlink" href="#c.MCC118DeviceInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 118 constant device information. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::NUM_AI_CHANNELS">
+<span class="target" id="structMCC118DeviceInfo_1a7716e43e020482c72c668fc96a7e707e"></span>const uint8_t <code class="descname">NUM_AI_CHANNELS</code><a class="headerlink" href="#c.MCC118DeviceInfo::NUM_AI_CHANNELS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of analog input channels (8.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MIN_CODE">
+<span class="target" id="structMCC118DeviceInfo_1a09ae65990c7af02bd16edb6cfeca46ed"></span>const uint16_t <code class="descname">AI_MIN_CODE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MIN_CODE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum ADC code (0.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MAX_CODE">
+<span class="target" id="structMCC118DeviceInfo_1affc62ed9a07615ef044a206380c615ba"></span>const uint16_t <code class="descname">AI_MAX_CODE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MAX_CODE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum ADC code (4095.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MIN_VOLTAGE">
+<span class="target" id="structMCC118DeviceInfo_1a6c9a23e111966e1fa80ee8285d1571af"></span>const double <code class="descname">AI_MIN_VOLTAGE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MIN_VOLTAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The input voltage corresponding to the minimum code (-10.0V.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MAX_VOLTAGE">
+<span class="target" id="structMCC118DeviceInfo_1ae1f2a594c35d377a008793f371af295d"></span>const double <code class="descname">AI_MAX_VOLTAGE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MAX_VOLTAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The input voltage corresponding to the maximum code (+10.0V - 1 LSB.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MIN_RANGE">
+<span class="target" id="structMCC118DeviceInfo_1a0d490a882fc6efa399fec20a6a1c4eb5"></span>const double <code class="descname">AI_MIN_RANGE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MIN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum voltage of the input range (-10.0V.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC118DeviceInfo::AI_MAX_RANGE">
+<span class="target" id="structMCC118DeviceInfo_1a9d7000018484148909d97514251b5a25"></span>const double <code class="descname">AI_MAX_RANGE</code><a class="headerlink" href="#c.MCC118DeviceInfo::AI_MAX_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum voltage of the input range (+10.0V.) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="trigger-modes">
+<h4>Trigger Modes<a class="headerlink" href="#trigger-modes" title="Permalink to this headline">¶</a></h4>
+<dl class="enum">
+<dt id="c.TriggerMode">
+<span class="target" id="mcc118_8h_1aa534ed76b07c3983382a53e00e53e94a"></span><em class="property">enum </em><code class="descname">TriggerMode</code><a class="headerlink" href="#c.TriggerMode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scan trigger input modes. </p>
+<p><em>Values:</em></p>
+<dl class="enumvalue">
+<dt id="c.TRIG_RISING_EDGE">
+<span class="target" id="mcc118_8h_1aa534ed76b07c3983382a53e00e53e94aa1df95eae49cc686aa6b9f91fa13c220b"></span><code class="descname">TRIG_RISING_EDGE</code> = 0<a class="headerlink" href="#c.TRIG_RISING_EDGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan on a rising edge of TRIG. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TRIG_FALLING_EDGE">
+<span class="target" id="mcc118_8h_1aa534ed76b07c3983382a53e00e53e94aaa008e9300e76a51f4c60fd9bf2ae5546"></span><code class="descname">TRIG_FALLING_EDGE</code> = 1<a class="headerlink" href="#c.TRIG_FALLING_EDGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan on a falling edge of TRIG. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TRIG_ACTIVE_HIGH">
+<span class="target" id="mcc118_8h_1aa534ed76b07c3983382a53e00e53e94aa3f701a26940df0c263d230b753f61274"></span><code class="descname">TRIG_ACTIVE_HIGH</code> = 2<a class="headerlink" href="#c.TRIG_ACTIVE_HIGH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan any time TRIG is high. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TRIG_ACTIVE_LOW">
+<span class="target" id="mcc118_8h_1aa534ed76b07c3983382a53e00e53e94aa95176a26d99fad97d400764990a71c0b"></span><code class="descname">TRIG_ACTIVE_LOW</code> = 3<a class="headerlink" href="#c.TRIG_ACTIVE_LOW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the scan any time TRIG is low. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="scan-status-flags">
+<h4>Scan Status Flags<a class="headerlink" href="#scan-status-flags" title="Permalink to this headline">¶</a></h4>
+<dl class="define">
+<dt id="c.STATUS_HW_OVERRUN">
+<span class="target" id="mcc118_8h_1a89fa865687f9600cea9b639b7e9a507c"></span><code class="descname">STATUS_HW_OVERRUN</code> (0x0001)<a class="headerlink" href="#c.STATUS_HW_OVERRUN" title="Permalink to this definition">¶</a></dt>
+<dd><p>A hardware overrun occurred. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.STATUS_BUFFER_OVERRUN">
+<span class="target" id="mcc118_8h_1a25928537fb73983bca9c65d869e2cdaf"></span><code class="descname">STATUS_BUFFER_OVERRUN</code> (0x0002)<a class="headerlink" href="#c.STATUS_BUFFER_OVERRUN" title="Permalink to this definition">¶</a></dt>
+<dd><p>A scan buffer overrun occurred. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.STATUS_TRIGGERED">
+<span class="target" id="mcc118_8h_1a48966b880c7694b5ff8828b02e3b4eb9"></span><code class="descname">STATUS_TRIGGERED</code> (0x0004)<a class="headerlink" href="#c.STATUS_TRIGGERED" title="Permalink to this definition">¶</a></dt>
+<dd><p>The trigger event occurred. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.STATUS_RUNNING">
+<span class="target" id="mcc118_8h_1a799b04d03f49612e3e636b56c3972b80"></span><code class="descname">STATUS_RUNNING</code> (0x0008)<a class="headerlink" href="#c.STATUS_RUNNING" title="Permalink to this definition">¶</a></dt>
+<dd><p>The scan is running (actively acquiring data.) </p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="python.html" class="btn btn-neutral float-right" title="Python Library Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Installing and Using the Library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Measurement Computing.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
