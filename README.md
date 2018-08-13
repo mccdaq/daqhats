@@ -7,7 +7,7 @@
 </table>
 
 ## About
-This is the development repository for Measurement Computing DAQ HAT boards. The
+This is the repository for Measurement Computing DAQ HAT boards. The
 **daqhats** library was created and is supported by Measurement Computing Corporation (MCC).
 
 #### Supported MCC DAQ HAT hardware
