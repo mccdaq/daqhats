@@ -10,11 +10,9 @@ single client.
 - Plotly: an interactive, browser-based graphing library for Python
 
 Enter the following commands to install the dependencies. 
-Install pip first if it is not already installed, then install Dash and Plotly.
 
    ```
-   sudo apt-get install python-pip
-   pip install dash dash-renderer dash-html-components dash-core-components plotly  
+   pip install dash dash-renderer dash-html-components dash-core-components  
    ```
 
 ## Start the web server

@@ -6,7 +6,6 @@ from a MCC 118 DAQ HAT device for a single client.  It makes use of the Dash
 Python framework for web-based interfaces and a plotly graph.  To install the
 dependencies for this example, run:
    $ pip install dash dash-renderer dash-html-components dash-core-components
-   $ pip install plotly
 
 Running this example:
 1. Start the server by running the web_server.py module in a terminal.
