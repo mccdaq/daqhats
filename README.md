@@ -22,7 +22,7 @@ Hardware supported by this version of the MCC DAQ HAT Library:
 ## Raspberry Pi Configuration
 Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Raspberry Pi.
 
-## Build Instructions
+## Install Instructions
 1. Power off the Raspberry Pi and attach one or more DAQ HAT boards, using unique 
    address settings for each. Refer to 
    [Installing the HAT board](https://mccdaq.github.io/daqhats/hardware.html) 
@@ -31,19 +31,24 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    One board must always be at address 0 to ensure that the OS reads a HAT EEPROM
    and initializes the hardware correctly.
 2. Power on the Pi, log in, and open a terminal window (if using the graphical interface.)
-3. Update your installation packages and install git (if not installed):
+3. Update your installation packages:
 
    ```sh
    sudo apt-get update
+   sudo apt-get dist-upgrade
+   ```
+4. Install git (if not installed):
+
+   ```sh
    sudo apt-get install git
    ```
-4. Download the daqhats library to the root of your home folder:
+5. Download the daqhats library to the root of your home folder:
 
    ```sh
    cd ~
    git clone https://github.com/mccdaq/daqhats.git
    ```
-5. Build and install the shared library, tools, and optional Python support. The 
+6. Build and install the shared library, tools, and optional Python support. The 
    installer will ask if you want to install Python 2 and Python 3 support. It 
    will also detect the HAT board EEPROMs and save the contents, if needed.
 
@@ -51,7 +56,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    cd ~/daqhats
    sudo ./install.sh
    ```   
-6. [Optional] Use the firmware update tool to update the firmware on your MCC HAT 
+7. [Optional] Use the firmware update tool to update the firmware on your MCC HAT 
    board. The "0" in the example below is the board address. Repeat the command for
    each MCC 118 address in your board stack. This example demonstrates how to update 
    the firmware on the MCC 118 HAT that is installed at address 0.

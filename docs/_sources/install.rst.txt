@@ -9,22 +9,26 @@ Installation
 
 1. Power off the Raspberry Pi then attach one or more HAT boards (see :ref:`install`).
 2. Power on the Pi and log in.  Open a terminal window if using the graphical interface.
-3. If git is not already installed, update installation packages and install it::
+3. Upgrade your install packages::
 
     sudo apt-get update
+    sudo apt-get dist-upgrade
+    
+4. If git is not already installed, install it::
+
     sudo apt-get install git
     
-4. Download this package to your user folder with git::
+5. Download this package to your user folder with git::
 
     cd ~
     git clone https://github.com/mccdaq/daqhats
     
-5. Build and install the shared library and optional Python support.  The installer will ask if you want to install Python 2 and Python 3 support.  It will also detect the HAT board EEPROMs and save the contents if needed::
+6. Build and install the shared library and optional Python support.  The installer will ask if you want to install Python 2 and Python 3 support.  It will also detect the HAT board EEPROMs and save the contents if needed::
 
     cd ~/daqhats
     sudo ./install.sh
 
-6. [Optional] To update the firmware on your MCC 118 board(s) use the firmware update tool.  The "0" in the example below is the board address.  Repeat the command for each MCC 118 address in your board stack::
+7. [Optional] To update the firmware on your MCC 118 board(s) use the firmware update tool.  The "0" in the example below is the board address.  Repeat the command for each MCC 118 address in your board stack::
 
     mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
     
