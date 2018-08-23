@@ -30,15 +30,15 @@ echo
 
 # Remove the Python packages
 
-pip2 show daqhats > /dev/null
-if [ "$?" -eq 0 ]; then
+num=$(pip2 show daqhats | wc -l)
+if [ "$num" -ne 0 ]; then
     echo "Removing Python 2 package"
     pip2 uninstall daqhats -y
     echo
 fi
 
-pip3 show daqhats > /dev/null
-if [ "$?" -eq 0 ]; then
+num=$(pip3 show daqhats | wc -l)
+if [ "$num" -ne 0 ]; then
     echo "Removing Python 3 package"
     pip3 uninstall daqhats -y
     echo
