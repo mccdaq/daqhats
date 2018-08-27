@@ -31,24 +31,30 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    One board must always be at address 0 to ensure that the OS reads a HAT EEPROM
    and initializes the hardware correctly.
 2. Power on the Pi, log in, and open a terminal window (if using the graphical interface.)
-3. Update your installation packages:
+3. Update your package list:
 
    ```sh
    sudo apt-get update
-   sudo apt-get dist-upgrade
    ```
-4. Install git (if not installed):
+4. **Optional:** If you get errors in the steps that follow, upgrade your installation packages,
+   reboot, and try again:
+
+   ```sh
+   sudo apt-get dist-upgrade
+   sudo reboot
+   ```
+5. Install git (if not installed):
 
    ```sh
    sudo apt-get install git
    ```
-5. Download the daqhats library to the root of your home folder:
+6. Download the daqhats library to the root of your home folder:
 
    ```sh
    cd ~
    git clone https://github.com/mccdaq/daqhats.git
    ```
-6. Build and install the shared library, tools, and optional Python support. The 
+7. Build and install the shared library, tools, and optional Python support. The 
    installer will ask if you want to install Python 2 and Python 3 support. It 
    will also detect the HAT board EEPROMs and save the contents, if needed.
 
@@ -56,10 +62,10 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    cd ~/daqhats
    sudo ./install.sh
    ```   
-7. [Optional] Use the firmware update tool to update the firmware on your MCC HAT 
-   board. The "0" in the example below is the board address. Repeat the command for
+7. **Optional:** Use the firmware update tool to update the firmware on your MCC 118
+   board(s). The "0" in the example below is the board address. Repeat the command for
    each MCC 118 address in your board stack. This example demonstrates how to update 
-   the firmware on the MCC 118 HAT that is installed at address 0.
+   the firmware on the MCC 118 that is installed at address 0.
 
    ```sh
    mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
