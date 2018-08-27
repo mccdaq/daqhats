@@ -175,8 +175,7 @@
 </pre></div>
 </div>
 </li>
-<li><p class="first"><strong>Optional:</strong> If you get errors in the steps that follow, upgrade your installation packages,
-reboot, and try again:</p>
+<li><p class="first"><strong>Optional:</strong> Update your installed packages and reboot:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">dist</span><span class="o">-</span><span class="n">upgrade</span>
 <span class="n">sudo</span> <span class="n">reboot</span>
 </pre></div>
@@ -208,6 +207,9 @@ the firmware on the MCC 118 that is installed at address 0:</p>
 </div>
 </li>
 </ol>
+<p><strong>Note:</strong> If you encounter any errors during steps 5 - 7 then uininstall the daqhats
+library (if installed), go back to step 4, update your installed packages and reboot,
+then repeat steps 5 - 7.</p>
 <p>You can now run the example programs under ~/daqhats/examples and create your own programs.</p>
 <p>To uninstall the package use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">daqhats</span>

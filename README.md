@@ -36,8 +36,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    ```sh
    sudo apt-get update
    ```
-4. **Optional:** If you get errors in the steps that follow, upgrade your installation packages,
-   reboot, and try again:
+4. **Optional:** Update your installation packages and reboot:
 
    ```sh
    sudo apt-get dist-upgrade
@@ -70,6 +69,11 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    ```sh
    mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
    ```
+   
+**Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
+library (if installed), go back to step 4, update your installed packages and reboot, 
+then repeat steps 5 - 7.
+   
 You can now run the example programs under ~/daqhats/examples and create your own 
 programs. Refer to the [Examples](#examples) section below for more information.
 
