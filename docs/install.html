@@ -170,20 +170,26 @@
 </li>
 <li><p class="first">Power on the Pi and log in.  Open a terminal window if using the graphical interface.</p>
 </li>
-<li><p class="first">Upgrade your install packages:</p>
+<li><p class="first">Update your package list:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">dist</span><span class="o">-</span><span class="n">upgrade</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">If git is not already installed, install it:</p>
+<li><p class="first"><strong>Optional:</strong> If you get errors in the steps that follow, upgrade your installation packages,
+reboot, and try again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">dist</span><span class="o">-</span><span class="n">upgrade</span>
+<span class="n">sudo</span> <span class="n">reboot</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install git (if not installed):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">git</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first">Download this package to your user folder with git:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~</span>
-<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mccdaq</span><span class="o">/</span><span class="n">daqhats</span>
+<span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mccdaq</span><span class="o">/</span><span class="n">daqhats</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
@@ -193,7 +199,10 @@
 </pre></div>
 </div>
 </li>
-<li><p class="first">[Optional] To update the firmware on your MCC 118 board(s) use the firmware update tool.  The “0” in the example below is the board address.  Repeat the command for each MCC 118 address in your board stack:</p>
+<li><p class="first"><strong>Optional:</strong> Use the firmware update tool to update the firmware on your MCC 118
+board(s). The “0” in the example below is the board address. Repeat the command for
+each MCC 118 address in your board stack. This example demonstrates how to update
+the firmware on the MCC 118 that is installed at address 0:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
 </pre></div>
 </div>
