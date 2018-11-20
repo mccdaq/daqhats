@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installing and Using the Library &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  <title>Installing and Using the Library &mdash; MCC DAQ HAT Library 1.1.0 documentation</title>
   
 
   
@@ -29,6 +29,7 @@
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="C Library Reference" href="c.html" />
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -90,6 +91,10 @@
 <li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing and Using the Library</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#firmware-updates">Firmware Updates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mcc-118">MCC 118</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-c-program">Creating a C program</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#creating-a-python-program">Creating a Python program</a></li>
 </ul>
@@ -198,31 +203,44 @@
 </pre></div>
 </div>
 </li>
-<li><p class="first"><strong>Optional:</strong> Use the firmware update tool to update the firmware on your MCC 118
-board(s). The “0” in the example below is the board address. Repeat the command for
-each MCC 118 address in your board stack. This example demonstrates how to update
-the firmware on the MCC 118 that is installed at address 0:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
-</pre></div>
-</div>
-</li>
 </ol>
 <p><strong>Note:</strong> If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.</p>
 <p>You can now run the example programs under ~/daqhats/examples and create your own programs.</p>
+<p>If you are using the Raspbian desktop interface the DAQ HAT Manager utility will be
+available under the Accessories start menu. This utility will allow you to list the
+detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
+control applications for each DAQ HAT to perform simple operations. The code for these
+programs is in the daqhats/tools/applications directory.</p>
+<p>You may display a list of the detected boards at any time with the DAQ HAT Manager or
+the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">daqhats_list_boards</span>
+</pre></div>
+</div>
+<p>If you change your board stackup and have more than one HAT board attached you must
+update the saved EEPROM images for the library to have the correct board information.
+You can use the DAQ HAT Manager or the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">daqhats_read_eeproms</span>
+</pre></div>
+</div>
 <p>To uninstall the package use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">daqhats</span>
 <span class="n">sudo</span> <span class="o">./</span><span class="n">uninstall</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
-<p>If you change your board stackup and have more than one HAT board attached you must update the saved EEPROM images for the library to have the correct board information:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">daqhats_read_eeproms</span>
+</div>
+<div class="section" id="firmware-updates">
+<h2>Firmware Updates<a class="headerlink" href="#firmware-updates" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mcc-118">
+<h3>MCC 118<a class="headerlink" href="#mcc-118" title="Permalink to this headline">¶</a></h3>
+<p>Use the firmware update tool to update the firmware on your MCC 118 board(s).
+The “0” in the example below is the board address. Repeat the command for each
+MCC 118 address in your board stack. This example demonstrates how to update the
+firmware on the MCC 118 that is installed at address 0:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
 </pre></div>
 </div>
-<p>You may display a list of the detected boards at any time with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">daqhats_list_boards</span>
-</pre></div>
 </div>
 </div>
 <div class="section" id="creating-a-c-program">
@@ -284,7 +302,7 @@ then repeat steps 5 - 7.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0',
+            VERSION:'1.1.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

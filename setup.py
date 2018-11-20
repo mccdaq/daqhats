@@ -10,7 +10,7 @@ else:
 
 setup(
     name='daqhats',
-    version='1.0.0',
+    version='1.1.0',
     description='MCC DAQ HAT Python Library',
     author='Measurement Computing Corp.',
     author_email='info@mccdaq.com',

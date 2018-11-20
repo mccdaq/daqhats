@@ -11,6 +11,8 @@ Methods
     :members:
     :exclude-members: test_clock, test_trigger
 
+    .. tabularcolumns:: |p{230pt}|p{190pt}|
+
     .. rubric:: Methods
 
     ==================================================  ========================================================

@@ -14,12 +14,16 @@
 #include <pthread.h>
 #include <sys/file.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
+#include <semaphore.h>
 #include "daqhats.h"
 #include "util.h"
 #include "gpio.h"
 
 // *****************************************************************************
 // Constants
+
+//#define SEMAPHORES
 
 #define LOCK_RETRY_TIME         5*SEC       // 5 seconds
 
@@ -55,6 +59,7 @@
 #define ADDR1_GPIO              13
 #define ADDR2_GPIO              26
 
+#define IRQ_GPIO                21
 
 // EEPROM header structure
 struct _Header
@@ -91,24 +96,8 @@ struct _VendorInfo
     char* pstr;
 };
 
-// lock file for synchronization
-static const char* const SPI_LOCKFILES[] =
-{
-    "/tmp/.mcc_spi_lockfile_0",
-    "/tmp/.mcc_spi_lockfile_1"
-};
-
-static const char* const BOARD_LOCKFILES[] =
-{
-    "/tmp/.mcc_hat_lockfile_0",
-    "/tmp/.mcc_hat_lockfile_1",
-    "/tmp/.mcc_hat_lockfile_2",
-    "/tmp/.mcc_hat_lockfile_3",
-    "/tmp/.mcc_hat_lockfile_4",
-    "/tmp/.mcc_hat_lockfile_5",
-    "/tmp/.mcc_hat_lockfile_6",
-    "/tmp/.mcc_hat_lockfile_7",
-};
+// lock files for synchronization
+static const char* const SPI_LOCKFILE = "/tmp/.mcc_spi_lockfile";
 
 static const char* const HAT_SETTINGS_DIR = "/etc/mcc/hats";
 static const char* const SYS_HAT_DIR = "/proc/device-tree/hat";
@@ -123,30 +112,17 @@ static const char* HAT_ERROR_MESSAGES[] =
     "There was a timeout while obtaining a resource lock.",
     "The device at the specified address is not the correct type.",
     "A needed resource was not available.",
+    "Could not communicate with the device.",
     "An unknown error occurred."
 };
 
 // *****************************************************************************
 // Variables
 static bool _address_initialized = false;
+static int lockfile;
 
 // *****************************************************************************
 // Local Functions
-
-// *****************************************************************************
-// Global Functions
-
-// library constructor / destructor
-void __attribute__ ((constructor)) init(void)
-{
-    // initialization
-    _address_init();
-}
-
-void __attribute__ ((destructor)) fini(void)
-{
-    // cleanup
-}
 
 /******************************************************************************
   Initializes the GPIO pins used for board addressing.
@@ -161,6 +137,54 @@ void _address_init(void)
         _address_initialized = true;
     }
 }
+
+
+void _lock_init(void)
+{
+    mode_t mask;
+    
+    // set umask so we can set permission to 0666; otherwise, if run as root it
+    // will leave lockfiles that normal users cannot open
+    mask = umask(0111);
+
+    lockfile = open(SPI_LOCKFILE,
+        O_CREAT     |   // create file if it does not exist
+        O_WRONLY    |   // open for write access only
+        O_CLOEXEC,      // close on execute
+        S_IRUSR     |   // user permission: read/write
+        S_IWUSR     |
+        S_IRGRP     |   // group permission: read/write
+        S_IWGRP     |
+        S_IROTH     |   // other permission: read/write
+        S_IWOTH);
+
+    // revert umask
+    umask(mask);
+}
+
+void _lock_fini(void)
+{
+    close(lockfile);
+}
+
+// *****************************************************************************
+// Global Functions
+
+// library constructor / destructor
+void __attribute__ ((constructor)) init(void)
+{
+    // initialization
+    _address_init();
+    
+    _lock_init();
+}
+
+void __attribute__ ((destructor)) fini(void)
+{
+    // cleanup
+    _lock_fini();
+}
+
 
 /******************************************************************************
   Sets the specified address on the GPIO address pins.
@@ -220,79 +244,37 @@ uint32_t _difftime_ms(struct timespec* start, struct timespec* end)
 // file handle is automatically released.
 
 /******************************************************************************
-  Use lock files to control access to the SPI busses by multiple processes.
+  Use lock files to control access to the SPI bus by multiple processes.
 
   Return: int, file descriptor (RESULT_TIMEOUT for time out obtaining lock)
  *****************************************************************************/
-int _obtain_spi_lock(enum SpiBus spi_bus)
+int _obtain_lock(void)
 {
     bool locked;
-    int lock_fd;
     struct timespec start_time;
     struct timespec current_time;
-    char* filename;
-    mode_t mask;
-
-    if (spi_bus == SPI_BUS_0)
-    {
-        filename = (char*)SPI_LOCKFILES[0];
-    }
-    else if (spi_bus == SPI_BUS_1)
-    {
-        filename = (char*)SPI_LOCKFILES[1];
-    }
-    else
-    {
-        return RESULT_BAD_PARAMETER;
-    }
+    int test;
 
     // Block until lock obtained, but allow context switching with usleep().
     // Time out after 5 seconds
     locked = false;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
-    // set umask so we can set permission to 0666; otherwise, if run as root it
-    // will leave lockfiles that normal users cannot open
-    mask = umask(0111);
+
     do
     {
-        lock_fd = open(filename,
-            O_CREAT     |   // create file if it does not exist
-            O_WRONLY    |   // open for write access only
-            O_CLOEXEC,      // close on execute
-            S_IRUSR     |   // user permission: read/write
-            S_IWUSR     |
-            S_IRGRP     |   // group permission: read/write
-            S_IWGRP     |
-            S_IROTH     |   // other permission: read/write
-            S_IWOTH);
-
-        if (lock_fd != -1)
+        // the file was opened, now lock it so no other process can open it
+        if ((test = flock(lockfile, LOCK_EX | LOCK_NB)) == 0)
         {
-            // the file was opened, now lock it so no other process can open it
-            //if (lockf(lock_fd, F_TLOCK, 0) == 0)
-            if (flock(lock_fd, LOCK_EX | LOCK_NB) == 0)
-            {
-                locked = true;
-            }
-            else
-            {
-                // could not get a lock, so wait and retry
-                close(lock_fd);
-                usleep(10);
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-            }
+            locked = true;
         }
         else
         {
-            // could not open the lock file, so wait and retry
+            // could not get a lock, so wait and retry
             usleep(10);
             clock_gettime(CLOCK_MONOTONIC, &current_time);
         }
     } while (!locked &&
         (_difftime_us(&start_time, &current_time) < LOCK_RETRY_TIME));
-
-    // revert umask
-    umask(mask);
 
     if (!locked)
     {
@@ -300,92 +282,16 @@ int _obtain_spi_lock(enum SpiBus spi_bus)
         return RESULT_TIMEOUT;
     }
 
-    return lock_fd;
+    return lockfile;
 }
 
-/******************************************************************************
-  Use lock files to control access to the HAT boards by multiple processes.
-
-  Return: int, file descriptor (RESULT_TIMEOUT for time out obtaining lock)
- *****************************************************************************/
-int _obtain_board_lock(uint8_t address)
-{
-    bool locked;
-    int lock_fd;
-    struct timespec start_time;
-    struct timespec current_time;
-    char* filename;
-    mode_t mask;
-
-    if (address >= MAX_NUMBER_HATS)
-    {
-        return RESULT_BAD_PARAMETER;
-    }
-
-    filename = (char*)BOARD_LOCKFILES[address];
-
-    // Block until lock obtained, but allow context switching with usleep().
-    // Time out after 5 seconds
-    locked = false;
-    clock_gettime(CLOCK_MONOTONIC, &start_time);
-    // set umask so we can set permission to 0666; otherwise, if run as root it
-    // will leave lockfiles that normal users cannot open
-    mask = umask(0111);
-    do
-    {
-        lock_fd = open(filename,
-            O_CREAT     |   // create file if it does not exist
-            O_WRONLY    |   // open for write access only
-            O_CLOEXEC,      // close on execute
-            S_IRUSR     |   // user permission: read/write
-            S_IWUSR     |
-            S_IRGRP     |   // group permission: read/write
-            S_IWGRP     |
-            S_IROTH     |   // other permission: read/write
-            S_IWOTH);
-
-        if (lock_fd != -1)
-        {
-            // the file was opened, now lock it so no other process can open it
-            if (flock(lock_fd, LOCK_EX | LOCK_NB) == 0)
-            {
-                locked = true;
-            }
-            else
-            {
-                // could not get a lock, so wait and retry
-                close(lock_fd);
-                usleep(10);
-                clock_gettime(CLOCK_MONOTONIC, &current_time);
-            }
-        }
-        else
-        {
-            // could not open the lock file, so wait and retry
-            usleep(10);
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-        }
-    } while (!locked &&
-        (_difftime_us(&start_time, &current_time) < LOCK_RETRY_TIME));
-
-    // revert umask
-    umask(mask);
-
-    if (!locked)
-    {
-        // could not get a lock within 5 seconds, report as a timeout
-        return RESULT_TIMEOUT;
-    }
-
-    return lock_fd;
-}
 
 /******************************************************************************
   Release a previously obtained lock.
  *****************************************************************************/
 void _release_lock(int lock_fd)
 {
-    close(lock_fd);
+    flock(lock_fd, LOCK_UN);
 }
 
 
@@ -807,5 +713,67 @@ const char* hat_error_message(int result)
     case RESULT_UNDEFINED:
     default:
         return HAT_ERROR_MESSAGES[7];
+    }
+}
+
+/******************************************************************************
+  Return the interrupt status.
+ *****************************************************************************/
+int hat_interrupt_state(void)
+{
+    if (gpio_status(IRQ_GPIO) == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+/******************************************************************************
+  Wait for an interrupt to occur, with timeout.
+ *****************************************************************************/
+int hat_wait_for_interrupt(int timeout)
+{
+    // wait for IRQ_GPIO to go low, with timeout
+    switch (gpio_wait_for_low(IRQ_GPIO, timeout))
+    {
+    case -1:    // error
+        return RESULT_UNDEFINED;
+    case 0:     // timeout
+        return RESULT_TIMEOUT;
+    default:    // success
+        return RESULT_SUCCESS;
+    }
+}
+
+/******************************************************************************
+  Create an interrupt handler that calls the user-provided callback function.
+ *****************************************************************************/
+int hat_interrupt_callback_enable(void (*function)(void*), void* data)
+{
+    switch (gpio_interrupt_callback(IRQ_GPIO, 0, function, data))
+    {
+    case -1:    // error
+        return RESULT_UNDEFINED;
+    case 0:
+    default:
+        return RESULT_SUCCESS;
+    }
+}
+
+/******************************************************************************
+  Disable an interrupt callback.
+ *****************************************************************************/
+int hat_interrupt_callback_disable(void)
+{
+    switch (gpio_interrupt_callback(IRQ_GPIO, 3, NULL, NULL))
+    {
+    case -1:    // error
+        return RESULT_UNDEFINED;
+    case 0:
+    default:
+        return RESULT_SUCCESS;
     }
 }

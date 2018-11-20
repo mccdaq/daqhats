@@ -27,6 +27,21 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
     _MAX_SAMPLE_RATE = 100000.0
 
+    _dev_info_type = namedtuple(
+        'MCC118DeviceInfo', [
+            'NUM_AI_CHANNELS', 'AI_MIN_CODE', 'AI_MAX_CODE',
+            'AI_MIN_VOLTAGE', 'AI_MAX_VOLTAGE', 'AI_MIN_RANGE',
+            'AI_MAX_RANGE'])
+
+    _dev_info = _dev_info_type(
+        NUM_AI_CHANNELS=8,
+        AI_MIN_CODE=0,
+        AI_MAX_CODE=4095,
+        AI_MIN_VOLTAGE=-10.0,
+        AI_MAX_VOLTAGE=(10.0 - (20.0/4096)),
+        AI_MIN_RANGE=-10.0,
+        AI_MAX_RANGE=+10.0)
+
     def __init__(self, address=0):
         """
         Initialize the class.
@@ -139,19 +154,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             * **AI_MAX_RANGE** (float): The maximum voltage of the input range
               (+10.0.)
         """
-        dev_info = namedtuple(
-            'MCC118DeviceInfo', [
-                'NUM_AI_CHANNELS', 'AI_MIN_CODE', 'AI_MAX_CODE',
-                'AI_MIN_VOLTAGE', 'AI_MAX_VOLTAGE', 'AI_MIN_RANGE',
-                'AI_MAX_RANGE'])
-        return dev_info(
-            NUM_AI_CHANNELS=8,
-            AI_MIN_CODE=0,
-            AI_MAX_CODE=4095,
-            AI_MIN_VOLTAGE=-10.0,
-            AI_MAX_VOLTAGE=(10.0 - (20.0/4096)),
-            AI_MIN_RANGE=-10.0,
-            AI_MAX_RANGE=+10.0)
+        return mcc118._dev_info
 
     def firmware_version(self):
         """

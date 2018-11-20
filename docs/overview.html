@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.1.0 documentation</title>
   
 
   
@@ -29,6 +29,7 @@
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installing the DAQ HAT board" href="hardware.html" />
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -101,7 +102,25 @@
 <li class="toctree-l4"><a class="reference internal" href="#trigger">Trigger</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#firmware-updates">Firmware updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#specifications">Specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-152">MCC 152</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Board components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Screw terminals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id3">Address jumpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dio-power-jumper-w3">DIO Power jumper (W3)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id4">Status LED</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Header connector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Functional block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">Functional details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs">Mixing 3.3V and 5V digital inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">Specifications</a></li>
 </ul>
 </li>
 </ul>
@@ -192,13 +211,13 @@ develop your own applications.</p>
 <li>Onboard sample buffers</li>
 <li>Digital trigger input</li>
 </ul>
-<a class="reference internal image-reference" href="_images/mcc118.jpg"><img alt="MCC 118 circuit board" class="align-center" src="_images/mcc118.jpg" style="width: 612.5px; height: 464.5px;" /></a>
+<img alt="MCC 118 circuit board" class="align-center" src="_images/mcc118-web.jpg" />
 <div class="section" id="board-components">
 <h3>Board components<a class="headerlink" href="#board-components" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="screw-terminals">
 <h4>Screw terminals<a class="headerlink" href="#screw-terminals" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>Ch 0 In</strong> to <strong>Ch 7 In</strong> (CHx): Single-ended analog input terminals.</li>
+<li><strong>CH 0 In</strong> to <strong>CH 7 In</strong> (CHx): Single-ended analog input terminals.</li>
 <li><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
 Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</li>
 <li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software configurable for edge or level sensitive,
@@ -225,23 +244,119 @@ with the board. The LED may be blinked by the user.</p>
 </div>
 <div class="section" id="functional-block-diagram">
 <h3>Functional block diagram<a class="headerlink" href="#functional-block-diagram" title="Permalink to this headline">¶</a></h3>
-<a class="reference internal image-reference" href="_images/mcc118-diag.jpg"><img alt="MCC 118 block diagram" class="align-center" src="_images/mcc118-diag.jpg" style="width: 617.4px; height: 348.6px;" /></a>
+<img alt="MCC 118 block diagram" class="align-center" src="_images/mcc118-diag-web.jpg" />
 </div>
 <div class="section" id="functional-details">
 <h3>Functional details<a class="headerlink" href="#functional-details" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="scan-clock">
 <h4>Scan clock<a class="headerlink" href="#scan-clock" title="Permalink to this headline">¶</a></h4>
 <p>The clock input / output (terminal CLK) is used to output the internal scan clock or apply an external scan clock to the device. The clock input signal may be a 3.3V or 5V TTL or CMOS logic signal, and the output will be 3.3V LVCMOS. A scan occurs for each rising edge of the clock, acquiring one sample from each of the selected channels in the scan. For example, when scanning channels 0, 1, and 2 the conversion activity will be:</p>
-<a class="reference internal image-reference" href="_images/mcc118-clock.png"><img alt="MCC 118 clock mode" class="align-center" src="_images/mcc118-clock.png" style="width: 570.4px; height: 295.6px;" /></a>
+<img alt="MCC 118 clock mode" class="align-center" src="_images/mcc118-clock-web.png" />
 </div>
 <div class="section" id="trigger">
 <h4>Trigger<a class="headerlink" href="#trigger" title="Permalink to this headline">¶</a></h4>
 <p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog input scan until the desired condition is met at the trigger input.  The trigger input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition may be rising edge, falling edge, high level, or low level.</p>
 </div>
 </div>
+<div class="section" id="firmware-updates">
+<h3>Firmware updates<a class="headerlink" href="#firmware-updates" title="Permalink to this headline">¶</a></h3>
+<p>Use the firmware update tool to update the firmware on your MCC 118 board(s).
+The “0” in the example below is the board address. Repeat the command for each
+MCC 118 address in your board stack. This example demonstrates how to update the
+firmware on the MCC 118 that is installed at address 0:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="specifications">
 <h3>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="_static/esmcc118.pdf">MCC 118 Electrical Specifications</a></p>
+</div>
+</div>
+<div class="section" id="mcc-152">
+<h2>MCC 152<a class="headerlink" href="#mcc-152" title="Permalink to this headline">¶</a></h2>
+<p>The MCC 152 is an analog output / digital I/O board with the following features:</p>
+<ul class="simple">
+<li>2 analog outputs<ul>
+<li>12-bit D/A converter</li>
+<li>0 - 5 V outputs</li>
+<li>5 mA output drive, sourcing</li>
+<li>Simultaneous update capability</li>
+</ul>
+</li>
+<li>8 digital I/O<ul>
+<li>5 V / 3.3 V supply voltage, jumper-selectable</li>
+<li>Bit-configurable for input (power on default) or output</li>
+<li>Outputs may be set to push-pull or open-drain (port-configurable)</li>
+<li>Programmable pull-up/pull-down resistors (disconnected on outputs when set to open-drain)</li>
+<li>10 mA source/25 mA sink per output</li>
+<li>Interrupt on input state change</li>
+</ul>
+</li>
+</ul>
+<img alt="MCC 152 circuit board" class="align-center" src="_images/mcc152-web.jpg" />
+<div class="section" id="id1">
+<h3>Board components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Screw terminals<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>AO0</strong> to <strong>AO1</strong> (AOx): Analog output terminals.</li>
+<li><strong>DIO0</strong> to <strong>DIO7</strong> (DIOx): Digital input/output terminals.</li>
+<li><strong>VIO</strong> (VIO): Digital I/O supply voltage (5 V or 3.3 V, selectable
+with jumper W3.)</li>
+<li><strong>AGND</strong> (AGND): Common ground for the analog output terminals.</li>
+<li><strong>DGND</strong> (DGND): Common ground for the digital I/O terminals.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Address jumpers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each DAQ HAT when multiple boards are
+connected. The first DAQ HAT connected to the Raspberry Pi must be at address 0
+(no jumper). Install jumpers on each additional connected board to set the
+desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about
+the recommended addressing method.</li>
+</ul>
+</div>
+<div class="section" id="dio-power-jumper-w3">
+<h4>DIO Power jumper (W3)<a class="headerlink" href="#dio-power-jumper-w3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>5V</strong> and <strong>3.3V</strong>: Selects the DIO voltage; the factory&nbsp;default is 5 V.
+Refer to <a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs">Mixing 3.3V and 5V digital inputs</a> for more information about
+the DIO supply voltage.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h4>Status LED<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>The LED turns on when the board is connected to a Raspberry Pi with external power
+applied.</p>
+</div>
+<div class="section" id="id5">
+<h4>Header connector<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a>
+for more information about the header connector.</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>Functional block diagram<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<img alt="MCC 152 block diagram" class="align-center" src="_images/mcc152-diag-web.jpg" />
+</div>
+<div class="section" id="id7">
+<h3>Functional details<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="mixing-3-3v-and-5v-digital-inputs">
+<h4>Mixing 3.3V and 5V digital inputs<a class="headerlink" href="#mixing-3-3v-and-5v-digital-inputs" title="Permalink to this headline">¶</a></h4>
+<p>The MCC 152 digital inputs are tolerant of 5V signals when the DIO is set to 3.3V
+operation with jumper W3.  However, current can flow into the MCC 152 from the 5V
+signal, so the user must limit this current to avoid raising the voltage of the
+digital power supply rail (VIO) and possibly damaging components. MCC recommends
+using a series resistor of 700 ohms or larger.</p>
+<p>Example:</p>
+<img alt="MCC 152 resistor example" class="align-center" src="_images/mcc152-resistor-example-web.png" />
+</div>
+</div>
+<div class="section" id="id8">
+<h3>Specifications<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="_static/esmcc152.pdf">MCC 152 Electrical Specifications</a></p>
 </div>
 </div>
 </div>
@@ -288,7 +403,7 @@ with the board. The LED may be blinked by the user.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0',
+            VERSION:'1.1.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

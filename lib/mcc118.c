@@ -201,7 +201,6 @@ static bool log_open = false;
 #endif
 
 static const char* const spi_device = SPI_DEVICE_0; // the spidev device
-static const enum SpiBus spi_bus_num = SPI_BUS_0;   // for obtain_lock()
 static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
                                                     // CPHA=1)
 static const uint8_t spi_bits = 8;                  // 8 bits per transfer
@@ -413,7 +412,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     tx_count = _create_frame(tx_buffer, command, tx_data_count, tx_data);
 
     // Obtain a spi lock
-    if ((lock_fd = _obtain_spi_lock(spi_bus_num)) < 0)
+    if ((lock_fd = _obtain_lock()) < 0)
     {
         // could not get a lock within 5 seconds, report as a timeout
         free(tx_buffer);

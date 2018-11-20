@@ -1,5 +1,5 @@
 MAJOR = 1
-MINOR = 0
+MINOR = 1
 SUB   = 0
 NAME = daqhats
 VERSION = $(MAJOR).$(MINOR).$(SUB)
@@ -7,12 +7,12 @@ INSTALL_DIR = /usr/local/lib
 BUILD_DIR = ./build
 
 CC = gcc 
-CFLAGS = -I../include -fPIC -Wall -Wextra -g -O2
-LDFLAGS = -shared -pthread -lm -Wl,-soname,lib$(NAME).so.$(MAJOR)
+CFLAGS = -I../include -I/opt/vc/include -fPIC -Wall -Wextra -g -O2
+LDFLAGS = -L/opt/vc/lib -shared -pthread -lm -lbcm_host -Wl,-soname,lib$(NAME).so.$(MAJOR)
 RM = rm -f  
 TARGET_LIB = lib$(NAME).so.$(VERSION)
 
-SRCS = util.c mcc118.c gpio.c cJSON.c
+SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:%.o=%.d)
 

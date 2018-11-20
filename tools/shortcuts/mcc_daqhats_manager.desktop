@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=DAQ HAT Manager
+Comment=Manage and control MCC DAQ HATs
+Exec=/usr/share/mcc/daqhats/daqhats_manager.py
+Type=Application
+Categories=Utility
+StartupNotify=false
+StartupWMClass=Daqhatapp
+Terminal=false
+Icon=/usr/share/mcc/daqhats/icon.png

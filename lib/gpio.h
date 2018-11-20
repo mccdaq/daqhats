@@ -12,5 +12,9 @@
 
 void gpio_dir(int pin, int dir);
 void gpio_write(int pin, int val);
+int gpio_status(int pin);
+int gpio_wait_for_low(int pin, int timeout);
+int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
+    void* data);
 
 #endif
