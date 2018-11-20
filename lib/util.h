@@ -32,13 +32,16 @@ enum SpiBus
 #define SPI_DEVICE_1            "/dev/spidev0.1"
 /// \endcond
 
+// The Raspberry Pi I2C device driver names
+#define I2C_DEVICE_1            "/dev/i2c-1"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 // internal functions for use by board classes
-int _obtain_spi_lock(enum SpiBus bus);
-int _obtain_board_lock(uint8_t address);
+int _obtain_lock(void);
 void _release_lock(int lock_fd);
 
 uint32_t _difftime_us(struct timespec* start, struct timespec* end);

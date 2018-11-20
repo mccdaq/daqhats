@@ -166,6 +166,10 @@ void print_error(int result)
     }
 }
 
+void resetCursor() {printf("\033[1;1H");}
+void clearEOL() {printf("\033[2K");}
+void cursorUp() {printf("\033[A");}
+
 /****************************************************************************
  * User input functions
  ****************************************************************************/
@@ -241,7 +245,13 @@ int select_hat_device(uint16_t hat_filter_id, uint8_t* address)
             }
 
             printf("\nSelect the address of the HAT device to use: ");
-            scanf("%d", &address_int);
+            if (scanf("%d", &address_int) == 0)
+            {
+                fprintf(stderr, "Error: Invalid selection\n");
+                free(hats);
+                return -1;
+            }
+            
             *address = (uint8_t)address_int;
 
             // Find the HAT device with the specified address in the list.

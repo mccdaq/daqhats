@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Library Reference &mdash; MCC DAQ HAT Library 1.0.0 documentation</title>
+  <title>Python Library Reference &mdash; MCC DAQ HAT Library 1.1.0 documentation</title>
   
 
   
@@ -29,6 +29,7 @@
   
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="C Library Reference" href="c.html" /> 
@@ -60,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.1.0
               </div>
             
           
@@ -99,10 +100,19 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#haterror-class">HatError class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hatcallback-class">HatCallback class</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#mcc-118-class">MCC 118 class</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Methods</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-152-class">MCC 152 class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dio-config-items">DIO Config Items</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -182,8 +192,8 @@ of board.  The Python package is named <em>daqhats</em>.</p>
 <h3>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="29%" />
-<col width="71%" />
+<col width="45%" />
+<col width="55%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>Method</td>
@@ -191,6 +201,18 @@ of board.  The Python package is named <em>daqhats</em>.</p>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#daqhats.hat_list" title="daqhats.hat_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">hat_list()</span></code></a></td>
 <td>Return a list of detected DAQ HAT boards.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.interrupt_state" title="daqhats.interrupt_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_state()</span></code></a></td>
+<td>Read the current DAQ HAT interrupt status.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.wait_for_interrupt" title="daqhats.wait_for_interrupt"><code class="xref py py-func docutils literal notranslate"><span class="pre">wait_for_interrupt()</span></code></a></td>
+<td>Wait for a DAQ HAT  interrupt to occur.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.interrupt_callback_enable" title="daqhats.interrupt_callback_enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_enable()</span></code></a></td>
+<td>Enable an interrupt callback function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.interrupt_callback_disable" title="daqhats.interrupt_callback_disable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_disable()</span></code></a></td>
+<td>Disable interrupt callback function.</td>
 </tr>
 </tbody>
 </table>
@@ -227,6 +249,130 @@ DAQ HATs found. Each namedtuple will contain the following field names<ul class=
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="daqhats.interrupt_state">
+<code class="descclassname">daqhats.</code><code class="descname">interrupt_state</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.interrupt_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the current DAQ HAT interrupt status</p>
+<p>Returns the status of the interrupt signal, True if active or False if
+inactive. The signal can be shared by multiple DAQ HATs so the status of
+each board that may generate an interrupt must be read and the interrupt
+source(s) cleared before the interrupt will become inactive.</p>
+<p>This function only applies when using devices that can generate an
+interrupt:</p>
+<ul class="simple">
+<li>MCC 152</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The interrupt status.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="daqhats.wait_for_interrupt">
+<code class="descclassname">daqhats.</code><code class="descname">wait_for_interrupt</code><span class="sig-paren">(</span><em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.wait_for_interrupt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for an interrupt from a DAQ HAT to occur.</p>
+<p>Pass a timeout in seconds. Pass -1 to wait forever or 0 to return
+immediately. If the interrupt has not occurred before the timeout elapses
+the function will return 0.</p>
+<p>This function only applies when using devices that can generate an
+interrupt:</p>
+<ul class="simple">
+<li>MCC 152</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The interrupt status - True = interrupt active, False = interrupt
+inactive.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="daqhats.interrupt_callback_enable">
+<code class="descclassname">daqhats.</code><code class="descname">interrupt_callback_enable</code><span class="sig-paren">(</span><em>callback</em>, <em>user_data</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.interrupt_callback_enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable an interrupt callback function.</p>
+<p>Set a function that will be called when a DAQ HAT interrupt occurs.</p>
+<p>The function will be called when the DAQ HAT interrupt signal becomes
+active, and cannot be called again until the interrupt signal becomes
+inactive. Active sources become inactive when manually cleared (such as
+reading the digital I/O inputs or clearing the interrupt enable.) If not
+latched, an active source also becomes inactive when the value returns to
+the original value (the value at the source before the interrupt was
+generated.)</p>
+<p>There may only be one callback function at a time; if you call this
+when a function is already set as the callback function then it will be
+replaced with the new function and the old function will no longer be called
+if an interrupt occurs. The data argument to this function will be passed
+to the callback function when it is called.</p>
+<p>The callback function must be encapsulated in a <a class="reference internal" href="#daqhats.HatCallback" title="daqhats.HatCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">HatCallback</span></code></a>
+class. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1"># This is my callback function.</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The interrupt occurred, and returned </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">callback</span> <span class="o">=</span> <span class="n">HatCallback</span><span class="p">(</span><span class="n">my_function</span><span class="p">)</span>
+<span class="n">interrupt_enable_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example <em>my_function()</em> will be called when the interrupt occurs,
+and the list <em>value</em> will be passed as the user_data. Inside the callback it
+will be received as <em>data</em>, but will still be the same object so any changes
+made will be present in the original <em>value</em>. Every time the interrupt
+occurs <em>value[0]</em> will be incremented and a higher number will be printed.</p>
+<p>An integer was not used for <em>value</em> because integers are immutable in Python
+so the original <em>value</em> would never change.</p>
+<p>The callback may be disabled with <a class="reference internal" href="#daqhats.interrupt_callback_disable" title="daqhats.interrupt_callback_disable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_disable()</span></code></a>.</p>
+<p>This function only applies when using devices that can generate an
+interrupt:</p>
+<ul class="simple">
+<li>MCC 152</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>callback</strong> (<a class="reference internal" href="#daqhats.HatCallback" title="daqhats.HatCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">HatCallback</span></code></a>) – The callback function encapsulated
+in a <a class="reference internal" href="#daqhats.HatCallback" title="daqhats.HatCallback"><code class="xref py py-class docutils literal notranslate"><span class="pre">HatCallback</span></code></a> class.</li>
+<li><strong>user_data</strong> (<em>object</em>) – callback function.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Exception</span></code> – Internal error enabling the callback.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="daqhats.interrupt_callback_disable">
+<code class="descclassname">daqhats.</code><code class="descname">interrupt_callback_disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.interrupt_callback_disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable interrupt callbacks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Exception</span></code> – Internal error disabling the callback.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="data">
 <h3>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h3>
@@ -246,6 +392,12 @@ DAQ HATs found. Each namedtuple will contain the following field names<ul class=
 <dt id="daqhats.HatIDs.MCC_118">
 <code class="descname">MCC_118</code><em class="property"> = 322</em><a class="headerlink" href="#daqhats.HatIDs.MCC_118" title="Permalink to this definition">¶</a></dt>
 <dd><p>MCC 118 ID</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.HatIDs.MCC_152">
+<code class="descname">MCC_152</code><em class="property"> = 324</em><a class="headerlink" href="#daqhats.HatIDs.MCC_152" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 152 ID</p>
 </dd></dl>
 
 </dd></dl>
@@ -336,7 +488,7 @@ descriptions.</p>
 <dl class="exception">
 <dt id="daqhats.HatError">
 <em class="property">exception </em><code class="descclassname">daqhats.</code><code class="descname">HatError</code><span class="sig-paren">(</span><em>address</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exceptions raised for MCC HAT specific errors.</p>
+<dd><p>Exceptions raised for MCC DAQ HAT specific errors.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -346,6 +498,29 @@ descriptions.</p>
 <li><strong>value</strong> (<em>str</em>) – the exception description.</li>
 </ul>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="hatcallback-class">
+<h3>HatCallback class<a class="headerlink" href="#hatcallback-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="daqhats.HatCallback">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">HatCallback</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatCallback" title="Permalink to this definition">¶</a></dt>
+<dd><p>DAQ HAT interrupt callback function class.</p>
+<p>This class handles passing Python functions to the shared library as a
+callback then retrieving the passed user data as a Python object when
+the function is called from the library.</p>
+<p>The callback function should have a single argument (optional) that is a
+Python object the user provides to <a class="reference internal" href="#daqhats.interrupt_callback_enable" title="daqhats.interrupt_callback_enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_enable()</span></code></a> that
+will be passed to the callback function whenever it is called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>function</strong> (<em>function</em>) – the function to be called when an interrupt occurs.</td>
 </tr>
 </tbody>
 </table>
@@ -1060,6 +1235,1157 @@ responds incorrectly.</td>
 
 </div>
 </div>
+<div class="section" id="mcc-152-class">
+<h2>MCC 152 class<a class="headerlink" href="#mcc-152-class" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Methods<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="daqhats.mcc152">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc152</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152" title="Permalink to this definition">¶</a></dt>
+<dd><p>The class for an MCC 152 board.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Method</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.info" title="daqhats.mcc152.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.info()</span></code></a></td>
+<td>Get info about this device type.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.serial" title="daqhats.mcc152.serial"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.serial()</span></code></a></td>
+<td>Read the serial number.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.a_out_write" title="daqhats.mcc152.a_out_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.a_out_write()</span></code></a></td>
+<td>Write an analog output channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.a_out_write_all" title="daqhats.mcc152.a_out_write_all"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.a_out_write_all()</span></code></a></td>
+<td>Write all analog output channels.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_reset" title="daqhats.mcc152.dio_reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_reset()</span></code></a></td>
+<td>Reset the digital I/O to the default configuration.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_input_read_bit" title="daqhats.mcc152.dio_input_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_input_read_bit()</span></code></a></td>
+<td>Read a digital input.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_input_read_port" title="daqhats.mcc152.dio_input_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_input_read_port()</span></code></a></td>
+<td>Read all digital inputs.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_input_read_tuple" title="daqhats.mcc152.dio_input_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_input_read_tuple()</span></code></a></td>
+<td>Read all digital inputs as a tuple.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_write_bit" title="daqhats.mcc152.dio_output_write_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_write_bit()</span></code></a></td>
+<td>Write a digital output.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_write_port" title="daqhats.mcc152.dio_output_write_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_write_port()</span></code></a></td>
+<td>Write all digital outputs.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_write_dict" title="daqhats.mcc152.dio_output_write_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_write_dict()</span></code></a></td>
+<td>Write multiple digital outputs with a dictionary.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_read_bit" title="daqhats.mcc152.dio_output_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_read_bit()</span></code></a></td>
+<td>Read the state of a digital output.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_read_port" title="daqhats.mcc152.dio_output_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_read_port()</span></code></a></td>
+<td>Read the state of all digital outputs.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_output_read_tuple" title="daqhats.mcc152.dio_output_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_output_read_tuple()</span></code></a></td>
+<td>Read the state of all digital outputs as a tuple.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_bit" title="daqhats.mcc152.dio_int_status_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_int_status_read_bit()</span></code></a></td>
+<td>Read the interrupt status for a single channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_port" title="daqhats.mcc152.dio_int_status_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_int_status_read_port()</span></code></a></td>
+<td>Read the interrupt status for all channels.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_tuple" title="daqhats.mcc152.dio_int_status_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_int_status_read_tuple()</span></code></a></td>
+<td>Read the interrupt status for all channels as a tuple.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_write_bit" title="daqhats.mcc152.dio_config_write_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_write_bit()</span></code></a></td>
+<td>Write a digital I/O configuration item value for a single channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_write_port" title="daqhats.mcc152.dio_config_write_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_write_port()</span></code></a></td>
+<td>Write a digital I/O configuration item value for all channels.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_write_dict" title="daqhats.mcc152.dio_config_write_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_write_dict()</span></code></a></td>
+<td>Write a digital I/O configuration item value for multiple channels.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_read_bit" title="daqhats.mcc152.dio_config_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_read_bit()</span></code></a></td>
+<td>Read a digital I/O configuration item value for a single channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_read_port" title="daqhats.mcc152.dio_config_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_read_port()</span></code></a></td>
+<td>Read a digital I/O configuration item value for all channels.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc152.dio_config_read_tuple" title="daqhats.mcc152.dio_config_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc152.dio_config_read_tuple()</span></code></a></td>
+<td>Read a digital I/O configuration item value for all channels as a tuple.</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="daqhats.mcc152.info">
+<em class="property">static </em><code class="descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant information about this type of device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names<ul class="simple">
+<li><strong>NUM_DIO_CHANNELS</strong> (int): The number of digital I/O channels
+(8.)</li>
+<li><strong>NUM_AO_CHANNELS</strong> (int): The number of analog output channels
+(2.)</li>
+<li><strong>AO_MIN_CODE</strong> (int): The minimum DAC code (0.)</li>
+<li><strong>AO_MAX_CODE</strong> (int): The maximum DAC code (4095.)</li>
+<li><strong>AO_MIN_VOLTAGE</strong> (float): The voltage corresponding to the
+minimum DAC code (0.0.)</li>
+<li><strong>AO_MAX_VOLTAGE</strong> (float): The voltage corresponding to the
+maximum DAC code (+5.0 - 1 LSB)</li>
+<li><strong>AO_MIN_RANGE</strong> (float): The minimum voltage of the output range
+(0.0.)</li>
+<li><strong>AO_MAX_RANGE</strong> (float): The maximum voltage of the output range
+(+5.0.)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.serial">
+<code class="descname">serial</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the serial number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The serial number.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.a_out_write">
+<code class="descname">a_out_write</code><span class="sig-paren">(</span><em>channel</em>, <em>value</em>, <em>options=&lt;OptionFlags.DEFAULT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.a_out_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a single analog output channel value. The value will be limited to
+the range of the DAC without raising an exception.</p>
+<p><strong>options</strong> is an OptionFlags value. Valid flags for this
+method are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Write a voltage value (0 - 5).</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Write a DAC code (a value
+between 0 and 4095) rather than voltage.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel</strong> (<em>int</em>) – The analog output channel number, 0-1.</li>
+<li><strong>value</strong> (<em>float</em>) – The value to write.</li>
+<li><strong>options</strong> (<em>int</em>) – An <a class="reference internal" href="#daqhats.OptionFlags" title="daqhats.OptionFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionFlags</span></code></a> value,
+<a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a> if unspecified.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.a_out_write_all">
+<code class="descname">a_out_write_all</code><span class="sig-paren">(</span><em>values</em>, <em>options=&lt;OptionFlags.DEFAULT: 0&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.a_out_write_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all analog output channels simultaneously.</p>
+<p><strong>options</strong> is an OptionFlags value. Valid flags for this
+method are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Write voltage values (0 - 5).</li>
+<li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Write DAC codes (values
+between 0 and 4095) rather than voltage.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> (<em>list of float</em>) – The values to write, in channel order. There
+must be at least two values, but only the first two will be
+used.</li>
+<li><strong>options</strong> (<em>int</em>) – An <a class="reference internal" href="#daqhats.OptionFlags" title="daqhats.OptionFlags"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionFlags</span></code></a> value,
+<a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a> if unspecified.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_reset">
+<code class="descname">dio_reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the DIO to the default configuration.</p>
+<ul class="simple">
+<li>All channels input</li>
+<li>Output registers set to 1</li>
+<li>Input inversion disabled</li>
+<li>No input latching</li>
+<li>Pull-up resistors enabled</li>
+<li>All interrupts disabled</li>
+<li>Push-pull output type</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_input_read_bit">
+<code class="descname">dio_input_read_bit</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_input_read_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a single digital input channel.</p>
+<p>Returns 0 if the input is low, 1 if it is high.</p>
+<p>If the specified channel is configured as an output this will return the
+value present at the terminal.</p>
+<p>This method reads the entire input register even though a single channel
+is specified, so care must be taken when latched inputs are enabled. If
+a latched input changes between input reads then changes back to its
+original value, the next input read will report the change to the first
+value then the following read will show the original value. If another
+input is read then this input change could be missed so it is best to
+use <a class="reference internal" href="#daqhats.mcc152.dio_input_read_port" title="daqhats.mcc152.dio_input_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_port()</span></code></a> or <a class="reference internal" href="#daqhats.mcc152.dio_input_read_tuple" title="daqhats.mcc152.dio_input_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_tuple()</span></code></a>
+when using latched inputs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> (<em>int</em>) – The DIO channel number, 0-7.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The input value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_input_read_port">
+<code class="descname">dio_input_read_port</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_input_read_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all digital input channels.</p>
+<p>Returns the values as an integer with a value of 0 - 255. Each channel
+is represented by a bit in the integer (bit 0 is channel 0, etc.)</p>
+<p>The value of a specific input can be found by examining the bit at that
+location. For example, to act on the channel 3 input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">mcc152</span><span class="o">.</span><span class="n">dio_input_read_port</span><span class="p">()</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">inputs</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;channel 3 is 0&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;channel 3 is 1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If a channel is configured as an output this will return the value
+present at the terminal.</p>
+<p>Care must be taken when latched inputs are enabled. If a latched input
+changes between input reads then changes back to its original value, the
+next input read will report the change to the first value then the
+following read will show the original value.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The input values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_input_read_tuple">
+<code class="descname">dio_input_read_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_input_read_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all digital inputs at once as a tuple.</p>
+<p>Returns a tuple of all input values in channel order. For example, to
+compare the channel 1 input to the channel 3 input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inputs</span> <span class="o">=</span> <span class="n">mcc152</span><span class="o">.</span><span class="n">dio_input_read_tuple</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;channel 1 and channel 3 inputs are the same&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If a channel is configured as an output this will return the value
+present at the terminal.</p>
+<p>Care must be taken when latched inputs are enabled. If a latched input
+changes between input reads then changes back to its original value, the
+next input read will report the change to the first value then the
+following read will show the original value.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>tuple of int: The input values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_write_bit">
+<code class="descname">dio_output_write_bit</code><span class="sig-paren">(</span><em>channel</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_write_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a single digital output channel.</p>
+<p>If the specified channel is configured as an input this will not have
+any effect at the terminal, but allows the output register to be loaded
+before configuring the channel as an output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel</strong> (<em>int</em>) – The digital channel number, 0-7.</li>
+<li><strong>value</strong> (<em>int</em>) – The output value, 0 or 1.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_write_port">
+<code class="descname">dio_output_write_port</code><span class="sig-paren">(</span><em>values</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_write_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all digital output channel values.</p>
+<p>Pass an integer in the range of 0 - 255, where each bit represents the
+value of the associated channel (bit 0 is channel 0, etc.) If a
+specified channel is configured as an input this will not have any
+effect at the terminal, but allows the output register to be loaded
+before configuring the channel as an output.</p>
+<p>To change specific outputs without affecting other outputs first read
+the output values with dio_output_read_port(), change the desired bits
+in the result, then write them back.</p>
+<p>For example, to set channels 0 and 2 to 1 without affecting the other
+outputs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="n">mcc152</span><span class="o">.</span><span class="n">dio_output_read_port</span><span class="p">()</span>
+<span class="n">values</span> <span class="o">|=</span> <span class="mh">0x05</span>
+<span class="n">mcc152</span><span class="o">.</span><span class="n">dio_output_write_port</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>integer</em>) – The output values.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_write_dict">
+<code class="descname">dio_output_write_dict</code><span class="sig-paren">(</span><em>value_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_write_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write multiple digital output channel values.</p>
+<p>Pass a dictionary containing channel:value pairs. If a channel is
+repeated in the dictionary then the last value will be used. If a
+specified channel is configured as an input this will not have any
+effect at the terminal, but allows the output register to be loaded
+before configuring the channel as an output.</p>
+<p>For example, to set channels 0 and 2 to 1 without affecting the other
+outputs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">1</span> <span class="p">}</span>
+<span class="n">mcc152</span><span class="o">.</span><span class="n">dio_output_write_dict</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>value_dict</strong> (<em>dictionary</em>) – The output values in a dictionary of
+channel:value pairs.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_read_bit">
+<code class="descname">dio_output_read_bit</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_read_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a single digital output channel value.</p>
+<p>This function returns the value stored in the output register. It may
+not represent the value at the terminal if the channel is configured as
+input or open-drain output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> (<em>int</em>) – The digital channel number, 0-7.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The output value.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_read_port">
+<code class="descname">dio_output_read_port</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_read_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all digital output channel values.</p>
+<p>Returns the values as an integer with a value of 0 - 255. Each channel
+is represented by a bit in the integer (bit 0 is channel 0, etc.) The
+value of a specific output can be found by examining the bit at that
+location.</p>
+<p>This function returns the values stored in the output register. They may
+not represent the value at the terminal if the channel is configured as
+input or open-drain output.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The output values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_output_read_tuple">
+<code class="descname">dio_output_read_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_output_read_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read all digital output channel values at once as a tuple.</p>
+<p>Returns a tuple of all output values in channel order. For example, to
+compare the channel 1 output to the channel 3 output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">outputs</span> <span class="o">=</span> <span class="n">mcc152</span><span class="o">.</span><span class="n">dio_output_read_tuple</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;channel 1 and channel 3 outputs are the same&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function returns the values stored in the output register. They may
+not represent the value at the terminal if the channel is configured as
+input or open-drain output.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>tuple of int: The output values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_int_status_read_bit">
+<code class="descname">dio_int_status_read_bit</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_int_status_read_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the interrupt status for a single channel.</p>
+<p>Returns 0 if the input is not generating an interrupt, 1 if it is
+generating an interrupt.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The interrupt status value.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_int_status_read_port">
+<code class="descname">dio_int_status_read_port</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_int_status_read_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the interrupt status for all channels.</p>
+<p>Returns the values as an integer with a value of 0 - 255. Each channel
+is represented by a bit in the integer (bit 0 is channel 0, etc.) The
+status for a specific input can be found by examining the bit at that
+location. Each bit will be 0 if the channel is not generating an
+interrupt or 1 if it is generating an interrupt.</p>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The interrupt status values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_int_status_read_tuple">
+<code class="descname">dio_int_status_read_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_int_status_read_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the interrupt status for all channels as a tuple.</p>
+<p>Returns a tuple of all interrupt status values in channel order. Each
+value will be 0 if the channel is not generating an interrupt or 1 if it
+is generating an interrupt. For example, to see if an interrupt has
+occurred on channel 2 or 4:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">status</span> <span class="o">=</span> <span class="n">mcc152</span><span class="o">.</span><span class="n">dio_int_status_read_tuple</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">status</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;an interrupt has occurred on channel 2 or 4&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>tuple of int: The status values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_write_bit">
+<code class="descname">dio_config_write_bit</code><span class="sig-paren">(</span><em>channel</em>, <em>item</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_write_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a digital I/O configuration value for a single channel.</p>
+<p>There are several configuration items that may be written for the
+digital I/O. The item is selected with the <strong>item</strong> argument, which may
+be one of the <a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a> values:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Set the digital I/O channel
+direction by passing 0 for output and 1 for input.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Configure the pull-up/down
+resistor by passing 0 for pull-down or 1 for pull-up. The resistor may
+be enabled or disabled with the <a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>
+item.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Enable or disable the
+pull-up/down resistor by passing 0 for disabled or 1 for enabled. The
+resistor is configured for pull-up/down with the
+<a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a> item. The resistor is
+automatically disabled if the bit is set to output and is configured
+as open-drain.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Enable inverting the input by
+passing a 0 for normal input or 1 for inverted.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Enable input latching by
+passing 0 for non-latched or 1 for latched.</p>
+<p>When the input is non-latched, reads show the current status of the
+input. A state change in the input generates an interrupt (if it is
+not masked). A read of the input clears the interrupt. If the input
+goes back to its initial logic state before the input is read, then
+the interrupt is cleared.</p>
+<p>When the input is latched, a change of state of the input generates an
+interrupt and the input logic value is loaded into the input port
+register. A read of the input will clear the interrupt. If the input
+returns to its initial logic state before the input is read, then the
+interrupt is not cleared and the input register keeps the logic value
+that initiated the interrupt. The next read of the input will show the
+initial state. Care must be taken when using bit reads on the input
+when latching is enabled - the bit method still reads the entire input
+register so a change on another bit could be missed. It is best to use
+port or tuple input reads when using latching.</p>
+<p>If the input is changed from latched to non-latched, a read from the
+input reflects the current terminal logic level. If the input is
+changed from non-latched to latched input, the read from the input
+represents the latched logic level.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Set the output type by writing
+0 for push-pull or 1 for open-drain. This setting affects all outputs
+so is not a per-channel setting and the channel argument is ignored.
+It should be set to the desired type before using
+<a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a> item to set channels as outputs.
+Internal pull-up/down resistors are disabled when a bit is set to
+output and is configured as open-drain, so external resistors should
+be used.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Enable or disable interrupt
+generation by masking the interrupt. Write 0 to enable the interrupt
+or 1 to mask (disable) it.</p>
+<p>All MCC 152s share a single interrupt signal to the CPU, so when an
+interrupt occurs the user must determine the source, optionally act
+on the interrupt, then clear that source so that other interrupts
+may be detected. The current interrupt state may be read with
+<a class="reference internal" href="#daqhats.interrupt_state" title="daqhats.interrupt_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_state()</span></code></a>. A user program may wait for the interrupt
+to become active with <a class="reference internal" href="#daqhats.wait_for_interrupt" title="daqhats.wait_for_interrupt"><code class="xref py py-func docutils literal notranslate"><span class="pre">wait_for_interrupt()</span></code></a>, or may register
+an interrupt callback function with
+<a class="reference internal" href="#daqhats.interrupt_callback_enable" title="daqhats.interrupt_callback_enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_enable()</span></code></a>. This allows the user to wait for
+a change on one or more inputs without constantly reading the inputs.
+The source of the interrupt may be determined by reading the interrupt
+status of each MCC 152 with <a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_bit" title="daqhats.mcc152.dio_int_status_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_bit()</span></code></a>,
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_port" title="daqhats.mcc152.dio_int_status_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_port()</span></code></a> or
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_tuple" title="daqhats.mcc152.dio_int_status_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_tuple()</span></code></a>, and all active interrupt
+sources must be cleared before the interrupt will become inactive. The
+interrupt is cleared by reading the input with
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_bit" title="daqhats.mcc152.dio_input_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_bit()</span></code></a>, <a class="reference internal" href="#daqhats.mcc152.dio_input_read_port" title="daqhats.mcc152.dio_input_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_port()</span></code></a>, or
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_tuple" title="daqhats.mcc152.dio_input_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_tuple()</span></code></a>.</p>
+</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel</strong> (<em>integer</em>) – The digital I/O channel, 0 - 7</li>
+<li><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</li>
+<li><strong>value</strong> (<em>integer</em>) – The configuration value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_write_port">
+<code class="descname">dio_config_write_port</code><span class="sig-paren">(</span><em>item</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_write_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a digital I/O configuration value for all channels.</p>
+<p>There are several configuration items that may be written for the
+digital I/O. They are written for all channels at once using an 8-bit
+value passed in <strong>value</strong>, where each bit corresponds to a channel (bit
+0 is channel 0, etc.) The item is selected with the <strong>item</strong> argument,
+which may be one of the <a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a> values.</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Set the digital I/O channel
+directions by passing 0 in a bit for output and 1 for input.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Configure the pull-up/down
+resistors by passing 0 in a bit for pull-down or 1 for pull-up. The
+resistors may be enabled or disabled with the
+<a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a> item.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Enable or disable pull-up/down
+resistors by passing 0 in a bit for disabled or 1 for enabled. The
+resistors are configured for pull-up/down with the
+<a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a> item. The resistors are
+automatically disabled if the bits are set to output and configured as
+open-drain.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Enable inverting inputs by
+passing a 0 in a bit for normal input or 1 for inverted.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Enable input latching by
+passing 0 in a bit for non-latched or 1 for latched.</p>
+<p>When the input is non-latched, reads show the current status of the
+input. A state change in the corresponding input generates an
+interrupt (if it is not masked). A read of the input clears the
+interrupt. If the input goes back to its initial logic state before
+the input is read, then the interrupt is cleared. When the input is
+latched, a change of state of the input generates an interrupt and the
+input logic value is loaded into the input port register. A read of
+the input will clear the interrupt. If the input returns to its
+initial logic state before the input is read, then the interrupt is
+not cleared and the input register keeps the logic value that
+initiated the interrupt. The next read of the input will show the
+initial state. Care must be taken when using bit reads on the input
+when latching is enabled - the bit method still reads the entire input
+register so a change on another bit could be missed. It is best to use
+port or tuple input reads when using latching.</p>
+<p>If the input is changed from latched to non-latched, a read from the
+input reflects the current terminal logic level. If the input is
+changed from non-latched to latched input, the read from the input
+represents the latched logic level.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Set the output type by writing
+0 for push-pull or 1 for open-drain. This setting affects all outputs
+so is not a per-channel setting. It should be set to the desired type
+before using <a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a> to set channels as
+outputs. Internal pull-up/down resistors are disabled when a bit is
+set to output and is configured as open-drain, so external resistors
+should be used.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Enable or disable interrupt
+generation for specific inputs by masking the interrupt. Write 0 in a
+bit to enable the interrupt from that channel or 1 to mask (disable)
+it.</p>
+<p>All MCC 152s share a single interrupt signal to the CPU, so when an
+interrupt occurs the user must determine the source, optionally act
+on the interrupt, then clear that source so that other interrupts
+may be detected. The current interrupt state may be read with
+<a class="reference internal" href="#daqhats.interrupt_state" title="daqhats.interrupt_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_state()</span></code></a>. A user program may wait for the interrupt
+to become active with <a class="reference internal" href="#daqhats.wait_for_interrupt" title="daqhats.wait_for_interrupt"><code class="xref py py-func docutils literal notranslate"><span class="pre">wait_for_interrupt()</span></code></a>, or may register
+an interrupt callback function with
+<a class="reference internal" href="#daqhats.interrupt_callback_enable" title="daqhats.interrupt_callback_enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_enable()</span></code></a>. This allows the user to wait for
+a change on one or more inputs without constantly reading the inputs.
+The source of the interrupt may be determined by reading the interrupt
+status of each MCC 152 with <a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_bit" title="daqhats.mcc152.dio_int_status_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_bit()</span></code></a>,
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_port" title="daqhats.mcc152.dio_int_status_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_port()</span></code></a> or
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_tuple" title="daqhats.mcc152.dio_int_status_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_tuple()</span></code></a>, and all active interrupt
+sources must be cleared before the interrupt will become inactive. The
+interrupt is cleared by reading the input with
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_bit" title="daqhats.mcc152.dio_input_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_bit()</span></code></a>, <a class="reference internal" href="#daqhats.mcc152.dio_input_read_port" title="daqhats.mcc152.dio_input_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_port()</span></code></a>, or
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_tuple" title="daqhats.mcc152.dio_input_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_tuple()</span></code></a>.</p>
+</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</li>
+<li><strong>value</strong> (<em>integer</em>) – The configuration value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_write_dict">
+<code class="descname">dio_config_write_dict</code><span class="sig-paren">(</span><em>item</em>, <em>value_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_write_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a digital I/O configuration value for multiple channels.</p>
+<p>There are several configuration items that may be written for the
+digital I/O. They are written for multiple channels at once using a
+dictionary of channel:value pairs. If a channel is repeated in the
+dictionary then the last value will be used. The item is selected with
+the <strong>item</strong> argument, which may be one of the <a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>
+values:</p>
+<ul>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Set the digital I/O channel
+directions by passing 0 in a value for output and 1 for input.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Configure the pull-up/down
+resistors by passing 0 in a value for pull-down or 1 for pull-up. The
+resistors may be enabled or disabled with the
+<a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a> item.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Enable or disable pull-up/down
+resistors by passing 0 in a value for disabled or 1 for enabled. The
+resistors are configured for pull-up/down with the
+<a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a> item. The resistors are
+automatically disabled if the bits are set to output and configured as
+open-drain.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Enable inverting inputs by
+passing a 0 in a value for normal input or 1 for inverted.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Enable input latching by
+passing 0 in a value for non-latched or 1 for latched.</p>
+<p>When the input is non-latched, reads show the current status of the
+input. A state change in the corresponding input generates an
+interrupt (if it is not masked). A read of the input clears the
+interrupt. If the input goes back to its initial logic state before
+the input is read, then the interrupt is cleared. When the input is
+latched, a change of state of the input generates an interrupt and the
+input logic value is loaded into the input port register. A read of
+the input will clear the interrupt. If the input returns to its
+initial logic state before the input is read, then the interrupt is
+not cleared and the input register keeps the logic value that
+initiated the interrupt. The next read of the input will show the
+initial state. Care must be taken when using bit reads on the input
+when latching is enabled - the bit method still reads the entire input
+register so a change on another bit could be missed. It is best to use
+port or tuple input reads when using latching.</p>
+<p>If the input is changed from latched to non-latched, a read from the
+input reflects the current terminal logic level. If the input is
+changed from non-latched to latched input, the read from the input
+represents the latched logic level.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Set the output type by writing
+0 for push-pull or 1 for open-drain. This setting affects all outputs
+so is not a per-channel setting. It should be set to the desired type
+before using <a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a> to set channels as
+outputs. Internal pull-up/down resistors are disabled when a bit is
+set to output and is configured as open-drain, so external resistors
+should be used.</p>
+</li>
+<li><p class="first"><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Enable or disable interrupt
+generation for specific inputs by masking the interrupt. Write 0 in a
+value to enable the interrupt from that channel or 1 to mask (disable)
+it.</p>
+<p>All MCC 152s share a single interrupt signal to the CPU, so when an
+interrupt occurs the user must determine the source, optionally act
+on the interrupt, then clear that source so that other interrupts
+may be detected. The current interrupt state may be read with
+<a class="reference internal" href="#daqhats.interrupt_state" title="daqhats.interrupt_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_state()</span></code></a>. A user program may wait for the interrupt
+to become active with <a class="reference internal" href="#daqhats.wait_for_interrupt" title="daqhats.wait_for_interrupt"><code class="xref py py-func docutils literal notranslate"><span class="pre">wait_for_interrupt()</span></code></a>, or may register
+an interrupt callback function with
+<a class="reference internal" href="#daqhats.interrupt_callback_enable" title="daqhats.interrupt_callback_enable"><code class="xref py py-func docutils literal notranslate"><span class="pre">interrupt_callback_enable()</span></code></a>. This allows the user to wait for
+a change on one or more inputs without constantly reading the inputs.
+The source of the interrupt may be determined by reading the interrupt
+status of each MCC 152 with <a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_bit" title="daqhats.mcc152.dio_int_status_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_bit()</span></code></a>,
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_port" title="daqhats.mcc152.dio_int_status_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_port()</span></code></a> or
+<a class="reference internal" href="#daqhats.mcc152.dio_int_status_read_tuple" title="daqhats.mcc152.dio_int_status_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_int_status_read_tuple()</span></code></a>, and all active interrupt
+sources must be cleared before the interrupt will become inactive. The
+interrupt is cleared by reading the input with
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_bit" title="daqhats.mcc152.dio_input_read_bit"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_bit()</span></code></a>, <a class="reference internal" href="#daqhats.mcc152.dio_input_read_port" title="daqhats.mcc152.dio_input_read_port"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_port()</span></code></a>, or
+<a class="reference internal" href="#daqhats.mcc152.dio_input_read_tuple" title="daqhats.mcc152.dio_input_read_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">dio_input_read_tuple()</span></code></a>.</p>
+</li>
+</ul>
+<p>For example, to set channels 6 and 7 to output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">values</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">6</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="mi">0</span> <span class="p">}</span>
+<span class="n">mcc152</span><span class="o">.</span><span class="n">dio_config_write_dict</span><span class="p">(</span><span class="n">DIOConfigItem</span><span class="o">.</span><span class="n">DIRECTION</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</li>
+<li><strong>value_dict</strong> (<em>dictionary</em>) – The configuration values for multiple
+channels in a dictionary of channel:value pairs.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_read_bit">
+<code class="descname">dio_config_read_bit</code><span class="sig-paren">(</span><em>channel</em>, <em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_read_bit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a digital I/O configuration value for a single channel.</p>
+<p>There are several configuration items that may be read for the digital
+I/O. The item is selected with the <strong>item</strong> argument, which may be one
+of the DIOConfigItems values:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Read the digital I/O channel
+direction setting, where 0 is output and 1 is input.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Read the pull-up/down resistor
+configuration where 0 is pull-down and 1 is pull-up.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Read the pull-up/down resistor
+enable setting where 0 is disabled and 1 is enabled.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Read the input inversion
+setting where 0 is normal input and 1 is inverted.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Read the input latching setting
+where 0 is non-latched and 1 is latched.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Read the output type setting
+where 0 is push-pull and 1 is open-drain. This setting affects all
+outputs so is not a per-channel setting and the channel argument is
+ignored.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Read the interrupt mask setting
+where 0 in a bit enables the interrupt and 1 disables it.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>channel</strong> (<em>integer</em>) – The digital I/O channel, 0 - 7.</li>
+<li><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The configuration item value.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_read_port">
+<code class="descname">dio_config_read_port</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_read_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a digital I/O configuration value for all channels.</p>
+<p>There are several configuration items that may be read for the digital
+I/O. They are read for all channels at once, returning an 8-bit integer
+where each bit corresponds to a channel (bit 0 is channel 0, etc.) The
+item is selected with the <strong>item</strong> argument, which may be one of the
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a> values:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Read the digital I/O channels
+direction settings, where 0 in a bit is output and 1 is input.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Read the pull-up/down resistor
+configurations where 0 in a bit is pull-down and 1 is pull-up.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Read the pull-up/down resistor
+enable settings where 0 in a bit is disabled and 1 is enabled.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Read the input inversion
+settings where 0 in a bit is normal input and 1 is inverted.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Read the input latching
+settings where 0 in a bit is non-latched and 1 is latched.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Read the output type setting
+where 0 is push-pull and 1 is open-drain. This setting affects all
+outputs so is not a per-channel setting.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Read the interrupt mask settings
+where 0 in a bit enables the interrupt and 1 disables it.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>int: The configuration item value.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.dio_config_read_tuple">
+<code class="descname">dio_config_read_tuple</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.dio_config_read_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a digital I/O configuration value for all channels as a tuple.</p>
+<p>There are several configuration items that may be read for the digital
+I/O. They are read for all channels at once, returning a tuple in
+channel order. The item is selected with the <strong>item</strong> argument, which
+may be one of the <a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a> values:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.DIRECTION" title="daqhats.DIOConfigItem.DIRECTION"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.DIRECTION</span></code></a>: Read the digital I/O channels
+direction settings, where 0 in a value is output and 1 is input.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="daqhats.DIOConfigItem.PULL_CONFIG"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_CONFIG</span></code></a>: Read the pull-up/down resistor
+configurations where 0 in a value is pull-down and 1 is pull-up.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="daqhats.DIOConfigItem.PULL_ENABLE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.PULL_ENABLE</span></code></a>: Read the pull-up/down resistor
+enable settings where 0 in a value is disabled and 1 is enabled.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="daqhats.DIOConfigItem.INPUT_INVERT"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_INVERT</span></code></a>: Read the input inversion
+settings where 0 in a value is normal input and 1 is inverted.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="daqhats.DIOConfigItem.INPUT_LATCH"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INPUT_LATCH</span></code></a>: Read the input latching
+settings where 0 in a value is non-latched and 1 is latched.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="daqhats.DIOConfigItem.OUTPUT_TYPE"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.OUTPUT_TYPE</span></code></a>: Read the output type setting
+where 0 is push-pull and 1 is open-drain. This setting affects all
+outputs so is not a per-channel setting.</li>
+<li><a class="reference internal" href="#daqhats.DIOConfigItem.INT_MASK" title="daqhats.DIOConfigItem.INT_MASK"><code class="xref py py-const docutils literal notranslate"><span class="pre">DIOConfigItem.INT_MASK</span></code></a>: Read the interrupt mask settings
+where 0 in a value enables the interrupt and 1 disables it.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>item</strong> (<em>integer</em>) – The configuration item, one of
+<a class="reference internal" href="#daqhats.DIOConfigItem" title="daqhats.DIOConfigItem"><code class="xref py py-class docutils literal notranslate"><span class="pre">DIOConfigItem</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>tuple of int: The configuration item values.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – an argument is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc152.address">
+<code class="descname">address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the device address.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>Data<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="dio-config-items">
+<h4>DIO Config Items<a class="headerlink" href="#dio-config-items" title="Permalink to this headline">¶</a></h4>
+<dl class="class">
+<dt id="daqhats.DIOConfigItem">
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">DIOConfigItem</code><a class="headerlink" href="#daqhats.DIOConfigItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Digital I/O Configuration Items.</p>
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.DIRECTION">
+<code class="descname">DIRECTION</code><em class="property"> = 0</em><a class="headerlink" href="#daqhats.DIOConfigItem.DIRECTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure channel direction</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.PULL_CONFIG">
+<code class="descname">PULL_CONFIG</code><em class="property"> = 1</em><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure pull-up/down resistor</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.PULL_ENABLE">
+<code class="descname">PULL_ENABLE</code><em class="property"> = 2</em><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable pull-up/down resistor</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.INPUT_INVERT">
+<code class="descname">INPUT_INVERT</code><em class="property"> = 3</em><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure input inversion</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.INPUT_LATCH">
+<code class="descname">INPUT_LATCH</code><em class="property"> = 4</em><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure input latching</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.OUTPUT_TYPE">
+<code class="descname">OUTPUT_TYPE</code><em class="property"> = 5</em><a class="headerlink" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure output type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="daqhats.DIOConfigItem.INT_MASK">
+<code class="descname">INT_MASK</code><em class="property"> = 6</em><a class="headerlink" href="#daqhats.DIOConfigItem.INT_MASK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure interrupt mask</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
 </div>
 
 
@@ -1102,7 +2428,7 @@ responds incorrectly.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0',
+            VERSION:'1.1.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

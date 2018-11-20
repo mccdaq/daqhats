@@ -37,6 +37,15 @@ daqhats_read_eeproms
 
 echo
 
+echo "Installing library for Python 3"
+dpkg-query -l python3-pip &> /dev/null
+if [ "$?" != "0" ]; then
+   apt-get -qy install python3-pip
+fi
+pip3 install . --upgrade
+
+echo
+
 # Install the Python package
 if [ $(which python | wc -l) -ne 0 ]; then
    echo -n "Do you want to install support for Python 2? [y/n] "
@@ -53,19 +62,15 @@ fi
 
 echo
 
-if [ $(which python3 | wc -l) -ne 0 ]; then
-   echo -n "Do you want to install support for Python 3? [y/n] "
+# Check for I2C device enabled
+if [ $(raspi-config nonint get_i2c) -eq 1 ]; then
+   echo "Some MCC DAQ HATs require the I2C interface to be enabled."
+   echo -n "Would you like to enable the I2C interface now? [y/n] "
    read input
    if [ "$input" == "y" ]; then
-      echo "Installing library for Python 3"
-      dpkg-query -l python3-pip &> /dev/null
-      if [ "$?" != "0" ]; then
-         apt-get -qy install python3-pip
-      fi
-      pip3 install . --upgrade
+      raspi-config nonint do_i2c 0
    fi
+   echo
 fi
-
-echo
 
 echo "Install complete"

@@ -4,15 +4,23 @@ Global functions and data
 Functions
 ---------
 
-===========================  ===================================================
-Function                     Description
----------------------------  ---------------------------------------------------
-:c:func:`hat_list`           Return a list of detected DAQ HAT boards.
-:c:func:`hat_error_message`  Return a text description for a DAQ HAT result.
-===========================  ===================================================
+========================================  ===============================================
+Function                                  Description
+----------------------------------------  -----------------------------------------------
+:c:func:`hat_list`                        Return a list of detected DAQ HAT boards.
+:c:func:`hat_error_message`               Return a text description for a DAQ HAT result.
+:c:func:`hat_wait_for_interrupt`          Wait for an interrupt to occur.
+:c:func:`hat_interrupt_state`             Read the current interrupt status.
+:c:func:`hat_interrupt_callback_enable`   Enable an interrupt callback function.
+:c:func:`hat_interrupt_callback_disable`  Disable interrupt callback function.
+========================================  ===============================================
 
 .. doxygenfunction:: hat_list
 .. doxygenfunction:: hat_error_message
+.. doxygenfunction:: hat_wait_for_interrupt
+.. doxygenfunction:: hat_interrupt_state
+.. doxygenfunction:: hat_interrupt_callback_enable
+.. doxygenfunction:: hat_interrupt_callback_disable
 
 Data types and definitions
 --------------------------

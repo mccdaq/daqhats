@@ -12,8 +12,7 @@ Installing a single board
 
     .. only:: html
 
-        .. image:: images/standoff.jpg
-            :scale: 20%
+        .. image:: images/standoff-web.jpg
 
     .. only:: latex
 
@@ -24,9 +23,8 @@ Installing a single board
 
     .. only:: html
 
-        .. image:: images/connector.jpg
-            :scale: 30%
-    
+        .. image:: images/connector-web.jpg
+
     .. only:: latex
 
         .. image:: images/connector.jpg

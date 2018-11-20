@@ -10,6 +10,7 @@
 
 // include files for DAQ HAT boards
 #include "mcc118.h"
+#include "mcc152.h"
 
 /// Known DAQ HAT IDs.
 enum HatIDs
@@ -19,7 +20,9 @@ enum HatIDs
     /// MCC 118 ID
     HAT_ID_MCC_118 = 0x0142,
     /// MCC 118 in firmware update mode ID
-    HAT_ID_MCC_118_BOOTLOADER = 0x8142
+    HAT_ID_MCC_118_BOOTLOADER = 0x8142,
+    /// MCC 152 ID
+    HAT_ID_MCC_152 = 0x0144
 };
 
 /// Return values from the library functions.
@@ -39,6 +42,8 @@ enum ResultCode
     RESULT_INVALID_DEVICE      = -5,
     /// A needed resource was not available.
     RESULT_RESOURCE_UNAVAIL    = -6,
+    /// Could not communicate with the device.
+    RESULT_COMMS_FAILURE       = -7,
     /// Some other error occurred.
     RESULT_UNDEFINED           = -10
 };
@@ -48,7 +53,7 @@ enum ResultCode
 /// The maximum number of DAQ HATs that may be connected.
 #define MAX_NUMBER_HATS         8   
 
-// Scan / read flags
+// Scan / read / write flags
 /// Default behavior.
 #define OPTS_DEFAULT            (0x0000)
 /// Read / write unscaled data.
@@ -126,6 +131,88 @@ int hat_list(uint16_t filter_id, struct HatInfo* list);
 *   @return The error message.
 */
 const char* hat_error_message(int result);
+
+/**
+*   Read the current interrupt status.
+*
+*   It returns the status of the interrupt signal.  This signal can be shared by
+*   multiple boards so the status of each board that may generate must be read
+*   and the interrupt source(s) cleared before the interrupt will become
+*   inactive.
+*
+*   This function only applies when using devices that can generate an
+*   interrupt:
+*       - MCC 152
+*
+*   @return 1 if interrupt is active, 0 if inactive.
+*/
+int hat_interrupt_state(void);
+
+/**
+*   Wait for an interrupt to occur.
+*
+*   It waits for the interrupt signal to become active, with a timeout
+*   parameter.
+*   
+*   This function only applies when using devices that can generate an
+*   interrupt:
+*       - MCC 152
+*
+*   @param timeout  Wait timeout in milliseconds. -1 to wait forever, 0 to
+*       return immediately.
+*   @return [RESULT_TIMEOUT](@ref RESULT_TIMEOUT),
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS), or 
+*       [RESULT_UNDEFINED](@ref RESULT_UNDEFINED).
+*/
+int hat_wait_for_interrupt(int timeout);
+
+/**
+*   Enable an interrupt callback function.
+*
+*   Set a function that will be called when a DAQ HAT interrupt occurs. The 
+*   function must have a void return type and void * argument, such as:
+*
+*       void function(void* user_data)
+*
+*   The function will be called when the DAQ HAT interrupt signal becomes
+*   active, and cannot be called again until the interrupt signal becomes
+*   inactive. Active sources become inactive when manually cleared (such as
+*   reading the digital I/O inputs or clearing the interrupt enable.) If not
+*   latched, an active source also becomes inactive when the value returns to
+*   the original value (the value at the source before the interrupt was
+*   generated.)
+*
+*   The user_data argument can be used for passing a reference to anything 
+*   needed by the callback function. It will be passed to the callback function
+*   when the interrupt occurs. Set it to NULL if not needed.
+
+*   There may only be one callback function at a time; if you call this
+*   when a function is already set as the callback function then it will be
+*   replaced with the new function and the old function will no longer be called
+*   if an interrupt occurs.
+*
+*   The callback function may be disabled with hat_interrupt_callback_disable().
+*
+*   This function only applies when using devices that can generate an
+*   interrupt:
+*       - MCC 152
+*
+*   @param function     The callback function.
+*   @param user_data    The data to pass to the callback function.
+*   @return [RESULT_SUCCESS](@ref RESULT_SUCCESS) or 
+*       [RESULT_UNDEFINED](@ref RESULT_UNDEFINED).
+*/
+int hat_interrupt_callback_enable(void (*function)(void*), void* user_data);
+
+/**
+*   Disable interrupt callbacks.
+*
+*   Removes any callback function from the interrupt handler.
+*
+*   @return [RESULT_SUCCESS](@ref RESULT_SUCCESS) or
+*       [RESULT_UNDEFINED](@ref RESULT_UNDEFINED).
+*/
+int hat_interrupt_callback_disable(void);
 
 #ifdef __cplusplus
 }

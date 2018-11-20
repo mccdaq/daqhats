@@ -36,6 +36,9 @@ int main(int argc, char* argv[])
         case HAT_ID_MCC_118:
             printf("Type: MCC 118\n");
             break;
+        case HAT_ID_MCC_152:
+            printf("Type: MCC 152\n");
+            break;
         default:
             printf("Type: Unknown\n");
             break;
