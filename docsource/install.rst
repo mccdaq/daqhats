@@ -38,7 +38,7 @@ then repeat steps 5 - 7.
     
 You can now run the example programs under ~/daqhats/examples and create your own programs.
 
-If you are using the Raspbian desktop interface the DAQ HAT Manager utility will be
+If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
 available under the Accessories start menu. This utility will allow you to list the
 detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
 control applications for each DAQ HAT to perform simple operations. The code for these
