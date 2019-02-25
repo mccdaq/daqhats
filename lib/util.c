@@ -120,6 +120,7 @@ static const char* HAT_ERROR_MESSAGES[] =
 // Variables
 static bool _address_initialized = false;
 static int lockfile;
+static pthread_mutex_t spi_mutex;
 
 // *****************************************************************************
 // Local Functions
@@ -234,17 +235,23 @@ uint32_t _difftime_ms(struct timespec* start, struct timespec* end)
         return (uint32_t)diff;
 }
 
-// There can be multiple boards in a system with multiple processes
-// communicating with the boards, and all will use a single SPI port.
-// Keep the SPI port locked to a single process for the duration of
-// the transaction with a lock file.  All MCC HAT libraries will use
-// this same lock file. This avoids the issue with named semaphores
-// where the semaphore could be stuck at 0 if a process receives
-// SIGKILL before incrementing the semaphore.  If the process dies the
-// file handle is automatically released.
-
 /******************************************************************************
-  Use lock files to control access to the SPI bus by multiple processes.
+  Control access to the SPI bus by multiple processes.
+
+  There can be multiple boards in a system with multiple processes
+  communicating with the boards, and all will use a single SPI port.
+  Keep the SPI port locked to a single process for the duration of
+  the transaction with a lock file.  All MCC HAT libraries will use
+  this same lock file. This avoids the issue with named semaphores
+  where the semaphore could be stuck at 0 if a process receives
+  SIGKILL before incrementing the semaphore.  If the process dies the
+  file handle is automatically released.
+ 
+  The flock() mechanism does not work for multiple threads within the same
+  process - the same file descriptor is shared among all the threads so once one
+  of them has a lock then flock() will return successfully for any other thread
+  that requests the lock.  We use a pthread_mutex to control cross-thread
+  locking.
 
   Return: int, file descriptor (RESULT_TIMEOUT for time out obtaining lock)
  *****************************************************************************/
@@ -282,6 +289,10 @@ int _obtain_lock(void)
         return RESULT_TIMEOUT;
     }
 
+    // Multiple threads in the same process will share the above file
+    // descriptor, so flock() will not work. Use a mutex for this scenario.
+    pthread_mutex_init(&spi_mutex, NULL);
+
     return lockfile;
 }
 
@@ -292,6 +303,7 @@ int _obtain_lock(void)
 void _release_lock(int lock_fd)
 {
     flock(lock_fd, LOCK_UN);
+    pthread_mutex_unlock(&spi_mutex);
 }
 
 
