@@ -289,9 +289,9 @@ int _obtain_lock(void)
         return RESULT_TIMEOUT;
     }
 
-    // Multiple threads in the same process will share the above file
-    // descriptor, so flock() will not work. Use a mutex for this scenario.
-    pthread_mutex_init(&spi_mutex, NULL);
+    // file locking will not work for multiple threads in the same process, so
+    // use a mutex as well
+    pthread_mutex_lock(&spi_mutex);
 
     return lockfile;
 }
