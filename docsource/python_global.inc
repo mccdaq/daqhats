@@ -47,8 +47,3 @@ HatError class
 --------------
 
 .. autoexception:: HatError
-
-HatCallback class
------------------
-
-.. autoclass:: HatCallback

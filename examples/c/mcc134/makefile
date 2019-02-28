@@ -1,0 +1,10 @@
+TOPTARGETS := all clean
+
+SUBDIRS := single_value_read
+
+$(TOPTARGETS): $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+.PHONY: $(TOPTARGETS) $(SUBDIRS)
+

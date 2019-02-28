@@ -1,6 +1,6 @@
 MAJOR = 1
-MINOR = 1
-SUB   = 0.1
+MINOR = 2
+SUB   = 0
 NAME = daqhats
 VERSION = $(MAJOR).$(MINOR).$(SUB)
 INSTALL_DIR = /usr/local/lib
@@ -12,7 +12,7 @@ LDFLAGS = -L/opt/vc/lib -shared -pthread -lm -lbcm_host -Wl,-soname,lib$(NAME).s
 RM = rm -f  
 TARGET_LIB = lib$(NAME).so.$(VERSION)
 
-SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c
+SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c mcc134.c mcc134_adc.c nist.c
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:%.o=%.d)
 
@@ -46,5 +46,5 @@ uninstall:
 .PHONY: clean
 
 clean:
-	@${RM} $(BUILD_DIR)/${TARGET_LIB} ${OBJS} ${DEPS}
-	@rmdir $(BUILD_DIR)
+	@${RM} ${OBJS} ${DEPS}
+	@rm -rf $(BUILD_DIR)

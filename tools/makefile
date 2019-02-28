@@ -35,7 +35,7 @@ uninstall:
 	@rm -f $(INSTALL_DIR)/daqhats_read_eeproms
 	@rm -f $(INSTALL_DIR)/daqhats_list_boards
 	@rm -rf $(APPS_DIR)
-	@rm -f $(SHORTCUT_DIR)/mcc_daqhats_manager.desktop
+	@rm -f $(SHORTCUT_DIR)/mcc*_control_panel.desktop
 
 .DEFAULT_GOAL := all
 

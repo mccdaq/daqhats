@@ -38,28 +38,22 @@ then repeat steps 5 - 7.
     
 You can now run the example programs under ~/daqhats/examples and create your own programs.
 
-If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
-available under the Accessories start menu. This utility will allow you to list the
-detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
-control applications for each DAQ HAT to perform simple operations. The code for these
-programs is in the daqhats/tools/applications directory.
-
-You may display a list of the detected boards at any time with the DAQ HAT Manager or
-the command::
-
-    daqhats_list_boards
-
-If you change your board stackup and have more than one HAT board attached you must
-update the saved EEPROM images for the library to have the correct board information.
-You can use the DAQ HAT Manager or the command::
-
-    sudo daqhats_read_eeproms
-    
 To uninstall the package use::
 
     cd ~/daqhats
     sudo ./uninstall.sh
     
+If you change your board stackup and have more than one HAT board attached you must update the saved EEPROM images for the library to have the correct board information::
+
+    sudo daqhats_read_eeproms
+    
+You may display a list of the detected boards at any time with::
+
+    daqhats_list_boards
+
+There are simple control panel programs for each device type in the tools directory.
+These may only be used under the graphical version of Raspbian, and provide easy
+access to the main features of each device type.
 
 Firmware Updates
 ****************
