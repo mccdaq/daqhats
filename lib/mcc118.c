@@ -954,6 +954,11 @@ static void* _scan_thread(void* arg)
                 done = true;
                 info->scan_running = false;
             }
+            else if (info->triggered == 0)
+            {
+                // waiting for trigger, use a longer sleep time
+                sleep_us = 5000;
+            }
             else
             {
                 // determine how much data to read
