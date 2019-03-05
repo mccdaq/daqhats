@@ -1,5 +1,8 @@
-1.1.0.2: Fixed an issue with high CPU usage when waiting for a trigger on the
+1.1.0.2:
+    - Fixed an issue with high CPU usage when waiting for a trigger on the
     MCC 118 - updated both library and trigger examples.
+    - Lowered the max SPI clock rate for the MCC 118 to fix communications 
+    issues on some systems.
     
 1.1.0.1: Fixed an issue with resource conflicts when using multiple threads in
     the same process (such as using multiple MCC 118s.)
