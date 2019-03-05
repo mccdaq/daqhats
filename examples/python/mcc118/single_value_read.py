@@ -15,8 +15,8 @@
 from __future__ import print_function
 from time import sleep
 from sys import stdout
-from daqhats_utils import select_hat_device, enum_mask_to_string
 from daqhats import mcc118, OptionFlags, HatIDs, HatError
+from daqhats_utils import select_hat_device, enum_mask_to_string
 
 # Constants
 CURSOR_BACK_2 = '\x1b[2D'

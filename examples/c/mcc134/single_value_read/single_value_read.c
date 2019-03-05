@@ -29,6 +29,7 @@ int main()
     int samples_per_channel = 0;
     int delay_between_reads = 1000;  // ms
     int num_channels = mcc134_info()->NUM_AI_CHANNELS;
+    char tc_type_str[10];
     
     low_chan = 0;
     high_chan = num_channels - 1;
@@ -48,10 +49,13 @@ int main()
         result = mcc134_tc_type_write(address, channel, tc_type);
         STOP_ON_ERROR(result);
     }
+
+    convert_tc_type_to_string(tc_type, tc_type_str);
     
     printf("\nMCC 134 single data value read example\n");
     printf("    Function demonstrated: mcc134_t_in_read\n");
     printf("    Channels: %d - %d\n", low_chan, high_chan);
+    printf("    Thermocouple type: %s\n", tc_type_str);
 
     printf("\nPress 'Enter' to continue\n");
 

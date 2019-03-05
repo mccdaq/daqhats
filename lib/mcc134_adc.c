@@ -11,6 +11,7 @@
 #include <linux/spi/spidev.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include "daqhats.h"
 #include "mcc134_adc.h"
 #include "util.h"
@@ -330,6 +331,8 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
     buffer[3] = CMD_NOP;
     buffer[4] = CMD_NOP;
     
+    memset(rbuffer, 0, 5);
+
     if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) != 
         RESULT_SUCCESS)
     {
@@ -403,6 +406,8 @@ int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input,
     buffer[2] = CMD_NOP;
     buffer[3] = CMD_NOP;
     buffer[4] = CMD_NOP;
+    
+    memset(rbuffer, 0, 5);
     
     if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) != 
         RESULT_SUCCESS)

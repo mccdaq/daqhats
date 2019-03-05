@@ -15,8 +15,8 @@
 from __future__ import print_function
 from time import sleep
 from sys import stdout
-from daqhats_utils import select_hat_device, enum_mask_to_string
 from daqhats import mcc134, HatIDs, HatError, TcTypes
+from daqhats_utils import select_hat_device, tc_type_to_string
 
 # Constants
 CURSOR_BACK_2 = '\x1b[2D'
@@ -30,18 +30,19 @@ def main():
     tc_type = TcTypes.TYPE_J   # change this to the desired thermocouple type
     delay_between_reads = 1  # Seconds
     channels = (0, 1, 2, 3)
-    
+
     try:
         # Get an instance of the selected hat device object.
         address = select_hat_device(HatIDs.MCC_134)
         hat = mcc134(address)
-        
+
         for channel in channels:
             hat.tc_type_write(channel, tc_type)
-        
+
         print('\nMCC 134 single data value read example')
         print('    Function demonstrated: mcc134.t_in_read')
         print('    Channels: ' + ', '.join(str(channel) for channel in channels))
+        print('    Thermocouple type: ' + tc_type_to_string(tc_type))
         try:
             input("\nPress 'Enter' to continue")
         except (NameError, SyntaxError):
@@ -66,11 +67,11 @@ def main():
                 for channel in channels:
                     value = hat.t_in_read(channel)
                     if value == mcc134.OPEN_TC_VALUE:
-                        print('     Open     '.format(value), end='')
+                        print('     Open     ', end='')
                     elif value == mcc134.OVERRANGE_TC_VALUE:
-                        print('     OverRange'.format(value), end='')
+                        print('     OverRange', end='')
                     elif value == mcc134.COMMON_MODE_TC_VALUE:
-                        print('   Common Mode'.format(value), end='')
+                        print('   Common Mode', end='')
                     else:
                         print('{:12.2f} C'.format(value), end='')
 

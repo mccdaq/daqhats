@@ -2,7 +2,7 @@
 
 ## About
 The Python web server example demonstrates a simple web server that displays 
-data acquired from the MCC 118 HAT. This example is intended to run on a 
+data acquired from the MCC 134 HAT. This example is intended to run on a 
 single client.  
 
 ## Dependencies
@@ -20,7 +20,7 @@ Enter the following commands to install the dependencies.
 following commands: 
 
    ```sh
-   cd ~/daqhats/examples/python/mcc118/web_server
+   cd ~/daqhats/examples/python/mcc134/web_server
    ./web_server.py
    ```   
 2. Open a web browser on a device on the same network as the host device and
