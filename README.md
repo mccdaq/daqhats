@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.1.0.1</td></tr>
+    <tr><td>Library Version<td>1.2.0</td></tr>
 </table>
 
 ## About
@@ -12,12 +12,13 @@ This is the development repository for Measurement Computing DAQ HAT boards. The
 
 #### Supported MCC DAQ HAT hardware
 Hardware supported by this version of the MCC DAQ HAT Library:
-- [MCC 118](https://mccdaq.github.io/daqhats/overview.html#mcc-118)
-- [MCC 152](https://mccdaq.github.io/daqhats/overview.html#mcc-152)
+- [MCC 118](https://nwright98.github.io/daqhats_dev/overview.html#mcc-118)
+- [MCC 134](https://nwright98.github.io/daqhats_dev/overview.html#mcc-134)
+- [MCC 152](https://nwright98.github.io/daqhats_dev/overview.html#mcc-152)
 
 ## Prerequisites
 - Raspbian or Raspbian Lite image (may work with other Raspberry Pi operating systems)
-- Raspberry Pi A+, B+, 2, or 3
+- Raspberry Pi A+, B+, 2, or 3 (A+, B, B+)
 - C, C++, Python 2.7 or Python 3.4
 
 ## Raspberry Pi Configuration
@@ -52,12 +53,11 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 
    ```sh
    cd ~
-   git clone https://github.com/mccdaq/daqhats.git
+   git clone https://github.com/nwright98/daqhats_dev.git
    ```
 7. Build and install the shared library, tools, and optional Python support. The 
-   installer will install Python 3 support by default and ask if you want to install
-   Python 2 support. It will also detect the HAT board EEPROMs and save the contents,
-   if needed.
+   installer will ask if you want to install Python 2 and Python 3 support. It 
+   will also detect the HAT board EEPROMs and save the contents, if needed.
 
    ```sh
    cd ~/daqhats
@@ -70,22 +70,19 @@ then repeat steps 5 - 7.
 You can now run the example programs under ~/daqhats/examples and create your own 
 programs. Refer to the [Examples](#examples) section below for more information.
 
-If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
-available under the Accessories start menu. This utility will allow you to list the
-detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
-control applications for each DAQ HAT to perform simple operations. The code for these
-programs is in the daqhats/tools/applications directory.
+There are simple control panel programs for each device type in ~/daqhats/tools. These 
+may only be used when running the graphical version of Raspbian, and they provide easy 
+access to the main features of each device type.
 
 #### List the installed boards
-You can use the DAQ HAT Manager or the **daqhats_list_boards** command to display a
-list of the detected MCC DAQ HATs.  This list is generated from the EEPROM images, so
-it will not be correct if you change the board stack without updating the EEPROM
-images (see below.)
+You can use the tool **daqhats_list_boards** to display a list of the detected 
+MCC DAQ HATs.  This list is generated from the EEPROM images, so it will not be 
+correct if you change the board stack without updating the EEPROM images 
+(see below.)
 
 #### Update the EEPROM images
 If you change your board stack, you must update the saved EEPROM images so that 
-the library has the correct board information. You can use the DAQ HAT Manager or the
-command:
+the library has the correct board information:
 
 ```sh
 sudo daqhats_read_eeproms
@@ -158,4 +155,4 @@ our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
 ## Documentation 
 Documentation for the daqhats library is available at 
-https://mccdaq.github.io/daqhats/index.html.
+https://nwright98.github.io/daqhats_dev/index.html.

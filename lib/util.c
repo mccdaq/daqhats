@@ -99,6 +99,18 @@ struct _VendorInfo
 // lock files for synchronization
 static const char* const SPI_LOCKFILE = "/tmp/.mcc_spi_lockfile";
 
+static const char* const BOARD_LOCKFILES[] =
+{
+    "/tmp/.mcc_hat_lockfile_0",
+    "/tmp/.mcc_hat_lockfile_1",
+    "/tmp/.mcc_hat_lockfile_2",
+    "/tmp/.mcc_hat_lockfile_3",
+    "/tmp/.mcc_hat_lockfile_4",
+    "/tmp/.mcc_hat_lockfile_5",
+    "/tmp/.mcc_hat_lockfile_6",
+    "/tmp/.mcc_hat_lockfile_7",
+};
+
 static const char* const HAT_SETTINGS_DIR = "/etc/mcc/hats";
 static const char* const SYS_HAT_DIR = "/proc/device-tree/hat";
 static const char* const VENDOR_NAME = "Measurement Computing Corp.";
@@ -119,8 +131,10 @@ static const char* HAT_ERROR_MESSAGES[] =
 // *****************************************************************************
 // Variables
 static bool _address_initialized = false;
-static int lockfile;
+static int spi_lockfile;
+static int board_lockfiles[MAX_NUMBER_HATS];
 static pthread_mutex_t spi_mutex;
+static pthread_mutex_t board_mutex[MAX_NUMBER_HATS];
 
 // *****************************************************************************
 // Local Functions
@@ -143,12 +157,14 @@ void _address_init(void)
 void _lock_init(void)
 {
     mode_t mask;
+    int i;
     
     // set umask so we can set permission to 0666; otherwise, if run as root it
     // will leave lockfiles that normal users cannot open
     mask = umask(0111);
 
-    lockfile = open(SPI_LOCKFILE,
+    // init spi lockfile
+    spi_lockfile = open(SPI_LOCKFILE,
         O_CREAT     |   // create file if it does not exist
         O_WRONLY    |   // open for write access only
         O_CLOEXEC,      // close on execute
@@ -161,11 +177,28 @@ void _lock_init(void)
 
     // revert umask
     umask(mask);
+    
+    // Multiple threads in the same process will share the above file
+    // descriptor, so flock() will not work. Use a mutex for this scenario.
+    pthread_mutex_init(&spi_mutex, NULL);
+    
+    for (i = 0; i < MAX_NUMBER_HATS; i++)
+    {
+        pthread_mutex_init(&board_mutex[i], NULL);
+    }
 }
 
 void _lock_fini(void)
 {
-    close(lockfile);
+    int i;
+    
+    close(spi_lockfile);
+    pthread_mutex_destroy(&spi_mutex);
+    
+    for (i = 0; i < MAX_NUMBER_HATS; i++)
+    {
+        pthread_mutex_destroy(&board_mutex[i]);
+    }
 }
 
 // *****************************************************************************
@@ -266,11 +299,11 @@ int _obtain_lock(void)
     // Time out after 5 seconds
     locked = false;
     clock_gettime(CLOCK_MONOTONIC, &start_time);
-
+    
     do
     {
         // the file was opened, now lock it so no other process can open it
-        if ((test = flock(lockfile, LOCK_EX | LOCK_NB)) == 0)
+        if ((test = flock(spi_lockfile, LOCK_EX | LOCK_NB)) == 0)
         {
             locked = true;
         }
@@ -288,22 +321,126 @@ int _obtain_lock(void)
         // could not get a lock within 5 seconds, report as a timeout
         return RESULT_TIMEOUT;
     }
-
+    
     // file locking will not work for multiple threads in the same process, so
     // use a mutex as well
     pthread_mutex_lock(&spi_mutex);
 
-    return lockfile;
+    return spi_lockfile;
 }
 
+/******************************************************************************
+  Use lock files to control access to the HAT boards by multiple processes. 
+  
+  Not used by all board types, just when there is a lengthy process involving
+  a board resource that cannot be interrupted. For example, setting up an
+  MCC 134 ADC conversion then waiting for the results (~50ms); use a lock to
+  prevent another process from changing the ADC config.
+
+  The flock() mechanism does not work for multiple threads within the same
+  process - the same file descriptor is shared among all the threads so once one
+  of them has a lock then flock() will return successfully for any other thread
+  that requests the lock.  We use a pthread_mutex to control cross-thread
+  locking.
+  
+  Return: int status
+ *****************************************************************************/
+int _obtain_board_lock(uint8_t address)
+{
+    bool locked;
+    int lock_fd;
+    struct timespec start_time;
+    struct timespec current_time;
+    char* filename;
+    mode_t mask;
+
+    if (address >= MAX_NUMBER_HATS)
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    filename = (char*)BOARD_LOCKFILES[address];
+
+    // Block until lock obtained, but allow context switching with usleep().
+    // Time out after 5 seconds
+    locked = false;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    // set umask so we can set permission to 0666; otherwise, if run as root it
+    // will leave lockfiles that normal users cannot open
+    mask = umask(0111);
+    do
+    {
+        lock_fd = open(filename,
+            O_CREAT     |   // create file if it does not exist
+            O_WRONLY    |   // open for write access only
+            O_CLOEXEC,      // close on execute
+            S_IRUSR     |   // user permission: read/write
+            S_IWUSR     |
+            S_IRGRP     |   // group permission: read/write
+            S_IWGRP     |
+            S_IROTH     |   // other permission: read/write
+            S_IWOTH);
+
+        if (lock_fd != -1)
+        {
+            // the file was opened, now lock it so no other process can open it
+            if (flock(lock_fd, LOCK_EX | LOCK_NB) == 0)
+            {
+                locked = true;
+            }
+            else
+            {
+                // could not get a lock, so wait and retry
+                close(lock_fd);
+                usleep(10);
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+            }
+        }
+        else
+        {
+            // could not open the lock file, so wait and retry
+            usleep(10);
+            clock_gettime(CLOCK_MONOTONIC, &current_time);
+        }
+    } while (!locked &&
+        (_difftime_us(&start_time, &current_time) < LOCK_RETRY_TIME));
+
+    // revert umask
+    umask(mask);
+
+    if (!locked)
+    {
+        // could not get a lock within 5 seconds, report as a timeout
+        return RESULT_TIMEOUT;
+    }
+
+    board_lockfiles[address] = lock_fd;
+    
+    // file locking will not work for multiple threads in the same process, so
+    // use a mutex as well
+    pthread_mutex_lock(&board_mutex[address]);
+
+    return RESULT_SUCCESS;
+}
 
 /******************************************************************************
-  Release a previously obtained lock.
+  Release a previously obtained SPI lock.
  *****************************************************************************/
 void _release_lock(int lock_fd)
 {
     flock(lock_fd, LOCK_UN);
     pthread_mutex_unlock(&spi_mutex);
+}
+
+
+/******************************************************************************
+  Release a previously obtained board lock.
+ *****************************************************************************/
+void _release_board_lock(uint8_t address)
+{
+    flock(board_lockfiles[address], LOCK_UN);
+    close(board_lockfiles[address]);
+    pthread_mutex_unlock(&board_mutex[address]);
 }
 
 

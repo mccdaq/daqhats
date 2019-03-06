@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="logger" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/logger" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="logger" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/logger" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="`pkg-config --cflags gtk+-3.0`" />
+		</Compiler>
+		<Linker>
+			<Add option="-ldaqhats" />
+			<Add option="-lgtkdatabox" />
+			<Add option="-pthread" />
+			<Add option="-lm" />
+			<Add option="`pkg-config --libs gtk+-3.0`" />
+		</Linker>
+		<Unit filename="logger/errors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logger/errors.h" />
+		<Unit filename="logger/globals.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logger/globals.h" />
+		<Unit filename="logger/log_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logger/log_file.h" />
+		<Unit filename="logger/logger.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logger/logger.h" />
+		<Unit filename="logger/makefile" />
+		<Unit filename="logger/theme.css" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

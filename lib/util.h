@@ -42,7 +42,9 @@ extern "C" {
 
 // internal functions for use by board classes
 int _obtain_lock(void);
+int _obtain_board_lock(uint8_t address);
 void _release_lock(int lock_fd);
+void _release_board_lock(uint8_t address);
 
 uint32_t _difftime_us(struct timespec* start, struct timespec* end);
 uint32_t _difftime_ms(struct timespec* start, struct timespec* end);

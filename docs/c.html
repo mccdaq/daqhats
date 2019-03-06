@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C Library Reference &mdash; MCC DAQ HAT Library 1.1.0 documentation</title>
+  <title>C Library Reference &mdash; MCC DAQ HAT Library 1.2.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0
               </div>
             
           
@@ -112,10 +112,19 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#mcc-152-functions-and-data">MCC 152 functions and data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-134-functions-and-data">MCC 134 functions and data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id2">Functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id3">Data types and definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Data definitions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id4">Device Info</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#thermocouple-types">Thermocouple Types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-152-functions-and-data">MCC 152 functions and data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">Data types and definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id7">Device Info</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dio-config-items">DIO Config Items</a></li>
 </ul>
 </li>
@@ -385,6 +394,12 @@ type of board.  The library may be used with C and C++.</p>
 <dt id="c.HAT_ID_MCC_118_BOOTLOADER">
 <span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8a37746a1d99f0112b16de95479eef7e19"></span><code class="descname">HAT_ID_MCC_118_BOOTLOADER</code> = 0x8142<a class="headerlink" href="#c.HAT_ID_MCC_118_BOOTLOADER" title="Permalink to this definition">¶</a></dt>
 <dd><p>MCC 118 in firmware update mode ID. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.HAT_ID_MCC_134">
+<span class="target" id="daqhats_8h_1a30cd29e26738a6f6d11746f3ccfa06e8adededfba1b3d304ee4b2cdaba5e6ba1c"></span><code class="descname">HAT_ID_MCC_134</code> = 0x0143<a class="headerlink" href="#c.HAT_ID_MCC_134" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 134 ID. </p>
 </dd></dl>
 
 <dl class="enumvalue">
@@ -1160,10 +1175,503 @@ type of board.  The library may be used with C and C++.</p>
 </div>
 </div>
 </div>
-<div class="section" id="mcc-152-functions-and-data">
-<h2>MCC 152 functions and data<a class="headerlink" href="#mcc-152-functions-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mcc-134-functions-and-data">
+<h2>MCC 134 functions and data<a class="headerlink" href="#mcc-134-functions-and-data" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="id2">
 <h3>Functions<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Function</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_open" title="mcc134_open"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_open()</span></code></a></td>
+<td>Open an MCC 134 for use.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_is_open" title="mcc134_is_open"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_is_open()</span></code></a></td>
+<td>Check if an MCC 134 is open.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_close" title="mcc134_close"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_close()</span></code></a></td>
+<td>Close an MCC 134.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_info" title="mcc134_info"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_info()</span></code></a></td>
+<td>Return information about this device type.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_serial" title="mcc134_serial"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_serial()</span></code></a></td>
+<td>Read the serial number.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_calibration_date" title="mcc134_calibration_date"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_calibration_date()</span></code></a></td>
+<td>Read the calibration date.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_calibration_coefficient_read" title="mcc134_calibration_coefficient_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_calibration_coefficient_read()</span></code></a></td>
+<td>Read the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_calibration_coefficient_write" title="mcc134_calibration_coefficient_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_calibration_coefficient_write()</span></code></a></td>
+<td>Write the calibration coefficients for a channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_tc_type_write" title="mcc134_tc_type_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_tc_type_write()</span></code></a></td>
+<td>Write the thermocouple type for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_tc_type_read" title="mcc134_tc_type_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_tc_type_read()</span></code></a></td>
+<td>Read the thermocouple type for a channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_update_interval_write" title="mcc134_update_interval_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_update_interval_write()</span></code></a></td>
+<td>Write the temperature update interval.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_update_interval_read" title="mcc134_update_interval_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_update_interval_read()</span></code></a></td>
+<td>Read the temperature update interval.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_t_in_read" title="mcc134_t_in_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_t_in_read()</span></code></a></td>
+<td>Read a temperature input value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc134_a_in_read" title="mcc134_a_in_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_a_in_read()</span></code></a></td>
+<td>Read an analog input value.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc134_cjc_read" title="mcc134_cjc_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc134_cjc_read()</span></code></a></td>
+<td>Read a CJC temperature.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="c.mcc134_open">
+<span class="target" id="mcc134_8h_1a311d4a95c74b3d06eac9b6abf49b5571"></span>int <code class="descname">mcc134_open</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open a connection to the MCC 134 device at the specified address. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_is_open">
+<span class="target" id="mcc134_8h_1aea1fb83ad1aa7a7b3f02c928aff11afe"></span>int <code class="descname">mcc134_is_open</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if an MCC 134 is open. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>1 if open, 0 if not open. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_close">
+<span class="target" id="mcc134_8h_1a56c28f0baa5cb441d5c310cbb186899e"></span>int <code class="descname">mcc134_close</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close a connection to an MCC 134 device and free allocated resources. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_info">
+<span class="target" id="mcc134_8h_1aeefa9f2a99e114773da6c94efed69127"></span>struct <a class="reference internal" href="#c.MCC134DeviceInfo" title="MCC134DeviceInfo">MCC134DeviceInfo</a>* <code class="descname">mcc134_info</code><span class="sig-paren">(</span>void<span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant device information for all MCC 134s. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>Pointer to struct <a class="reference internal" href="#structMCC134DeviceInfo"><span class="std std-ref">MCC134DeviceInfo</span></a>. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_serial">
+<span class="target" id="mcc134_8h_1aaef269f14927f3065dc5eeceacce44a8"></span>int <code class="descname">mcc134_serial</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, char *<em>&nbsp;buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 134 serial number. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer</span></code>: Pass a user-allocated buffer pointer to receive the serial number as a string. The buffer must be at least 9 characters in length. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_calibration_date">
+<span class="target" id="mcc134_8h_1a888e3a00588cf1cf66ee4793055b5734"></span>int <code class="descname">mcc134_calibration_date</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, char *<em>&nbsp;buffer</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_calibration_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 134 calibration date. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">buffer</span></code>: Pass a user-allocated buffer pointer to receive the date as a string (format “YYYY-MM-DD”). The buffer must be at least 11 characters in length. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_calibration_coefficient_read">
+<span class="target" id="mcc134_8h_1aa75961dbaf8865e010db73067c097e15"></span>int <code class="descname">mcc134_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 134 calibration coefficients for a single channel. </p>
+<p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: Receives the slope. </li>
+<li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: Receives the offset. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_calibration_coefficient_write">
+<span class="target" id="mcc134_8h_1afaf25f8367254b899c86486fb227304e"></span>int <code class="descname">mcc134_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily write the MCC 134 calibration coefficients for a single channel. </p>
+<p>The user can apply their own calibration coefficients by writing to these values. The values will reset to the factory values from the EEPROM whenever <a class="reference internal" href="#mcc134_8h_1a311d4a95c74b3d06eac9b6abf49b5571"><span class="std std-ref">mcc134_open()</span></a> is called.</p>
+<p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
+</pre></div>
+</div>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: The new slope value. </li>
+<li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: The new offset value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_tc_type_write">
+<span class="target" id="mcc134_8h_1a3175534a5379ca5e47488e0d635f9367"></span>int <code class="descname">mcc134_tc_type_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint8_t<em>&nbsp;type</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_tc_type_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the thermocouple type for a channel. </p>
+<p>Tells the MCC 134 library what thermocouple type is connected to the specified channel and enables the channel. This is required for correct temperature calculations. The type is one of <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7"><span class="std std-ref">TcTypes</span></a> and the board will default to all disabled (set to <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7a92225667217ae34597b91610df09fe5c"><span class="std std-ref">TC_DISABLED</span></a>) when it is first opened.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">type</span></code>: The thermocouple type, one of <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7"><span class="std std-ref">TcTypes</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_tc_type_read">
+<span class="target" id="mcc134_8h_1a47c4803f6b8fedb34c9b6455e43265bf"></span>int <code class="descname">mcc134_tc_type_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint8_t *<em>&nbsp;type</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_tc_type_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the thermocouple type for a channel. </p>
+<p>Reads the current thermocouple type for the specified channel. The type is one of <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7"><span class="std std-ref">TcTypes</span></a> and the board will default to all channels disabled (set to <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7a92225667217ae34597b91610df09fe5c"><span class="std std-ref">TC_DISABLED</span></a>) when it is first opened.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">type</span></code>: Receives the thermocouple type, one of <a class="reference internal" href="#mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7"><span class="std std-ref">TcTypes</span></a>. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_update_interval_write">
+<span class="target" id="mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"></span>int <code class="descname">mcc134_update_interval_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;interval</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_update_interval_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the temperature update interval. </p>
+<p>Tells the MCC 134 library how often to update temperatures, with the interval specified in seconds. The library defaults to updating every second, but you may increase this interval if you do not plan to call <a class="reference internal" href="#mcc134_8h_1a2e95aee5299a83290571a3995ca1bfc9"><span class="std std-ref">mcc134_t_in_read()</span></a> very often. This will reduce the load on shared resources for other DAQ HATs.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">interval</span></code>: The interval in seconds (1 - 255). </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_update_interval_read">
+<span class="target" id="mcc134_8h_1ab51b7d5856a12a2f04b7414790cc21df"></span>int <code class="descname">mcc134_update_interval_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;interval</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_update_interval_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the temperature update interval. </p>
+<p>Reads the library temperature update rate in seconds.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">interval</span></code>: Receives the update rate. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_t_in_read">
+<span class="target" id="mcc134_8h_1a2e95aee5299a83290571a3995ca1bfc9"></span>int <code class="descname">mcc134_t_in_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_t_in_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a temperature input channel. </p>
+<p>Reads the specified channel and returns the value as degrees Celsius. The channel must be enabled with <a class="reference internal" href="#mcc134_8h_1a3175534a5379ca5e47488e0d635f9367"><span class="std std-ref">mcc134_tc_type_write()</span></a> or the function will return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"><span class="std std-ref">RESULT_BAD_PARAMETER</span></a>.</p>
+<p>This function returns immediately with the most recent internal temperature reading for the specified channel. When a board is open, the library will read each channel once per second. This interval can be increased with <a class="reference internal" href="#mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"><span class="std std-ref">mcc134_update_interval_write()</span></a>. There will be a delay when the board is first opened because the read thread has to read the cold junction compensation sensors and thermocouple inputs before it can return the first value.</p>
+<p>The returned temperature can have some special values to indicate abnormal conditions:<ul class="simple">
+<li><a class="reference internal" href="#mcc134_8h_1a24936b0627fd548fbcbd5822bd00c208"><span class="std std-ref">OPEN_TC_VALUE</span></a> if an open thermocouple is detected on the channel.</li>
+<li><a class="reference internal" href="#mcc134_8h_1a978d111e8cfabf0c23cdff98174ee88d"><span class="std std-ref">OVERRANGE_TC_VALUE</span></a> if an overrange is detected on the channel.</li>
+<li><a class="reference internal" href="#mcc134_8h_1adc744e799770f9d327e77e011779180d"><span class="std std-ref">COMMON_MODE_TC_VALUE</span></a> if a common-mode error is detected on the channel. This occurs when thermocouples attached to the board are at different voltages.</li>
+</ul>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number (0 - 3.) </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the temperature value in degrees C. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_a_in_read">
+<span class="target" id="mcc134_8h_1a26c4472d7301c0dca000e91db7c5be6b"></span>int <code class="descname">mcc134_a_in_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint32_t<em>&nbsp;options</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_a_in_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read an analog input channel and return the value. </p>
+<p>This function returns immediately with the most recent voltage or ADC code reading for the specified channel. The channel must be enabled with <a class="reference internal" href="#mcc134_8h_1a3175534a5379ca5e47488e0d635f9367"><span class="std std-ref">mcc134_tc_type_write()</span></a> or the function will return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"><span class="std std-ref">RESULT_BAD_PARAMETER</span></a>.</p>
+<p>The library reads the ADC at the time interval set with <a class="reference internal" href="#mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"><span class="std std-ref">mcc134_update_interval_write()</span></a>, which defaults to 1 second. This interval may be increased with <a class="reference internal" href="#mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"><span class="std std-ref">mcc134_update_interval_write()</span></a>.</p>
+<p>The returned voltage can have a special value to indicate abnormal conditions:<ul class="simple">
+<li><a class="reference internal" href="#mcc134_8h_1adc744e799770f9d327e77e011779180d"><span class="std std-ref">COMMON_MODE_TC_VALUE</span></a> if a common-mode error is detected on the channel. This occurs when thermocouples attached to the board are at different voltages.</li>
+</ul>
+</p>
+<p>The valid options are:<ul class="simple">
+<li><a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a>: Return ADC code (a value between -8,388,608 and 8,388,607) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a>: Return data without the calibration factors applied.</li>
+</ul>
+</p>
+<p>The options parameter is set to 0 or <a class="reference internal" href="#daqhats_8h_1ac3262ea2b2658ce9d272e6b1246edd35"><span class="std std-ref">OPTS_DEFAULT</span></a> for default operation, which is scaled and calibrated data.</p>
+<p>Multiple options may be specified by ORing the flags. For instance, specifying <a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a> | <a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a> will return the value read from the ADC without calibration or converting to voltage.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">options</span></code>: Options bitmask. </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the analog input value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc134_cjc_read">
+<span class="target" id="mcc134_8h_1a172e1f9d9bea991f61c89e24a0c4d6cd"></span>int <code class="descname">mcc134_cjc_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc134_cjc_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the cold junction compensation temperature for a specified channel. </p>
+<p>Returns the most recent cold junction sensor temperature for the specified thermocouple terminal. The library automatically performs cold junction compensation, so this function is only needed for informational use or if you want to perform your own compensation. The temperature is returned in degress C.</p>
+<p>The library reads the cold junction compensation sensors at the time interval set with <a class="reference internal" href="#mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"><span class="std std-ref">mcc134_update_interval_write()</span></a>, which defaults to 1 second. This interval may be increased with <a class="reference internal" href="#mcc134_8h_1ab9d3904e0d97fb66f7d3325b3200251e"><span class="std std-ref">mcc134_update_interval_write()</span></a>.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The analog input channel number, 0 - 3. </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the read value. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="section" id="id3">
+<h3>Data definitions<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="define">
+<dt id="c.OPEN_TC_VALUE">
+<span class="target" id="mcc134_8h_1a24936b0627fd548fbcbd5822bd00c208"></span><code class="descname">OPEN_TC_VALUE</code> (-9999.0)<a class="headerlink" href="#c.OPEN_TC_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return value for an open thermocouple. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.OVERRANGE_TC_VALUE">
+<span class="target" id="mcc134_8h_1a978d111e8cfabf0c23cdff98174ee88d"></span><code class="descname">OVERRANGE_TC_VALUE</code> (-8888.0)<a class="headerlink" href="#c.OVERRANGE_TC_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return value for thermocouple voltage outside the valid range. </p>
+</dd></dl>
+
+<dl class="define">
+<dt id="c.COMMON_MODE_TC_VALUE">
+<span class="target" id="mcc134_8h_1adc744e799770f9d327e77e011779180d"></span><code class="descname">COMMON_MODE_TC_VALUE</code> (-7777.0)<a class="headerlink" href="#c.COMMON_MODE_TC_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return value for thermocouple voltage outside the common-mode range. </p>
+</dd></dl>
+
+<div class="section" id="id4">
+<h4>Device Info<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<dl class="struct">
+<dt id="c.MCC134DeviceInfo">
+<span class="target" id="structMCC134DeviceInfo"></span><em class="property">struct </em><code class="descname">MCC134DeviceInfo</code><a class="headerlink" href="#c.MCC134DeviceInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>MCC 134 constant device information. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::NUM_AI_CHANNELS">
+<span class="target" id="structMCC134DeviceInfo_1a9501cd02ddd2bbd446a9be0b84e5ac8c"></span>const uint8_t <code class="descname">NUM_AI_CHANNELS</code><a class="headerlink" href="#c.MCC134DeviceInfo::NUM_AI_CHANNELS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of analog input channels (4.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MIN_CODE">
+<span class="target" id="structMCC134DeviceInfo_1ab8859dc09e548f08f52f88009c3b3fe1"></span>const int32_t <code class="descname">AI_MIN_CODE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MIN_CODE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum ADC code (-8,388,608.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MAX_CODE">
+<span class="target" id="structMCC134DeviceInfo_1a83c59cf3d3bac50b03171292d34e308d"></span>const int32_t <code class="descname">AI_MAX_CODE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MAX_CODE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum ADC code (8,388,607.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MIN_VOLTAGE">
+<span class="target" id="structMCC134DeviceInfo_1a46cc7f603747923cb3c0ee397351342d"></span>const double <code class="descname">AI_MIN_VOLTAGE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MIN_VOLTAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The input voltage corresponding to the minimum code (-0.078125V.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MAX_VOLTAGE">
+<span class="target" id="structMCC134DeviceInfo_1afde54a1290995168949db397d94ac268"></span>const double <code class="descname">AI_MAX_VOLTAGE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MAX_VOLTAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The input voltage corresponding to the maximum code (+0.078125V - 1 LSB.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MIN_RANGE">
+<span class="target" id="structMCC134DeviceInfo_1aa6c54c554dc7d8bf54d5879eac0ab52c"></span>const double <code class="descname">AI_MIN_RANGE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MIN_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum voltage of the input range (-0.078125V.) </p>
+</dd></dl>
+
+<dl class="variable">
+<dt id="c.MCC134DeviceInfo::AI_MAX_RANGE">
+<span class="target" id="structMCC134DeviceInfo_1af0a8d13399d70f7162c29d491a64ffe4"></span>const double <code class="descname">AI_MAX_RANGE</code><a class="headerlink" href="#c.MCC134DeviceInfo::AI_MAX_RANGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum voltage of the input range (0.078125V.) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="thermocouple-types">
+<h4>Thermocouple Types<a class="headerlink" href="#thermocouple-types" title="Permalink to this headline">¶</a></h4>
+<dl class="enum">
+<dt id="c.TcTypes">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7"></span><em class="property">enum </em><code class="descname">TcTypes</code><a class="headerlink" href="#c.TcTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thermocouple type constants. </p>
+<p><em>Values:</em></p>
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_J">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7a0041036811e8022abae0eea50b9ef75f"></span><code class="descname">TC_TYPE_J</code> = 0<a class="headerlink" href="#c.TC_TYPE_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>J type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_K">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7abb4e06bcac96719b0df58db42a4a4c6a"></span><code class="descname">TC_TYPE_K</code><a class="headerlink" href="#c.TC_TYPE_K" title="Permalink to this definition">¶</a></dt>
+<dd><p>K type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_T">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7a480f2a759e0e2418b8b1a42cda654ac7"></span><code class="descname">TC_TYPE_T</code><a class="headerlink" href="#c.TC_TYPE_T" title="Permalink to this definition">¶</a></dt>
+<dd><p>T type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_E">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7ad69693c3b754e823067262daf8ec24f9"></span><code class="descname">TC_TYPE_E</code><a class="headerlink" href="#c.TC_TYPE_E" title="Permalink to this definition">¶</a></dt>
+<dd><p>E type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_R">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7ac66bdd0ac9c7225e54a3777accd8937f"></span><code class="descname">TC_TYPE_R</code><a class="headerlink" href="#c.TC_TYPE_R" title="Permalink to this definition">¶</a></dt>
+<dd><p>R type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_S">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7aae88c34e2c93e18b046668cbd00b177b"></span><code class="descname">TC_TYPE_S</code><a class="headerlink" href="#c.TC_TYPE_S" title="Permalink to this definition">¶</a></dt>
+<dd><p>S type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_B">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7ae52b6238d7482aa6db7e5e7f174c49b0"></span><code class="descname">TC_TYPE_B</code><a class="headerlink" href="#c.TC_TYPE_B" title="Permalink to this definition">¶</a></dt>
+<dd><p>B type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_TYPE_N">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7ab055f8716e28b8f991ef969c8c8cc203"></span><code class="descname">TC_TYPE_N</code><a class="headerlink" href="#c.TC_TYPE_N" title="Permalink to this definition">¶</a></dt>
+<dd><p>N type. </p>
+</dd></dl>
+
+<dl class="enumvalue">
+<dt id="c.TC_DISABLED">
+<span class="target" id="mcc134_8h_1a7af55e89d2a4390c9a69ecea583ce1c7a92225667217ae34597b91610df09fe5c"></span><code class="descname">TC_DISABLED</code> = 0xFF<a class="headerlink" href="#c.TC_DISABLED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input disabled. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+<div class="section" id="mcc-152-functions-and-data">
+<h2>MCC 152 functions and data<a class="headerlink" href="#mcc-152-functions-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>Functions<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="41%" />
@@ -1670,10 +2178,10 @@ type of board.  The library may be used with C and C++.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="id3">
-<h3>Data types and definitions<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id4">
-<h4>Device Info<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id6">
+<h3>Data types and definitions<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h4>Device Info<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
 <dl class="struct">
 <dt id="c.MCC152DeviceInfo">
 <span class="target" id="structMCC152DeviceInfo"></span><em class="property">struct </em><code class="descname">MCC152DeviceInfo</code><a class="headerlink" href="#c.MCC152DeviceInfo" title="Permalink to this definition">¶</a></dt>
@@ -1830,7 +2338,7 @@ type of board.  The library may be used with C and C++.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

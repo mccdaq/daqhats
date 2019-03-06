@@ -14,12 +14,12 @@ to send the time and DIO 0 value (Value0).
 "My Applets", and click the "New Applet" button.
 2. Click "this" then search for Webhooks. Click the Webhooks icon when found.
 3. On the "Choose trigger" screen, click "Receive a web request".
-4. On the "Complete trigger fields" screen, enter an event name ("dio_trigger" 
+4. On the "Complete trigger fields" screen, enter an event name ("dio_trigger"
 for this example) and click the **Create trigger** button.
 5. Click "that", then search for "email" on the "Choose action service"
 screen and select the **Send me an email** icon when found.
 6. On the "Complete action fields" screen modify the Subject field so it
-contains "DIO trigger occurred" (without quotes) and the body so it contains 
+contains "DIO trigger occurred" (without quotes) and the body so it contains
 "DIO trigger occurred at {{OccurredAt}} with value {{Value1}}."
 (without quotes). Click the **Create action** button.
 7. Review the summary statement, then click the **Finish** button.
@@ -55,6 +55,11 @@ def send_trigger(event, value1="", value2="", value3=""):
 def main():
     """ Main function """
 
+    if KEY == "<my_key>":
+        print("The default key must be changed to the user's personal IFTTT "
+              "Webhooks key before using this example.")
+        sys.exit()
+
     # Find the first MCC 152
     mylist = hat_list(filter_by_id=HatIDs.MCC_152)
     if not mylist:
@@ -81,7 +86,7 @@ def main():
 
     print("Current input value is {}".format(value))
     print("Waiting for changes, Ctrl-C to exit. ")
-    
+
     while True:
         # wait for a change
         wait_for_interrupt(-1)
