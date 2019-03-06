@@ -13,9 +13,9 @@ This is the development repository for Measurement Computing DAQ HAT boards. The
 
 #### Supported MCC DAQ HAT hardware
 Hardware supported by this version of the MCC DAQ HAT Library:
-- [MCC 118](https://nwright98.github.io/daqhats_dev/overview.html#mcc-118)
-- [MCC 134](https://nwright98.github.io/daqhats_dev/overview.html#mcc-134)
-- [MCC 152](https://nwright98.github.io/daqhats_dev/overview.html#mcc-152)
+- [MCC 118](https://nwright-mcc.github.io/daqhats_dev/overview.html#mcc-118)
+- [MCC 134](https://nwright-mcc.github.io/daqhats_dev/overview.html#mcc-134)
+- [MCC 152](https://nwright-mcc.github.io/daqhats_dev/overview.html#mcc-152)
 
 ## Prerequisites
 - Raspbian or Raspbian Lite image (may work with other Raspberry Pi operating systems)
@@ -54,24 +54,24 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 
    ```sh
    cd ~
-   git clone https://github.com/nwright98/daqhats_dev.git
+   git clone https://github.com/nwright-mcc/daqhats.git daqhats_dev
    ```
 7. Build and install the shared library, tools, and optional Python support. The 
-   installer will ask if you want to install Python 2 and Python 3 support. It 
+   installer will ask if you want to install Python 2 support. It 
    will also detect the HAT board EEPROMs and save the contents, if needed.
 
    ```sh
-   cd ~/daqhats
+   cd ~/daqhats_dev
    sudo ./install.sh
    ```   
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot, 
 then repeat steps 5 - 7.
    
-You can now run the example programs under ~/daqhats/examples and create your own 
+You can now run the example programs under ~/daqhats_dev/examples and create your own 
 programs. Refer to the [Examples](#examples) section below for more information.
 
-There are simple control panel programs for each device type in ~/daqhats/tools. These 
+There are simple control panel programs for each device type in ~/daqhats_dev/tools. These 
 may only be used when running the graphical version of Raspbian, and they provide easy 
 access to the main features of each device type.
 
@@ -93,7 +93,7 @@ sudo daqhats_read_eeproms
 If you want to uninstall the the daqhats library, use the following commands:
 
 ```sh
-cd ~/daqhats
+cd ~/daqhats_dev
 sudo ./uninstall.sh
 ```
 
@@ -105,12 +105,12 @@ MCC 118 address in your board stack. This example demonstrates how to update the
 firmware on the MCC 118 that is installed at address 0.
 
 ```sh
-mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
+mcc118_firmware_update 0 ~/daqhats_dev/tools/MCC_118.hex
 ```
 
 ## Examples
 The daqhats library includes example programs developed with C/C++ and Python. 
-The examples are available under ~/daqhats/examples, and are provided in the 
+The examples are available under ~/daqhats_dev/examples, and are provided in the 
 following formats:
 
 - console-based (C/C++ and Python)
@@ -156,4 +156,4 @@ our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
 ## Documentation 
 Documentation for the daqhats library is available at 
-https://nwright98.github.io/daqhats_dev/index.html.
+https://nwright-mcc.github.io/daqhats/index.html.
