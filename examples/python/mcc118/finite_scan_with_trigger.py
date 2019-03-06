@@ -119,6 +119,8 @@ def wait_for_trigger(hat):
         status = hat.a_in_scan_status()
         is_running = status.running
         is_triggered = status.triggered
+        if not is_triggered:
+            sleep(0.001)
 
 
 def read_and_display_data(hat, samples_per_channel, num_channels):

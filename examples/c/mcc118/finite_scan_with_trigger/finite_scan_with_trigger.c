@@ -110,6 +110,11 @@ int main(void)
         STOP_ON_ERROR(result);
 
         cancel_trigger = enter_press();
+        if (!cancel_trigger && 
+            ((read_status & STATUS_TRIGGERED) != STATUS_TRIGGERED))
+        {
+            usleep(1000);
+        }
     } 
     while ((result == RESULT_SUCCESS) &&
            ((read_status & STATUS_TRIGGERED) != STATUS_TRIGGERED) && 

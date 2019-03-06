@@ -204,7 +204,7 @@ static const char* const spi_device = SPI_DEVICE_0; // the spidev device
 static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
                                                     // CPHA=1)
 static const uint8_t spi_bits = 8;                  // 8 bits per transfer
-static const uint32_t spi_speed = 10000000;         // maximum SPI clock 
+static const uint32_t spi_speed = 9600000;          // maximum SPI clock 
                                                     // frequency
 static const uint16_t spi_delay = 0;                // delay in us before 
                                                     // removing CS
@@ -929,6 +929,7 @@ static void* _scan_thread(void* arg)
     }
 
 #define MIN_SLEEP_US	200
+#define TRIG_SLEEP_US	1000
 
     done = false;
     sleep_us = MIN_SLEEP_US;
@@ -953,6 +954,11 @@ static void* _scan_thread(void* arg)
 #endif
                 done = true;
                 info->scan_running = false;
+            }
+            else if (info->triggered == 0)
+            {
+                // waiting for trigger, use a longer sleep time
+                sleep_us = TRIG_SLEEP_US;
             }
             else
             {
