@@ -62,8 +62,8 @@ class HatCallback(object):
     DAQ HAT interrupt callback function class.
 
     This class handles passing Python functions to the shared library as a
-    callback then retrieving the passed user data as a Python object when
-    the function is called from the library.
+    callback.  It stores the user data internally and passes it to the callback
+    function to avoid issues with passing the object through the library.
 
     The callback function should have a single argument (optional) that is a
     Python object the user provides to :py:func:`interrupt_callback_enable` that
@@ -81,6 +81,7 @@ class HatCallback(object):
         self.function = function
         self.cbfunctype = CFUNCTYPE(None, c_void_p)
         self.cbfunc = None
+        self.user_data = None
 
     def get_callback_func(self):
         """
@@ -92,17 +93,17 @@ class HatCallback(object):
             """
             Function wrapper.
             """
-            self.handle_callback(user_data)
+            self.handle_callback()
         self.cbfunc = self.cbfunctype(func)
         return self.cbfunc
 
-    def handle_callback(self, user_data):
+    def handle_callback(self):
         """
-        This is directly called from the interrupt thread. It converts the
-        void* back into a python object then calls the user's callback.
+        This is directly called from the interrupt thread. It calls the user's
+        callback, passing the user_data object that gets set with 
+        interrupt_callback_enable().
         """
-        p_user_data = cast(user_data, POINTER(py_object)).contents.value
-        self.function(p_user_data)
+        self.function(self.user_data)
 
 def _load_daqhats_library():
     """
@@ -306,11 +307,12 @@ def interrupt_callback_enable(callback, user_data):
                                                     c_void_p]
     _libc.hat_interrupt_callback_enable.restype = c_int
 
-    # cast the python user_data object to a void*
-    c_user_data = cast(pointer(py_object(user_data)), c_void_p)
+    # save the user data in the HatCallback object
+    callback.user_data = user_data
+
     # pass the callback class handler function and void * to the library
-    if (_libc.hat_interrupt_callback_enable(my_callback.get_callback_func(),
-                                            c_user_data) != 0):
+    if (_libc.hat_interrupt_callback_enable(callback.get_callback_func(),
+                                            None) != 0):
         raise Exception("Could not enable callback function.")
     # save reference so it isn't garbage collected
     global _HAT_CALLBACK # pylint: disable=global-statement
