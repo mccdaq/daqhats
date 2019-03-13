@@ -3,10 +3,15 @@
     MCC 118 - updated both library and trigger examples.
     - Lowered the max SPI clock rate for the MCC 118 to fix communications 
     issues on some systems.
+    - Fixed an issue with MCC 152 DIO interrupt callbacks in Python when
+    running a scan on a separate MCC 118
     
-1.1.0.1: Fixed an issue with resource conflicts when using multiple threads in
+1.1.0.1: 
+    - Fixed an issue with resource conflicts when using multiple threads in
     the same process (such as using multiple MCC 118s.)
 
-1.1.0: Added support for the MCC 152.
+1.1.0: 
+    - Added support for the MCC 152.
 
-1.0.0: Initial release for the MCC 118.
+1.0.0:
+    - Initial release for the MCC 118.
