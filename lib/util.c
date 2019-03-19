@@ -702,13 +702,14 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
                     {
                         close(eeprom_fd);
                         eeprom_fd = -1;
+                        pData[custom_size] = '\0';  // null terminate the string
                     }
                 }
             }
 
             if (pSize)
             {
-                *pSize = custom_size;
+                *pSize = custom_size + 1;   // add room for null
             }
         }
         if (eeprom_fd != -1)
@@ -827,11 +828,12 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
                 {
                     custom_size = 0;
                 }
+                pData[custom_size] = '\0';  // add null termination
             }
         }
         if (pSize)
         {
-            *pSize = custom_size;
+            *pSize = custom_size + 1;   // add room for null
         }
     }
 
