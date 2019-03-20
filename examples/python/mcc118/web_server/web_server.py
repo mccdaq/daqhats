@@ -6,6 +6,7 @@ from a MCC 118 DAQ HAT device for a single client.  It makes use of the Dash
 Python framework for web-based interfaces and a plotly graph.  To install the
 dependencies for this example, run:
    $ pip install dash dash-renderer dash-html-components dash-core-components
+   $ pip install plotly
 
 Running this example:
 1. Start the server by running the web_server.py module in a terminal.
@@ -23,7 +24,7 @@ import json
 from time import sleep
 from collections import deque
 from dash import Dash
-from dash.dependencies import Input, Output, State, Event
+from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
@@ -155,7 +156,8 @@ _app.layout = html.Div([
               'overflow': 'hidden'}),
     dcc.Interval(
         id='timer',
-        interval=1000*60*60*24  # in milliseconds
+        interval=1000*60*60*24,  # in milliseconds
+        n_intervals=0
     ),
     html.Div(
         id='chartData',
@@ -307,6 +309,7 @@ def disable_hat_selector_dropdown(acq_state):
         disabled = True
     return disabled
 
+
 @_app.callback(
     Output('sampleRate', 'disabled'),
     [Input('status', 'children')]
@@ -382,13 +385,13 @@ def update_start_stop_button_name(acq_state):
 
 @_app.callback(
     Output('chartData', 'children'),
-    [Input('status', 'children')],
+    [Input('timer', 'n_intervals'),
+     Input('status', 'children')],
     [State('chartData', 'children'),
      State('samplesToDisplay', 'value'),
-     State('channelSelections', 'values')],
-    [Event('timer', 'interval')]
+     State('channelSelections', 'values')]
 )
-def update_strip_chart_data(acq_state, chart_data_json_str,
+def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
                             samples_to_display_val, active_channels):
     """
     A callback function to update the chart data stored in the chartData HTML
@@ -398,6 +401,7 @@ def update_strip_chart_data(acq_state, chart_data_json_str,
     https://dash.plot.ly/sharing-data-between-callbacks).
 
     Args:
+        n_intervals (int): Number of timer intervals - triggers the callback.
         acq_state (str): The application state of "idle", "configured",
             "running" or "error" - triggers the callback.
         chart_data_json_str (str): A string representation of a JSON object
@@ -528,7 +532,7 @@ def update_strip_chart(chart_data_json_str, active_channels):
             x=list(chart_data['samples']),
             y=list(data[chan_idx]),
             name='Channel {0:d}'.format(channel),
-            marker=go.Marker(color=colors[channel])
+            marker=go.scatter.Marker(color=colors[channel])
         )
         plot_data.append(scatter_serie)
 
@@ -580,7 +584,7 @@ def update_chart_info(_figure, chart_data_json_str):
      State('sampleRate', 'value'),
      State('samplesToDisplay', 'value'),
      State('channelSelections', 'values')]
-) # pylint: disable=too-many-arguments
+)  # pylint: disable=too-many-arguments
 def update_error_message(chart_data_json_str, acq_state, hat_selection,
                          sample_rate, samples_to_display, active_channels):
     """
