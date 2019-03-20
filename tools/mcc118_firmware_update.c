@@ -39,7 +39,7 @@ uint16_t hex_boot_version;
 void print_usage(void)
 {
     // don't advertise bootloader update option
-    printf("Usage: firmware_update <address> <hex file>\n");
+    printf("Usage: mcc118_firmware_update <address> <hex file>\n");
     printf("  address: the board address (0-7)\n");
     printf("  hex file: the name of the hex file containing the firmware\n");
 }

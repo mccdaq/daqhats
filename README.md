@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.2.0.0</td></tr>
+    <tr><td>Library Version<td>1.3.0.0</td></tr>
 </table>
 
 ## About
@@ -15,6 +15,7 @@ Hardware supported by this version of the MCC DAQ HAT Library:
 - [MCC 118](https://nwright-mcc.github.io/daqhats/overview.html#mcc-118)
 - [MCC 134](https://nwright-mcc.github.io/daqhats/overview.html#mcc-134)
 - [MCC 152](https://nwright-mcc.github.io/daqhats/overview.html#mcc-152)
+- [MCC 172](https://nwright-mcc.github.io/daqhats/overview.html#mcc-172)
 
 ## Prerequisites
 - Raspbian or Raspbian Lite image (may work with other Raspberry Pi operating systems)

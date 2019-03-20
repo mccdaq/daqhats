@@ -229,7 +229,7 @@ int mcc152_open(uint8_t address)
             }
             else
             {
-                return RESULT_BAD_PARAMETER;
+                return RESULT_INVALID_DEVICE;
             }
         }
         else

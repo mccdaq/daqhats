@@ -1,31 +1,31 @@
 /**
-*   @file mcc118.h
+*   @file mcc172.h
 *   @author Measurement Computing Corp.
-*   @brief This file contains definitions for the MCC 118.
+*   @brief This file contains definitions for the MCC 172.
 *
-*   06/21/2018
+*   03/18/2019
 */
-#ifndef _MCC_118_H
-#define _MCC_118_H
+#ifndef _MCC_172_H
+#define _MCC_172_H
 
 #include <stdint.h>
 
-/// MCC 118 constant device information.
-struct MCC118DeviceInfo
+/// MCC 172 constant device information.
+struct MCC172DeviceInfo
 {
-    /// The number of analog input channels (8.)
+    /// The number of analog input channels (2.)
     const uint8_t NUM_AI_CHANNELS;
-    /// The minimum ADC code (0.)
-    const uint16_t AI_MIN_CODE;
-    /// The maximum ADC code (4095.)
-    const uint16_t AI_MAX_CODE;
-    /// The input voltage corresponding to the minimum code (-10.0V.)
+    /// The minimum ADC code (-8,388,608.)
+    const uint32_t AI_MIN_CODE;
+    /// The maximum ADC code (8,388,607.)
+    const uint32_t AI_MAX_CODE;
+    /// The input voltage corresponding to the minimum code (-5.0V.)
     const double AI_MIN_VOLTAGE;
-    /// The input voltage corresponding to the maximum code (+10.0V - 1 LSB.)
+    /// The input voltage corresponding to the maximum code (+5.0V - 1 LSB.)
     const double AI_MAX_VOLTAGE;
-    /// The minimum voltage of the input range (-10.0V.)
+    /// The minimum voltage of the input range (-5.0V.)
     const double AI_MIN_RANGE;
-    /// The maximum voltage of the input range (+10.0V.)
+    /// The maximum voltage of the input range (+5.0V.)
     const double AI_MAX_RANGE;
 };
 
@@ -34,44 +34,44 @@ extern "C" {
 #endif
 
 /**
-*   @brief Open a connection to the MCC 118 device at the specified address.
+*   @brief Open a connection to the MCC 172 device at the specified address.
 *
 *   @param address  The board address (0 - 7).
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_open(uint8_t address);
+int mcc172_open(uint8_t address);
 
 /**
-*   @brief Check if an MCC 118 is open.
+*   @brief Check if an MCC 172 is open.
 *
 *   @param address  The board address (0 - 7).
 *   @return 1 if open, 0 if not open.
 */
-int mcc118_is_open(uint8_t address);
+int mcc172_is_open(uint8_t address);
 
 /**
-*   @brief Close a connection to an MCC 118 device and free allocated resources.
+*   @brief Close a connection to an MCC 172 device and free allocated resources.
 *
 *   @param address  The board address (0 - 7).
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_close(uint8_t address);
+int mcc172_close(uint8_t address);
 
 /**
-*   @brief Return constant device information for all MCC 118s.
+*   @brief Return constant device information for all MCC 172s.
 *
-*   @return Pointer to struct MCC118DeviceInfo.
+*   @return Pointer to struct MCC172DeviceInfo.
 *       
 */
-struct MCC118DeviceInfo* mcc118_info(void);
+struct MCC172DeviceInfo* mcc172_info(void);
 
 /**
-*   @brief Blink the LED on the MCC 118.
+*   @brief Blink the LED on the MCC 172.
 *
 *   Passing 0 for count will result in the LED blinking continuously until the 
-*   board is reset or mcc118_blink_led() is called again with a non-zero value 
+*   board is reset or mcc172_blink_led() is called again with a non-zero value 
 *   for count.
 *
 *   @param address  The board address (0 - 7).
@@ -79,25 +79,22 @@ struct MCC118DeviceInfo* mcc118_info(void);
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_blink_led(uint8_t address, uint8_t count);
+int mcc172_blink_led(uint8_t address, uint8_t count);
 
 /**
-*   @brief Return the board firmware and bootloader versions.
+*   @brief Return the board firmware version.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param version  Receives the firmware version.  The version will be in BCD 
 *       hexadecimal with the high byte as the major version and low byte as 
 *       minor, i.e. 0x0103 is version 1.03.
-*   @param boot_version  Receives the bootloader version.  The version will be 
-*       in BCD hexadecimal as above.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_firmware_version(uint8_t address, uint16_t* version, 
-    uint16_t* boot_version);
+int mcc172_firmware_version(uint8_t address, uint16_t* version);
 
 /**
-*   @brief Read the MCC 118 serial number
+*   @brief Read the MCC 172 serial number
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param buffer   Pass a user-allocated buffer pointer to receive the serial 
@@ -105,10 +102,10 @@ int mcc118_firmware_version(uint8_t address, uint16_t* version,
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_serial(uint8_t address, char* buffer);
+int mcc172_serial(uint8_t address, char* buffer);
 
 /**
-*   @brief Read the MCC 118 calibration date
+*   @brief Read the MCC 172 calibration date
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param buffer   Pass a user-allocated buffer pointer to receive the date as 
@@ -117,32 +114,32 @@ int mcc118_serial(uint8_t address, char* buffer);
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_calibration_date(uint8_t address, char* buffer);
+int mcc172_calibration_date(uint8_t address, char* buffer);
 
 /**
-*   @brief Read the MCC 118 calibration coefficients for a single channel.
+*   @brief Read the MCC 172 calibration coefficients for a single channel.
 *
 *   The coefficients are applied in the library as:
 *
 *       calibrated_ADC_code = (raw_ADC_code * slope) + offset
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param channel  The channel number (0 - 7).
+*   @param channel  The channel number (0 - 1).
 *   @param slope    Receives the slope.
 *   @param offset   Receives the offset.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_calibration_coefficient_read(uint8_t address, uint8_t channel, 
+int mcc172_calibration_coefficient_read(uint8_t address, uint8_t channel, 
     double* slope, double* offset);
 
 /**
-*   @brief Temporarily write the MCC 118 calibration coefficients for a single 
+*   @brief Temporarily write the MCC 172 calibration coefficients for a single 
 *       channel.
 *
 *   The user can apply their own calibration coefficients by writing to these 
 *   values. The values will reset to the factory values from the EEPROM whenever 
-*   mcc118_open() is called. This function will fail and return 
+*   mcc172_open() is called. This function will fail and return 
 *   [RESULT_BUSY](@ref RESULT_BUSY) if a scan is active when it is called.
 *
 *   The coefficients are applied in the library as:
@@ -150,97 +147,175 @@ int mcc118_calibration_coefficient_read(uint8_t address, uint8_t channel,
 *       calibrated_ADC_code = (raw_ADC_code * slope) + offset
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param channel  The channel number (0 - 7).
+*   @param channel  The channel number (0 - 1).
 *   @param slope    The new slope value.
 *   @param offset   The new offset value.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_calibration_coefficient_write(uint8_t address, uint8_t channel, 
+int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel, 
     double slope, double offset);
 
 /**
-*   @brief Perform a single reading of an analog input channel and return the 
-*       value.
-*
-*   The valid options are:
-*       - [OPTS_NOSCALEDATA](@ref OPTS_NOSCALEDATA): Return ADC code (a value 
-*           between 0 and 4095) rather than voltage.
-*       - [OPTS_NOCALIBRATEDATA](@ref OPTS_NOCALIBRATEDATA): Return data without 
-*           the calibration factors applied.
-*
-*   The options parameter is set to 0 or [OPTS_DEFAULT](@ref OPTS_DEFAULT) for 
-*   default operation, which is scaled and calibrated data.
-*
-*   Multiple options may be specified by ORing the flags. For instance, 
-*   specifying [OPTS_NOSCALEDATA](@ref OPTS_NOSCALEDATA) | 
-*   [OPTS_NOCALIBRATEDATA](@ref OPTS_NOCALIBRATEDATA) will return the value read 
-*   from the ADC without calibration or converting to voltage.
-*
-*   The function will return [RESULT_BUSY](@ref RESULT_BUSY) if called while a 
-*   scan is running.
+*   @brief Read the MCC 172 IEPE configuration for a single channel.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param channel  The analog input channel number, 0 - 7.
-*   @param options  Options bitmask.
-*   @param value    Receives the analog input value.
+*   @param channel  The channel number (0 - 1).
+*   @param config   Receives the configuration for the specified channel:
+*       0: IEPE power off
+*       1: IEPE power on
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_a_in_read(uint8_t address, uint8_t channel, uint32_t options, 
-    double* value);
+int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config);
 
 /**
-*   @brief Set the trigger input mode.
+*   @brief Write the MCC 172 IEPE configuration for a single channel.
+*
+*   Writes the new IEPE configuration for a channel. This function will fail and
+*   return [RESULT_BUSY](@ref RESULT_BUSY) if a scan is active when it is
+*   called.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
+*   @param channel  The channel number (0 - 1).
+*   @param config   The IEPE configuration for the specified channel:
+*       0: IEPE power off
+*       1: IEPE power on
+*   @return [Result code](@ref ResultCode), 
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
+*/
+int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config);
+
+/**
+*   @brief Read the sampling clock configuration.
+*
+*   This function will return the sample clock configuration and rate. The rate
+*   is only valid if the clock is configured for local or master mode.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param clock_source Receives the ADC clock source:
+*       0: local clock, not shared with other devices
+*       1: master clock, this device creates the master clock for other devices
+*       configured as slaves
+*       2: slave clock, this device gets its clock from another device
+*   @param sample_rate_per_channel   Receives the sampling rate in samples per 
+*       second per channel
+*   @return [Result code](@ref ResultCode), 
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
+*/
+int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
+    double* sample_rate);
+
+/**
+*   @brief Write the sampling clock configuration.
+*
+*   This function will configure the ADC sampling clock. The default
+*   configuration after opening the device is local mode, 51.2 KHz sampling
+*   rate.
+*
+*   In local or master mode, the ADCs will be synchronized so they acquire data
+*   at the same time. This requires 128 clock cycles before the first sample is
+*   available. When using a master - slave clock configuration there are
+*   additional considerations:
+*       - There should be only one master device; otherwise, you will be
+*       connecting multiple outputs together and could damage a device.
+*       - Configure the clock on the slave device(s) first, master last. The
+*       synchronization will occur when the master clock is configured, causing
+*       the ADCs on all the devices to be in sync.
+*
+*   The sample_rate_per_channel will be internally adjusted to the next lower 
+*   rate from this list:
+*       - 51.2 KHz
+*       - 25.6 KHz
+*       - 12.8 KHz
+*       - 10.24 KHz
+*       - 6.4 KHz
+*       - 5.12 KHz
+*       - 3.2 KHz
+*       - 2.56 KHz
+*       - 2.048 KHz
+*       - 1.6 KHz
+*       - 1.024 KHz
+*       - 800 Hz
+*       - 640 Hz
+*       - 512 Hz
+*       - 400 Hz
+*       - 320 Hz
+*       - 256 Hz
+*       - 204.8 Hz
+*       - 200 Hz
+*
+*   In slave mode the sample_rate_per_channel parameter is only used for thread
+*   timing and buffer size, so set it to the rate used by the master device.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param clock_source The ADC clock source:
+*       0: local clock, not shared with other devices
+*       1: master clock, this device creates the master clock for other devices
+*       configured as slaves
+*       2: slave clock, this device gets its clock from another device
+*   @param sample_rate_per_channel   The requested sampling rate in samples per 
+*       second per channel
+*   @return [Result code](@ref ResultCode), 
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
+*/
+int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
+    double* sample_rate);
+
+/**
+*   @brief Read the sampling clock status.
+*
+*   After configuring the sampling clock with mcc172_a_in_clock_config() the
+*   ADCs will be synchronized so they acquire data at the same time, requiring
+*   128 clock cycles before the first sample is available. This function reports
+*   the status of the synchronization. A scan will wait for ADC data to be
+*   generated so you may start a scan without waiting for sync to complete.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param status   Receives the ADC clock status:
+*       0: clock not synchronized
+*       1: clock synchronized
+*   @return [Result code](@ref ResultCode), 
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
+*/
+int mcc172_a_in_clock_status(uint8_t address, uint8_t* status);
+
+/**
+*   @brief Configure the digital trigger.
+*
+*   The analog input scan may be configured to start saving the acquired data
+*   when the digital trigger is in the desired state. A single device trigger
+*   may also be shared with multiple boards. This command sets the trigger
+*   source and mode
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param source   The trigger source
 *   @param mode     One of the [trigger mode](@ref TriggerMode) values.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_trigger_mode(uint8_t address, uint8_t mode);
+int mcc172_trigger_mode(uint8_t address, uint8_t source, uint8_t mode);
+
 
 /**
-*   @brief Read the actual sample rate per channel for a requested sample rate.
-*
-*   The internal scan clock is generated from a 16 MHz clock source so only 
-*   discrete frequency steps can be achieved.  This function will return the 
-*   actual rate for a requested channel count and rate. This function does not 
-*   perform any actions with a board, it simply calculates the rate.
-*
-*   @param channel_count    The number of channels in the scan.
-*   @param sample_rate_per_channel   The desired sampling rate in samples per 
-*       second per channel, max 100,000.
-*   @param actual_sample_rate_per_channel   The actual sample rate that would 
-*       occur when requesting this rate on an MCC 118, or 0 if there is an 
-*       error.
-*   @return [Result code](@ref ResultCode), 
-*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful,
-*       [RESULT_BAD_PARAMETER](@ref RESULT_BAD_PARAMETER) if the scan parameters 
-*       are not achievable on an MCC 118.
-*/
-int mcc118_a_in_scan_actual_rate(uint8_t channel_count, 
-    double sample_rate_per_channel, double* actual_sample_rate_per_channel);
-
-/**
-*   @brief Start a hardware-paced analog input scan.
+*   @brief Start capturing analog input data from the specified channels
 *
 *   The scan runs as a separate thread from the user's code.  The function will 
 *   allocate a scan buffer and read data from the device into that buffer.  The 
 *   user reads the data from this buffer and the scan status using the 
-*   mcc118_a_in_scan_read() function. mcc118_a_in_scan_stop() is used to stop a
+*   mcc172_a_in_scan_read() function. mcc172_a_in_scan_stop() is used to stop a
 *   continuous scan, or to stop a finite scan before it completes.  The user 
-*   must call mcc118_a_in_scan_cleanup() after the scan has finished and all 
+*   must call mcc172_a_in_scan_cleanup() after the scan has finished and all 
 *   desired data has been read; this frees all resources from the scan and 
 *   allows additional scans to be performed.
 *
 *   The scan state has defined terminology:
-*   - \b Active: mcc118_a_in_scan_start() has been called and the device may be 
+*   - \b Active: mcc172_a_in_scan_start() has been called and the device may be 
 *       acquiring data or finished with the acquisition. The scan has not been
-*       cleaned up by calling mcc118_a_in_scan_cleanup(), so another scan may
+*       cleaned up by calling mcc172_a_in_scan_cleanup(), so another scan may
 *       not be started.
 *   - \b Running: The scan is active and the device is still acquiring data.
-*       Certain functions like mcc118_a_in_read() will return an error because
+*       Certain functions like mcc172_a_in_read() will return an error because
 *       the device is busy.
 *
 *   The valid options are:
@@ -248,25 +323,18 @@ int mcc118_a_in_scan_actual_rate(uint8_t channel_count,
 *           between 0 and 4095) rather than voltage.
 *       - [OPTS_NOCALIBRATEDATA](@ref OPTS_NOCALIBRATEDATA): Return data without 
 *           the calibration factors applied.
-*       - [OPTS_EXTCLOCK](@ref OPTS_EXTCLOCK): Use an external 3.3V or 5V logic 
-*           signal at the CLK input as the scan clock. Multiple devices can be 
-*           synchronized by connecting the CLK pins together and using this
-*           option on all but one device so they will be clocked by the 
-*           single device using its internal clock. \b sample_rate_per_channel 
-*           is only used for buffer sizing.
 *       - [OPTS_EXTTRIGGER](@ref OPTS_EXTTRIGGER): Hold off the scan (after 
-*           calling mcc118_a_in_scan_start()) until the trigger condition is 
-*           met.  The trigger is a 3.3V or 5V logic signal applied to the TRIG 
-*           pin.
+*           calling mcc172_a_in_scan_start()) until the trigger condition is 
+*           met.
 *       - [OPTS_CONTINUOUS](@ref OPTS_CONTINUOUS): Scans continuously until 
-*           stopped by the user by calling mcc118_a_in_scan_stop() and writes 
+*           stopped by the user by calling mcc172_a_in_scan_stop() and writes 
 *           data to a circular buffer. The data must be read before being 
 *           overwritten to avoid a buffer overrun error. \b samples_per_channel 
 *           is only used for buffer sizing.
 *
 *   The options parameter is set to 0 or [OPTS_DEFAULT](@ref OPTS_DEFAULT) for 
-*   default operation, which is scaled and calibrated data, internal scan clock, 
-*   no trigger, and finite operation.
+*   default operation, which is scaled and calibrated data, no trigger, and
+*   finite operation.
 *
 *   Multiple options may be specified by ORing the flags. For instance, 
 *   specifying [OPTS_NOSCALEDATA](@ref OPTS_NOSCALEDATA) | 
@@ -282,14 +350,13 @@ int mcc118_a_in_scan_actual_rate(uint8_t channel_count,
 *   greater
 *
 *   \verbatim embed:rst:leading-asterisk
-*   ==============      =========================
-*   Sample Rate         Buffer Size (per channel)
-*   ==============      =========================
-*   Not specified       10 kS
-*   0-100 S/s           1 kS
-*   100-10k S/s         10 kS
-*   10k-100k S/s        100 kS
-*   ==============      =========================
+*   =====================      =========================
+*   Sample Rate                Buffer Size (per channel)
+*   =====================      =========================
+*   200-1024 S/s                 1 KS
+*   1280-10.24 KS/s             10 KS
+*   12.8, 25.6, 51.2 KS/s      100 KS
+*   =====================      =========================
 *   \endverbatim
 *
 *   Specifying a very large value for \b samples_per_channel could use too much 
@@ -303,27 +370,23 @@ int mcc118_a_in_scan_actual_rate(uint8_t channel_count,
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param channel_mask  A bit mask of the channels to be scanned. Set each bit 
-*       to enable the associated channel (0x01 - 0xFF.)
+*       to enable the associated channel (0x01 - 0x03.)
 *   @param samples_per_channel  The number of samples to acquire for each 
 *       channel in the scan (finite mode,) or can be used to set a larger scan 
 *       buffer size than the default value (continuous mode.) 
-*   @param sample_rate_per_channel   The sampling rate in samples per second per 
-*       channel, max 100,000. When using an external sample clock set this value 
-*       to the maximum expected rate of the clock.
 *   @param options  The options bitmask.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful,
 *       [RESULT_BUSY](@ref RESULT_BUSY) if a scan is already active.
 */
-int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask, 
-    uint32_t samples_per_channel, double sample_rate_per_channel, 
-    uint32_t options);
+int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask, 
+    uint32_t samples_per_channel, uint32_t options);
 
 /**
 *   @brief Returns the size of the internal scan data buffer.
 *
 *   An internal data buffer is allocated for the scan when 
-*   mcc118_a_in_scan_start() is called. This function returns the total size of 
+*   mcc172_a_in_scan_start() is called. This function returns the total size of 
 *   that buffer in samples.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
@@ -336,14 +399,14 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 *       [RESULT_BAD_PARAMETER](@ref RESULT_BAD_PARAMETER) if the address is 
 *       invalid or buffer_size_samples is NULL.
 */
-int mcc118_a_in_scan_buffer_size(uint8_t address, 
+int mcc172_a_in_scan_buffer_size(uint8_t address, 
     uint32_t* buffer_size_samples);
 
 /**
 *   @brief Reads status and number of available samples from an analog input 
 *   scan.
 *
-*   The scan is started with mcc118_a_in_scan_start() and runs in a background 
+*   The scan is started with mcc172_a_in_scan_start() and runs in a background 
 *   thread that reads the data from the board into an internal scan buffer.
 *   This function reads the status of the scan and amount of data in the scan 
 *   buffer.
@@ -364,13 +427,13 @@ int mcc118_a_in_scan_buffer_size(uint8_t address,
 *       [RESULT_RESOURCE_UNAVAIL](@ref RESULT_RESOURCE_UNAVAIL) if a scan has 
 *       not been started under this instance of the device.
 */
-int mcc118_a_in_scan_status(uint8_t address, uint16_t* status, 
+int mcc172_a_in_scan_status(uint8_t address, uint16_t* status, 
     uint32_t* samples_per_channel);
 
 /**
 *   @brief Reads status and multiple samples from an analog input scan.
 *
-*   The scan is started with mcc118_a_in_scan_start() and runs in a background 
+*   The scan is started with mcc172_a_in_scan_start() and runs in a background 
 *   thread that reads the data from the board into an internal scan buffer.
 *   This function reads the data from the scan buffer, and returns the current 
 *   scan status.
@@ -402,7 +465,7 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 *       [RESULT_RESOURCE_UNAVAIL](@ref RESULT_RESOURCE_UNAVAIL) if a scan is not
 *           active.
 */
-int mcc118_a_in_scan_read(uint8_t address, uint16_t* status, 
+int mcc172_a_in_scan_read(uint8_t address, uint16_t* status, 
     int32_t samples_per_channel, double timeout, double* buffer,
     uint32_t buffer_size_samples, uint32_t* samples_read_per_channel);
 
@@ -410,13 +473,13 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
 *   @brief Stops an analog input scan.
 *
 *   The scan is stopped immediately.  The scan data that has been read into the 
-*   scan buffer is available until mcc118_a_in_scan_cleanup() is called.
+*   scan buffer is available until mcc172_a_in_scan_cleanup() is called.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_a_in_scan_stop(uint8_t address);
+int mcc172_a_in_scan_stop(uint8_t address);
 
 /**
 *   @brief Free analog input scan resources after the scan is complete.
@@ -425,7 +488,7 @@ int mcc118_a_in_scan_stop(uint8_t address);
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_a_in_scan_cleanup(uint8_t address);
+int mcc172_a_in_scan_cleanup(uint8_t address);
 
 /**
 *   @brief Return the number of channels in the current analog input scan.
@@ -433,26 +496,9 @@ int mcc118_a_in_scan_cleanup(uint8_t address);
 *   This function returns 0 if no scan is active.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @return The number of channels, 0 - 8.
+*   @return The number of channels, 0 - 2.
 */
-int mcc118_a_in_scan_channel_count(uint8_t address);
-
-/**
-*   @brief Test the CLK pin.
-*
-*   This function will return RESULT_BUSY if called while a scan is running.
-*
-*   @param address  The board address (0 - 7). Board must already be opened.
-*   @param mode The CLK pin mode
-*       - 0 = input
-*       - 1 = output low
-*       - 2 = output high
-*       - 3 = output 1 kHz square wave
-*   @param value   Receives the value at the CLK pin after setting the mode.
-*   @return [Result code](@ref ResultCode), 
-*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
-*/
-int mcc118_test_clock(uint8_t address, uint8_t mode, uint8_t* value);
+int mcc172_a_in_scan_channel_count(uint8_t address);
 
 /**
 *   @brief Test the TRIG pin by returning the current state.
@@ -462,7 +508,7 @@ int mcc118_test_clock(uint8_t address, uint8_t mode, uint8_t* value);
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc118_test_trigger(uint8_t address, uint8_t* state);
+int mcc172_test_trigger(uint8_t address, uint8_t* state);
 
 #ifdef __cplusplus
 }
