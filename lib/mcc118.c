@@ -461,23 +461,14 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     // send the command
     clock_gettime(CLOCK_MONOTONIC, &start_time);
 
-    do
+    if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
     {
-        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
-        {
-            _release_lock(lock_fd);
-            free(tx_buffer);
-            free(rx_buffer);
-            free(temp_buffer);
-            return RESULT_UNDEFINED;
-        }
-
-        resend = false;
-
-        clock_gettime(CLOCK_MONOTONIC, &current_time);
-        diff = _difftime_us(&start_time, &current_time);
-        timeout = (diff > reply_timeout_us);
-    } while (resend && !timeout);
+        _release_lock(lock_fd);
+        free(tx_buffer);
+        free(rx_buffer);
+        free(temp_buffer);
+        return RESULT_UNDEFINED;
+    }
 
     if (retry_us)
         usleep(retry_us);
@@ -1086,7 +1077,7 @@ int mcc118_open(uint8_t address)
     _mcc118_lib_init();
 
     // validate the parameters
-    if ((address >= MAX_NUMBER_HATS))
+    if (address >= MAX_NUMBER_HATS)
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1107,7 +1098,7 @@ int mcc118_open(uint8_t address)
             }
             else
             {
-                return RESULT_BAD_PARAMETER;
+                return RESULT_INVALID_DEVICE;
             }
         }
         else
