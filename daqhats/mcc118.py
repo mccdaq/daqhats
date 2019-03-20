@@ -121,8 +121,13 @@ class mcc118(Hat): # pylint: disable=invalid-name
         self._lib.mcc118_test_trigger.argtypes = [c_ubyte, POINTER(c_ubyte)]
         self._lib.mcc118_test_trigger.restype = c_int
 
-        if self._lib.mcc118_open(self._address) != self._RESULT_SUCCESS:
-            self._initialized = False
+        result = self._lib.mcc118_open(self._address) 
+        
+        if result == self._RESULT_SUCCESS:
+            self._initialized = True
+        elif result == self._RESULT_INVALID_BOARD:
+            raise HatError(self._address, "Invalid board type.")
+        else:
             raise HatError(self._address, "Board not responding.")
 
         return
