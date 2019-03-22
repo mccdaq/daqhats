@@ -428,9 +428,6 @@ def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
         chart data.
     """
     updated_chart_data = chart_data_json_str
-    if n_intervals == 0:
-        return updated_chart_data
-
     samples_to_display = int(samples_to_display_val)
     num_channels = len(active_channels)
     if acq_state == 'running':
