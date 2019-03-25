@@ -371,7 +371,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     struct timespec current_time;
     uint32_t diff;
     bool got_reply;
-    bool resend;
     int lock_fd;
     int ret;
     uint8_t temp;
@@ -1132,12 +1131,24 @@ int mcc118_open(uint8_t address)
         {
             // convert the JSON custom data to parameters
             cJSON* root = cJSON_Parse(custom_data);
-            if (!_parse_factory_data(root, &dev->factory_data))
+            if (root == NULL)
             {
-                // invalid custom data, use default values
+                // error parsing the JSON data
                 _set_defaults(&dev->factory_data);
+                printf("Warning - address %d using factory EEPROM default "
+                    "values\n", address);
             }
-            cJSON_Delete(root);
+            else
+            {
+                if (!_parse_factory_data(root, &dev->factory_data))
+                {
+                    // invalid custom data, use default values
+                    _set_defaults(&dev->factory_data);
+                    printf("Warning - address %d using factory EEPROM default "
+                        "values\n", address);
+                }
+                cJSON_Delete(root);
+            }
 
             free(custom_data);
         }
@@ -1145,6 +1156,8 @@ int mcc118_open(uint8_t address)
         {
             // use default parameters, board probably has an empty EEPROM.
             _set_defaults(&dev->factory_data);
+            printf("Warning - address %d using factory EEPROM default "
+                "values\n", address);
         }
 
     }
