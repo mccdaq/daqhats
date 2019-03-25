@@ -263,7 +263,8 @@ int mcc152_open(uint8_t address)
             {
                 // error parsing the JSON data
                 _set_defaults(&dev->factory_data);
-                printf("Warning - using factory EEPROM default values\n");
+                printf("Warning - address %d using factory EEPROM default "
+                    "values\n", address);
             }
             else
             {
@@ -271,7 +272,8 @@ int mcc152_open(uint8_t address)
                 {
                     // invalid custom data, use default values
                     _set_defaults(&dev->factory_data);
-                    printf("Warning - using factory EEPROM default values\n");
+                    printf("Warning - address %d using factory EEPROM default "
+                        "values\n", address);
                 }
                 cJSON_Delete(root);
             }
@@ -282,7 +284,8 @@ int mcc152_open(uint8_t address)
         {
             // use default parameters, board probably has an empty EEPROM.
             _set_defaults(&dev->factory_data);
-            printf("Warning - using factory EEPROM default values\n");
+            printf("Warning - address %d using factory EEPROM default "
+                "values\n", address);
         }
 
         // initialize the DAC
