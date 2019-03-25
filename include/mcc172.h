@@ -259,8 +259,8 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
 */
-int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
-    double* sample_rate);
+int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
+    double sample_rate);
 
 /**
 *   @brief Read the sampling clock status.
