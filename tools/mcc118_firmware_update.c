@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include "daqhats/daqhats.h"
+#include "daqhats.h"
 #include "mcc118_update.h"
 
 // Flash address/size values are given in bytes

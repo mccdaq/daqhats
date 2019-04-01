@@ -33,6 +33,8 @@ struct MCC172DeviceInfo
 extern "C" {
 #endif
 
+int mcc172_test(uint8_t address, double* value);
+
 /**
 *   @brief Open a connection to the MCC 172 device at the specified address.
 *
@@ -189,8 +191,20 @@ int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config);
 /**
 *   @brief Read the sampling clock configuration.
 *
-*   This function will return the sample clock configuration and rate. The rate
-*   is only valid if the clock is configured for local or master mode.
+*   This function will return the sample clock configuration and rate. If the 
+*   clock is configured for local or master mode, then the rate will be the 
+*   internally adjusted rate set by the user.  If the clock is configured for
+*   slave mode, then the rate will be measured from the master clock after the
+*   synchronization period has ended. The synchcronization status is also
+*   returned.
+*
+*   The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by an
+*   integer between 1 and 256. The sample_rate_per_channel will be internally
+*   converted to the nearest valid rate. The actual rate can be read back
+*   using mcc172_a_in_clock_config_read(). When used in slave mode, the device
+*   will measure the frequency of the incoming master clock after the
+*   synchronization period is complete. Calling mcc172_a_in_clock_config_read()
+*   after this will return the measured sample rate.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param clock_source Receives the ADC clock source:
@@ -200,11 +214,13 @@ int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config);
 *       2: slave clock, this device gets its clock from another device
 *   @param sample_rate_per_channel   Receives the sampling rate in samples per 
 *       second per channel
+*   @param synced   Receives the syncronization status (0: sync in progress,
+*       1: sync complete)
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
 */
 int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
-    double* sample_rate);
+    double* sample_rate_per_channel, uint8_t* synced);
 
 /**
 *   @brief Write the sampling clock configuration.
@@ -223,27 +239,13 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *       synchronization will occur when the master clock is configured, causing
 *       the ADCs on all the devices to be in sync.
 *
-*   The sample_rate_per_channel will be internally adjusted to the next lower 
-*   rate from this list:
-*       - 51.2 KHz
-*       - 25.6 KHz
-*       - 12.8 KHz
-*       - 10.24 KHz
-*       - 6.4 KHz
-*       - 5.12 KHz
-*       - 3.2 KHz
-*       - 2.56 KHz
-*       - 2.048 KHz
-*       - 1.6 KHz
-*       - 1.024 KHz
-*       - 800 Hz
-*       - 640 Hz
-*       - 512 Hz
-*       - 400 Hz
-*       - 320 Hz
-*       - 256 Hz
-*       - 204.8 Hz
-*       - 200 Hz
+*   The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by an
+*   integer between 1 and 256. The sample_rate_per_channel will be internally
+*   converted to the nearest valid rate. The actual rate can be read back
+*   using mcc172_a_in_clock_config_read(). When used in slave mode, the device
+*   will measure the frequency of the incoming master clock after the
+*   synchronization period is complete. Calling mcc172_a_in_clock_config_read()
+*   after this will return the measured sample rate.
 *
 *   In slave mode the sample_rate_per_channel parameter is only used for thread
 *   timing and buffer size, so set it to the rate used by the master device.
@@ -260,25 +262,7 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
 */
 int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
-    double sample_rate);
-
-/**
-*   @brief Read the sampling clock status.
-*
-*   After configuring the sampling clock with mcc172_a_in_clock_config() the
-*   ADCs will be synchronized so they acquire data at the same time, requiring
-*   128 clock cycles before the first sample is available. This function reports
-*   the status of the synchronization. A scan will wait for ADC data to be
-*   generated so you may start a scan without waiting for sync to complete.
-*
-*   @param address  The board address (0 - 7). Board must already be opened.
-*   @param status   Receives the ADC clock status:
-*       0: clock not synchronized
-*       1: clock synchronized
-*   @return [Result code](@ref ResultCode), 
-*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
-*/
-int mcc172_a_in_clock_status(uint8_t address, uint8_t* status);
+    double sample_rate_per_channel);
 
 /**
 *   @brief Configure the digital trigger.
@@ -294,8 +278,7 @@ int mcc172_a_in_clock_status(uint8_t address, uint8_t* status);
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc172_trigger_mode(uint8_t address, uint8_t source, uint8_t mode);
-
+int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode);
 
 /**
 *   @brief Start capturing analog input data from the specified channels
@@ -308,6 +291,10 @@ int mcc172_trigger_mode(uint8_t address, uint8_t source, uint8_t mode);
 *   must call mcc172_a_in_scan_cleanup() after the scan has finished and all 
 *   desired data has been read; this frees all resources from the scan and 
 *   allows additional scans to be performed.
+*
+*   The scan cannot be started until the ADCs are synchronized, so this function
+*   will not return until that has completed. It is best to wait for sync using
+*   mcc172_a_in_clock_config_read() before starting the scan.
 *
 *   The scan state has defined terminology:
 *   - \b Active: mcc172_a_in_scan_start() has been called and the device may be 
@@ -501,14 +488,39 @@ int mcc172_a_in_scan_cleanup(uint8_t address);
 int mcc172_a_in_scan_channel_count(uint8_t address);
 
 /**
-*   @brief Test the TRIG pin by returning the current state.
+*   @brief Read the state of shared signals for testing.
+*
+*   This function reads the state of the ADC clock, sync, and trigger signals.
+*   Use it in conjunction with mcc172_a_in_clock_config_write() and 
+*   mcc172_trigger_config() to put the signals into slave mode then set values
+*   on the signals using the Pi GPIO pins.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param state    Receives the TRIG pin state (0 or 1.)
+*   @param clock    Receives the current logic level of the ADC clock.
+*   @param sync     Receives the current logic level of sync.
+*   @param trigger  Receives the current logic level of trigger.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc172_test_trigger(uint8_t address, uint8_t* state);
+int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
+    uint8_t* trigger);
+
+/**
+*   @brief Write values to shared signals for testing.
+*
+*   This function puts the shared signals into test mode and sets them to the
+*   specified state. The signal levels can then be read on the Pi GPIO pins to
+*   confirm.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param mode     Set to 1 for test mode, 0 to return to normal operation.
+*   @param clock    The value to write to the adc clock when in test mode.
+*   @param sync     The value to write to sync when in test mode.
+*   @return [Result code](@ref ResultCode), 
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
+*/
+int mcc172_test_signals_write(uint8_t address, uint8_t mode, uint8_t clock,
+    uint8_t sync);
 
 #ifdef __cplusplus
 }

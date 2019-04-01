@@ -25,7 +25,7 @@
 
 // *****************************************************************************
 // Constants
-//#define DEBUG
+#define DEBUG
 
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
@@ -35,6 +35,7 @@
 #define VOLTAGE_MIN             RANGE_MIN
 #define VOLTAGE_MAX             (RANGE_MAX - LSB_SIZE)
 #define NUM_CHANNELS            2
+#define MAX_SAMPLE_RATE         51200
 
 struct MCC172DeviceInfo mcc172_device_info =
 {
@@ -58,21 +59,23 @@ struct MCC172DeviceInfo mcc172_device_info =
 #define RESET_GPIO              16
 #define IRQ_GPIO                20
 
-// Delay / timeout constants
-#define SEND_RETRY_TIME         10*MSEC     // 10 milliseconds
-
 // MCC 172 command codes
 #define CMD_AINSCANSTART        0x11
 #define CMD_AINSCANSTATUS       0x12
 #define CMD_AINSCANDATA         0x13
 #define CMD_AINSCANSTOP         0x14
-#define CMD_AINSCANSTATUSDATA   0x15
+#define CMD_AINCLOCKCONFIG_R    0x15
+#define CMD_AINCLOCKCONFIG_W    0x16
+#define CMD_TRIGGERCONFIG_R     0x17
+#define CMD_TRIGGERCONFIG_W     0x18
 
 #define CMD_BLINK               0x40
 #define CMD_ID                  0x41
 #define CMD_RESET               0x42
-#define CMD_TESTCLOCK           0x43
-#define CMD_TESTTRIGGER         0x44
+#define CMD_IEPECONFIG_R        0x43
+#define CMD_IEPECONFIG_W        0x44
+#define CMD_TESTSIGNAL_R        0x45
+#define CMD_TESTSIGNAL_W        0x46
 
 #define CMD_READ_REPLY          0x7F
 
@@ -102,7 +105,10 @@ struct MCC172DeviceInfo mcc172_device_info =
 
 #define TX_BUFFER_SIZE          (MAX_TX_DATA_SIZE + MSG_TX_HEADER_SIZE)
 
-#define MAX_SAMPLES_READ        512
+#define MAX_SPI_TRANSFER        4096
+#define SAMPLE_SIZE_BYTES       3
+#define MAX_SAMPLES_READ        ((MAX_SPI_TRANSFER - MSG_RX_HEADER_SIZE)/ \
+                                SAMPLE_SIZE_BYTES)
 
 // MCC 172 command response codes
 #define FW_RES_SUCCESS          0x00
@@ -172,6 +178,7 @@ struct mcc172Device
     uint16_t handle_count;      // the number of handles open to this device
     uint16_t fw_version;        // firmware version
     int spi_fd;                 // SPI file descriptor
+    uint8_t trigger_source;      // Trigger source
     uint8_t trigger_mode;       // Trigger mode
     struct mcc172FactoryData factory_data;   // Factory data
     struct mcc172ScanThreadInfo* scan_info; // Scan info
@@ -360,11 +367,13 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     struct timespec current_time;
     uint32_t diff;
     bool got_reply;
-    bool resend;
     int lock_fd;
     int ret;
     uint8_t temp;
     bool timeout;
+#ifdef DEBUG
+    char buffer[80];
+#endif
 
     uint16_t tx_count;
     uint8_t* tx_buffer;
@@ -448,25 +457,14 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     };
 
     // send the command
-    clock_gettime(CLOCK_MONOTONIC, &start_time);
-
-    do
+    if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
     {
-        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
-        {
-            _release_lock(lock_fd);
-            free(tx_buffer);
-            free(rx_buffer);
-            free(temp_buffer);
-            return RESULT_UNDEFINED;
-        }
-
-        resend = false;
-
-        clock_gettime(CLOCK_MONOTONIC, &current_time);
-        diff = _difftime_us(&start_time, &current_time);
-        timeout = (diff > reply_timeout_us);
-    } while (resend && !timeout);
+        _release_lock(lock_fd);
+        free(tx_buffer);
+        free(rx_buffer);
+        free(temp_buffer);
+        return RESULT_UNDEFINED;
+    }
 
     if (retry_us)
         usleep(retry_us);
@@ -536,7 +534,10 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             }
             else
             {
-                printf("ioctl failed %d %d\n", errno, tr2.len);
+#ifdef DEBUG
+                sprintf(buffer, "ioctl failed %d %d\n", errno, tr2.len);
+                _syslog(buffer);
+#endif                
                 usleep(300);
             }
 
@@ -795,7 +796,12 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     uint16_t count;
     int ret;
     struct mcc172Device* dev;
-    uint16_t* rx_data;
+    uint8_t* rx_data;
+    uint8_t* ptr;
+    int32_t value;
+#ifdef DEBUG
+    char strbuffer[80];
+#endif
 
     if (!_check_addr(address) ||
         (buffer == NULL))
@@ -805,15 +811,19 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
 
     dev = _devices[address];
 
-    rx_data = (uint16_t*)calloc(1, sample_count * sizeof(uint16_t));
+    rx_data = (uint8_t*)calloc(1, sample_count * SAMPLE_SIZE_BYTES);
     if (rx_data == NULL)
     {
         return RESULT_RESOURCE_UNAVAIL;
     }
 
     // send the read scan data command
+#ifdef DEBUG
+    sprintf(strbuffer, "s: %d\n", sample_count);
+    _syslog(strbuffer);
+#endif    
     ret = _spi_transfer(address, CMD_AINSCANDATA, &sample_count, 2, rx_data,
-        sample_count*sizeof(uint16_t), 40*MSEC, 1);
+        sample_count*SAMPLE_SIZE_BYTES, 40*MSEC, 1);
 
     if (ret != RESULT_SUCCESS)
     {
@@ -821,11 +831,28 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         return ret;
     }
 
+    ptr = rx_data;
     for (count = 0; count < sample_count; count++)
     {
-        // convert raw values to double
-        buffer[count] = (double)rx_data[count];
-
+        // convert 24-bit value to signed 32-bit
+        if (ptr[0] & 0x80)
+        {
+            value = 0xFF000000 | 
+                ((uint32_t)ptr[0] << 16) | 
+                ((uint32_t)ptr[1] << 8)  | 
+                ptr[2];
+        }
+        else
+        {
+            value = 0x00000000 | 
+                ((uint32_t)ptr[0] << 16) | 
+                ((uint32_t)ptr[1] << 8)  | 
+                ptr[2];
+        }
+        ptr += SAMPLE_SIZE_BYTES;
+        
+        buffer[count] = (double)value;
+            
         if (calibrated)
         {
             // apply the appropriate cal factor to each sample in the list
@@ -839,9 +866,9 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         if (scaled)
         {
             buffer[count] *= LSB_SIZE;
-            buffer[count] += VOLTAGE_MIN;
+            //buffer[count] += VOLTAGE_MIN;
         }
-
+        
         dev->scan_info->channel_index++;
         if (dev->scan_info->channel_index >= dev->scan_info->channel_count)
         {
@@ -974,8 +1001,9 @@ static void* _scan_thread(void* arg)
                         RESULT_SUCCESS)
                     {
 #ifdef DEBUG
-                        sprintf(str, "scan_thread_read %d %d %d", 
-                            info->write_index, read_count, info->buffer_depth);
+                        sprintf(str, "scan_thread_read %d %d %d %d", 
+                            info->write_index, read_count, info->buffer_depth,
+                            available_samples);
                         _syslog(str);
 #endif
                         info->write_index += read_count;
@@ -1096,8 +1124,8 @@ int mcc172_open(uint8_t address)
         }
 
         // ensure GPIO signals are initialized
-        gpio_dir(RESET_GPIO, 0);
         gpio_write(RESET_GPIO, 0);
+        gpio_dir(RESET_GPIO, 0);
         
         gpio_dir(IRQ_GPIO, 1);
         
@@ -1124,12 +1152,24 @@ int mcc172_open(uint8_t address)
         {
             // convert the JSON custom data to parameters
             cJSON* root = cJSON_Parse(custom_data);
-            if (!_parse_factory_data(root, &dev->factory_data))
+            if (root == NULL)
             {
-                // invalid custom data, use default values
+                // error parsing the JSON data
                 _set_defaults(&dev->factory_data);
+                printf("Warning - address %d using factory EEPROM default "
+                    "values\n", address);
             }
-            cJSON_Delete(root);
+            else
+            {
+                if (!_parse_factory_data(root, &dev->factory_data))
+                {
+                    // invalid custom data, use default values
+                    _set_defaults(&dev->factory_data);
+                    printf("Warning - address %d using factory EEPROM default "
+                        "values\n", address);
+                }
+                cJSON_Delete(root);
+            }
 
             free(custom_data);
         }
@@ -1137,6 +1177,8 @@ int mcc172_open(uint8_t address)
         {
             // use default parameters, board probably has an empty EEPROM.
             _set_defaults(&dev->factory_data);
+            printf("Warning - address %d using factory EEPROM default "
+                "values\n", address);
         }
 
     }
@@ -1240,10 +1282,9 @@ int mcc172_blink_led(uint8_t address, uint8_t count)
 
     // send command
     int ret = _spi_transfer(address, CMD_BLINK, &count, 1, NULL, 0, 20*MSEC, 
-        10);
+        0);
     return ret;
 }
-
 
 /******************************************************************************
   Return the board firmware version
@@ -1273,7 +1314,7 @@ int mcc172_reset(uint8_t address)
     }
 
     // send reset command
-    int ret = _spi_transfer(address, CMD_RESET, NULL, 0, NULL, 0, 20*MSEC, 10);
+    int ret = _spi_transfer(address, CMD_RESET, NULL, 0, NULL, 0, 20*MSEC, 0);
     return ret;
 }
 
@@ -1365,7 +1406,9 @@ int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel,
  *****************************************************************************/
 int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config)
 {
+    uint8_t buffer;
     if (!_check_addr(address) ||
+        (channel >= NUM_CHANNELS) ||
         (config > 1))
     {
         return RESULT_BAD_PARAMETER;
@@ -1377,9 +1420,27 @@ int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config)
         return RESULT_BUSY;
     }
 
-    // write the configuration to the device
+    // read the existing config
+    int ret = _spi_transfer(address, CMD_IEPECONFIG_R, NULL, 0, &buffer, 1,
+        20*MSEC, 0);
+    if (ret != RESULT_SUCCESS)
+    {
+        return ret;
+    }
 
-    return RESULT_SUCCESS;
+    if (config == 0)
+    {
+        buffer &= ~(1 << channel);
+    }
+    else
+    {
+        buffer |= (1 << channel);
+    }
+    
+    // write the configuration to the device
+    ret = _spi_transfer(address, CMD_IEPECONFIG_W, &buffer, 1, NULL, 0,
+        20*MSEC, 0);
+    return ret;
 }
 
 /******************************************************************************
@@ -1387,15 +1448,23 @@ int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config)
  *****************************************************************************/
 int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 {
+    uint8_t buffer;
+    
     if (!_check_addr(address) ||
+        (channel >= NUM_CHANNELS) ||
         (config == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
 
     // read the configuration from the device
-
-    return RESULT_SUCCESS;
+    int ret = _spi_transfer(address, CMD_IEPECONFIG_R, NULL, 0, &buffer, 1,
+        20*MSEC, 0);
+    if (ret == RESULT_SUCCESS)
+    {
+        *config = (buffer >> channel) & 0x01;
+    }
+    return ret;
 }
 
 /******************************************************************************
@@ -1404,6 +1473,10 @@ int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     double sample_rate_per_channel)
 {
+    double divisor;
+    int result;
+    uint8_t buffer[2];
+    
     if (!_check_addr(address) ||
         (clock_source > 1))
     {
@@ -1416,51 +1489,68 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
         return RESULT_BUSY;
     }
 
+    // set the sample rate to one supported by the device
+    divisor = MAX_SAMPLE_RATE / sample_rate_per_channel + 0.5;
+    
+    if (divisor < 1.0)
+    {
+        divisor = 1.0;
+    }
+    else if (divisor > 256.0)
+    {
+        divisor = 256.0;
+    }
+    
     // write the configuration to the device
+    buffer[0] = clock_source;
+    buffer[1] = (uint8_t)(divisor - 1);
+    result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0, 
+        20*MSEC, 0);
 
-    return RESULT_SUCCESS;
+    return result;
 }
 
 /******************************************************************************
   Read the ADC clock configuration.
  *****************************************************************************/
 int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
-    double* sample_rate)
+    double* sample_rate, uint8_t* synced)
 {
+    int result;
+    uint8_t buffer[2];
+    
     if (!_check_addr(address) ||
         (clock_source == NULL) ||
-        (sample_rate == NULL))
+        (sample_rate == NULL) || 
+        (synced == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
 
     // read the configuration from the device
-
-    return RESULT_SUCCESS;
-}
-
-/******************************************************************************
-  Read the ADC sync status.
- *****************************************************************************/
-int mcc172_a_in_clock_status(uint8_t address, uint8_t* status)
-{
-    if (!_check_addr(address) ||
-        (status == NULL))
+    result = _spi_transfer(address, CMD_AINCLOCKCONFIG_R, NULL, 0, buffer, 2,
+        20*MSEC, 0);
+    if (result != RESULT_SUCCESS)
     {
-        return RESULT_BAD_PARAMETER;
+        return result;
     }
-
-    // read the status from the device
-
+    
+    *clock_source = buffer[0] & 0x03;
+    *synced = (buffer[0] >> 7) & 0x01;
+    *sample_rate = MAX_SAMPLE_RATE / ((double)buffer[1] + 1);
+    
     return RESULT_SUCCESS;
 }
 
 /******************************************************************************
-  Set the scan trigger mode.
+  Configure the trigger input.
  *****************************************************************************/
-int mcc172_trigger_mode(uint8_t address, uint8_t source, uint8_t mode)
+int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode)
 {
+    uint8_t buffer;
+    
     if (!_check_addr(address) ||
+        (source > 2) || 
         (mode > TRIG_ACTIVE_LOW))
     {
         return RESULT_BAD_PARAMETER;
@@ -1472,8 +1562,14 @@ int mcc172_trigger_mode(uint8_t address, uint8_t source, uint8_t mode)
         return RESULT_BUSY;
     }
 
+    // Write the config
+    buffer = (mode << 2) | (source);
+    _devices[address]->trigger_source = source;
     _devices[address]->trigger_mode = mode;
-    return RESULT_SUCCESS;
+    int ret = _spi_transfer(address, CMD_TRIGGERCONFIG_W, &buffer, 1, NULL, 0, 
+        20*MSEC, 0);
+
+    return ret;
 }
 
 /******************************************************************************
@@ -1487,14 +1583,16 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     int result;
     uint8_t num_channels;
     uint8_t channel;
-    double adc_rate;
+    double sample_rate_per_channel;
     struct mcc172Device* dev;
     struct mcc172ScanThreadInfo* info;
     uint8_t buffer[10];
-    uint32_t period;
     uint32_t scan_count;
-    uint8_t scan_options;
-
+    uint8_t clock_source;
+    uint8_t synced;
+#ifdef DEBUG
+    char strbuffer[80];
+#endif
 
     if (!_check_addr(address) ||
         (channel_mask == 0) ||
@@ -1539,6 +1637,24 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     info->channel_count = num_channels;
     info->channel_index = 0;
 
+    // Read the clock config, wait until in sync
+    do
+    {
+        result = mcc172_a_in_clock_config_read(address, &clock_source, 
+            &sample_rate_per_channel, &synced);
+        if (result != RESULT_SUCCESS)
+        {
+            free(info);
+            dev->scan_info = NULL;
+            return result;
+        }
+        
+        if (synced == 0)
+        {
+            usleep(100000);
+        }
+    } while (synced == 0);
+    
     // Calculate the buffer size
     if (options & OPTS_CONTINUOUS)
     {
@@ -1547,27 +1663,23 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         //
         // Rate         Buffer size
         // ----         -----------
-        // < 100 S/s    1 kS per channel
-        // < 10 kS/s    10 kS per channel
+        // < 1024 S/s   1 kS per channel
+        // < 10.24 kS/s 10 kS per channel
         // < 100 kS/s   100 kS per channel
-        /*
-        if (sample_rate_per_channel <= 100.0)
+        
+        if (sample_rate_per_channel <= 1024.0)
         {
             info->buffer_size = 1000;
         }
-        else if (sample_rate_per_channel <= 10000.0)
+        else if (sample_rate_per_channel <= 10240.0)
         {
             info->buffer_size = 10000;
         }
-        else if (sample_rate_per_channel <= 100000.0)
+        else 
         {
             info->buffer_size = 100000;
         }
-        else
-        {
-            info->buffer_size = 10000;
-        }
-        */
+
         if (info->buffer_size < samples_per_channel)
         {
             info->buffer_size = samples_per_channel;
@@ -1594,20 +1706,29 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 
     // Set the device read threshold based on the scan rate - read data
     // every 100ms or faster.
-    if ((adc_rate == 0.0) ||    // rate not specified
-        (adc_rate > 2560.0))
+    /*
+    if (sample_rate_per_channel > 2560.0)
     {
         info->read_threshold = COUNT_NORMALIZE(256, info->channel_count);
     }
     else
+    */
     {
-        info->read_threshold = (uint16_t)(adc_rate / 10);
+        info->read_threshold = (uint16_t)(sample_rate_per_channel / 10);
+        if (info->read_threshold > MAX_SAMPLES_READ)
+        {
+            info->read_threshold = MAX_SAMPLES_READ;
+        };
         info->read_threshold = COUNT_NORMALIZE(info->read_threshold, 
             info->channel_count);
         if (info->read_threshold == 0)
         {
             info->read_threshold = info->channel_count;
         }
+#ifdef DEBUG
+        sprintf(strbuffer, "r: %d\n", info->read_threshold);
+        _syslog(strbuffer);
+#endif        
     }
 
     pthread_attr_t attr;
@@ -1622,10 +1743,10 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
     // Start the scan
-    scan_options = 0;
     if (options & OPTS_EXTTRIGGER)
     {
-        scan_options |= (0x01 | (dev->trigger_mode << 1));
+        // enable the trigger
+        channel_mask |= 0x04;
     }
 
     if (options & OPTS_CONTINUOUS)
@@ -1643,14 +1764,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     buffer[1] = (uint8_t)(scan_count >> 8);
     buffer[2] = (uint8_t)(scan_count >> 16);
     buffer[3] = (uint8_t)(scan_count >> 24);
-    buffer[4] = (uint8_t)period;
-    buffer[5] = (uint8_t)(period >> 8);
-    buffer[6] = (uint8_t)(period >> 16);
-    buffer[7] = (uint8_t)(period >> 24);
-    buffer[8] = channel_mask;
-    buffer[9] = scan_options;
+    buffer[4] = channel_mask;
 
-    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 10, NULL, 0, 
+    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 5, NULL, 0, 
         20*MSEC, 0);
 
     if (result != RESULT_SUCCESS)
@@ -1983,7 +2099,7 @@ int mcc172_a_in_scan_stop(uint8_t address)
 
     // send scan stop command
     int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC, 
-        10);
+        0);
     return ret;
 }
 
@@ -2019,21 +2135,66 @@ int mcc172_a_in_scan_cleanup(uint8_t address)
 }
 
 /******************************************************************************
-  Test the TRIG pin by returning the current state.
+ Read the state of shared signals for testing.
  *****************************************************************************/
-int mcc172_test_trigger(uint8_t address, uint8_t* pState)
+int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
+    uint8_t* trigger)
 {
+    uint8_t buffer;
+    
+    if (!_check_addr(address) ||
+        (clock == NULL) ||
+        (sync == NULL) ||
+        (trigger == NULL))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // send the command
+    int ret = _spi_transfer(address, CMD_TESTSIGNAL_R, NULL, 0, &buffer, 
+        1, 20*MSEC, 0);
+    if (ret == RESULT_SUCCESS)
+    {
+        *clock = buffer & 0x01;
+        *sync = (buffer >> 1) & 0x01;
+        *trigger = (buffer >> 2) & 0x01;
+    }
+    return ret;
+}
+
+/******************************************************************************
+ Write values to shared signals for testing.
+ *****************************************************************************/
+int mcc172_test_signals_write(uint8_t address, uint8_t mode, uint8_t clock,
+    uint8_t sync)
+{
+    uint8_t buffer;
+    
     if (!_check_addr(address))
     {
         return RESULT_BAD_PARAMETER;
     }
 
-    // send test trigger command
-    int ret = _spi_transfer(address, CMD_TESTTRIGGER, NULL, 0, pState, 
-        pState ? 1 : 0, 20*MSEC, 0);
+    // send the command
+    buffer = 0;
+    if (mode > 0)
+    {
+        buffer |= 0x01;
+    }
+    if (clock > 0)
+    {
+        buffer |= 0x02;
+    }
+    if (sync > 0)
+    {
+        buffer |= 0x04;
+    }
+    int ret = _spi_transfer(address, CMD_TESTSIGNAL_W, &buffer, 1, NULL, 0,
+        20*MSEC, 0);
 
     return ret;
 }
+
 
 /******************************************************************************
   Open a non-responding or unprogrammed MCC 172 for firmware update - do not 
