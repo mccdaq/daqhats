@@ -550,11 +550,25 @@ def update_strip_chart(chart_data_json_str, active_channels):
         )
         plot_data.append(scatter_serie)
 
+    # Get min and max data values
+    y_min = None
+    y_max = None
+    for chan_data in data:
+        for y_val in chan_data:
+            if y_min is None or (y_val is not None and y_val < y_min):
+                y_min = y_val
+            if y_max is None or (y_val is not None and y_val > y_max):
+                y_max = y_val
+
+    # Set the Y scale
+    y_max = y_max + 5.0 if y_max is not None else 100.0
+    y_min = y_min - 5.0 if y_min is not None else 0.0
+
     figure = {
         'data': plot_data,
         'layout': go.Layout(
             xaxis=dict(title='Samples', range=xaxis_range),
-            yaxis=dict(title='Temperature (&deg;C)'),
+            yaxis=dict(title='Temperature (&deg;C)', range=[y_min, y_max]),
             margin={'l': 50, 'r': 40, 't': 50, 'b': 40, 'pad': 0},
             showlegend=True,
             title='Strip Chart'
