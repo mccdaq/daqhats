@@ -1,0 +1,31 @@
+label#Chan0 {
+  background-color: rgba(100%, 0%, 0%, 1);
+}
+
+label#Chan1 {
+  background-color: rgba(0%, 100%, 0%, 1);
+}
+
+label#Chan2 {
+  background-color: rgba(0%, 0%, 100%, 1);
+}
+
+label#Chan3 {
+  background-color: rgba(100%, 100%, 0%, 1);
+}
+
+label#Chan4 {
+  background-color: rgba(100%, 0%, 100%, 1);
+}
+
+label#Chan5 {
+  background-color: rgba(0%, 100%, 100%, 1);
+}
+
+label#Chan6 {
+  background-color: rgba(67%, 67%, 0%, 1);
+}
+
+label#Chan7 {
+  background-color: rgba(0%, 67%, 67%, 1);
+}

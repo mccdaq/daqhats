@@ -105,7 +105,6 @@ struct MCC172DeviceInfo mcc172_device_info =
 
 #define TX_BUFFER_SIZE          (MAX_TX_DATA_SIZE + MSG_TX_HEADER_SIZE)
 
-#define MAX_SPI_TRANSFER        4096
 #define SAMPLE_SIZE_BYTES       3
 #define MAX_SAMPLES_READ        ((MAX_SPI_TRANSFER - MSG_RX_HEADER_SIZE)/ \
                                 SAMPLE_SIZE_BYTES)
@@ -152,19 +151,19 @@ struct mcc172ScanThreadInfo
     pthread_t handle;
     double* scan_buffer;
     uint32_t buffer_size;
-    uint32_t write_index;
-    uint32_t read_index;
-    uint32_t samples_transferred;
-    uint32_t buffer_depth;
+    volatile uint32_t write_index;
+    volatile uint32_t read_index;
+    volatile uint32_t samples_transferred;
+    volatile uint32_t buffer_depth;
 
     uint16_t read_threshold;
     uint16_t options;
-    bool hw_overrun;
-    bool buffer_overrun;
-    bool thread_running;
+    volatile bool hw_overrun;
+    volatile bool buffer_overrun;
+    volatile bool thread_running;
     bool stop_thread;
     bool triggered;
-    bool scan_running;
+    volatile bool scan_running;
     uint8_t channel_count;
     uint8_t channel_index;
     uint8_t channels[NUM_CHANNELS];
@@ -182,6 +181,11 @@ struct mcc172Device
     uint8_t trigger_mode;       // Trigger mode
     struct mcc172FactoryData factory_data;   // Factory data
     struct mcc172ScanThreadInfo* scan_info; // Scan info
+    pthread_mutex_t scan_mutex;
+    
+    uint8_t tx_buffer[MAX_SPI_TRANSFER];
+    uint8_t temp_buffer[MAX_SPI_TRANSFER];
+    uint8_t rx_buffer[MAX_SPI_TRANSFER];
 };
 
 /// \endcond
@@ -200,7 +204,7 @@ static const char* const spi_device = SPI_DEVICE_0; // the spidev device
 static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
                                                     // CPHA=1)
 static const uint8_t spi_bits = 8;                  // 8 bits per transfer
-static const uint32_t spi_speed = 20000000;         // maximum SPI clock 
+static const uint32_t spi_speed = 18000000;         // maximum SPI clock 
                                                     // frequency
 static const uint16_t spi_delay = 0;                // delay in us before 
                                                     // removing CS
@@ -273,7 +277,7 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
                 parse_state++;
             }
             break;
-        case 1: // command
+        case 1: // command     
             parse_state++;
             break;
         case 2: // status
@@ -318,6 +322,7 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
     *remaining = _remaining;
     *frame_length = _frame_length;
     *frame_start = _frame_start;
+    
     return found_frame;
 }
 
@@ -359,6 +364,9 @@ static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
 
   Return: RESULT_SUCCESS if successful
  *****************************************************************************/
+
+void* rx_start_ptr;
+
 static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data, 
     uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count, 
     uint32_t reply_timeout_us, uint32_t retry_us)
@@ -366,21 +374,21 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     struct timespec start_time;
     struct timespec current_time;
     uint32_t diff;
-    bool got_reply;
+    bool got_reply = false;
     int lock_fd;
     int ret;
     uint8_t temp;
-    bool timeout;
+    bool timeout = false;
 #ifdef DEBUG
     char buffer[80];
 #endif
 
     uint16_t tx_count;
-    uint8_t* tx_buffer;
-    uint8_t* rx_buffer;
-    uint8_t* temp_buffer;
     struct mcc172Device* dev = _devices[address];
+    struct spi_ioc_transfer tr;
 
+    memset(&tr, 0, sizeof(struct spi_ioc_transfer));
+    
     if (!_check_addr(address) ||                // check address failed
         (tx_data_count && (tx_data == NULL)) || // no tx buffer when count != 0
         (rx_data_count && (rx_data == NULL)))   // no rx buffer when count != 0
@@ -388,35 +396,14 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         return RESULT_BAD_PARAMETER;
     }
 
-    // allocate buffers
-    uint16_t tx_buffer_size = MSG_TX_HEADER_SIZE + tx_data_count;
-    tx_buffer = (uint8_t*)calloc(1, tx_buffer_size);
-    uint16_t rx_buffer_size = MSG_RX_HEADER_SIZE + rx_data_count + 5;
-    rx_buffer = (uint8_t*)calloc(1, rx_buffer_size);
-    uint16_t temp_buffer_size = MAX(rx_buffer_size, tx_buffer_size);
-    temp_buffer = (uint8_t*)calloc(1, temp_buffer_size);
+    //uint16_t rx_buffer_size = MSG_RX_HEADER_SIZE + rx_data_count + 5;
 
-    if ((tx_buffer == NULL) ||
-        (rx_buffer == NULL) ||
-        (temp_buffer == NULL))
-    {
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
-
-        return RESULT_RESOURCE_UNAVAIL;
-    }
-
-    // create a tx frame
-    tx_count = _create_frame(tx_buffer, command, tx_data_count, tx_data);
+    tx_count = _create_frame(dev->tx_buffer, command, tx_data_count, tx_data);
 
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
         // could not get a lock within 5 seconds, report as a timeout
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_LOCK_TIMEOUT;
     }
 
@@ -427,9 +414,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     if (ret == -1)
     {
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_UNDEFINED;
     }
     if (temp != spi_mode)
@@ -438,39 +422,34 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         if (ret == -1)
         {
             _release_lock(lock_fd);
-            free(tx_buffer);
-            free(rx_buffer);
-            free(temp_buffer);
             return RESULT_UNDEFINED;
         }
     }
 
     // Init the spi ioctl structure, using temp_buffer for the intermediate
     // reply.
-    struct spi_ioc_transfer tr = {
-        .tx_buf = (uintptr_t)tx_buffer,
-        .rx_buf = (uintptr_t)temp_buffer,
-        .len = tx_count,
-        .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
-        .bits_per_word = spi_bits,
-    };
+    tr.tx_buf = (uintptr_t)dev->tx_buffer;
+    tr.rx_buf = (uintptr_t)dev->temp_buffer;
+    tr.len = tx_count;
+    tr.delay_usecs = spi_delay;
+    tr.speed_hz = spi_speed;
+    tr.bits_per_word = spi_bits;
+    tr.cs_change = 0;
 
     // send the command
     if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
     {
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_UNDEFINED;
     }
 
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    
     if (retry_us)
         usleep(retry_us);
 
     // read the reply
-    memset(temp_buffer, 0xFF, rx_buffer_size);
+    //memset(dev->temp_buffer, 0xFF, rx_buffer_size);
     uint16_t frame_start = 0;
     uint16_t frame_length;
     uint16_t remaining = 0;
@@ -478,22 +457,18 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     // only read the first byte of the reply in order to test for the device 
     // readiness
-    struct spi_ioc_transfer tr1 = {
-        .tx_buf = (uintptr_t)temp_buffer,
-        .rx_buf = (uintptr_t)rx_buffer,
-        .len = 1,
-        .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
-        .bits_per_word = spi_bits,
-    };
+    tr.tx_buf = (uintptr_t)NULL;//(uintptr_t)dev->temp_buffer;
+    tr.rx_buf = (uintptr_t)dev->rx_buffer;
+    tr.len = 1;
+
     got_reply = false;
 
     do
     {
         // loop until a reply is ready
-        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr1)) >= 1)
+        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
         {
-            if (rx_buffer[0] != 0)
+            if (dev->rx_buffer[0] != 0)
             {
                 got_reply = true;
             }
@@ -511,31 +486,27 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         timeout = (diff > reply_timeout_us);
     } while (!got_reply && !timeout);
 
+   
     if (got_reply)
     {
         // read the rest of the reply
-        struct spi_ioc_transfer tr2 = {
-            .tx_buf = (uintptr_t)temp_buffer,
-            .rx_buf = (uintptr_t)&rx_buffer[1],
-            .len = read_amount,
-            .delay_usecs = spi_delay,
-            .speed_hz = spi_speed,
-            .bits_per_word = spi_bits,
-        };
+        tr.tx_buf = (uintptr_t)NULL;//dev->temp_buffer;
+        tr.rx_buf = (uintptr_t)&dev->rx_buffer[1];
+        tr.len = read_amount;
 
         got_reply = false;
         do
         {
-            if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr2)) >= 1)
+            if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
             {
                 // parse the reply
-                got_reply = _parse_buffer(rx_buffer, read_amount+1, 
+                got_reply = _parse_buffer(dev->rx_buffer, read_amount+1, 
                     &frame_start, &frame_length, &remaining);
             }
             else
             {
 #ifdef DEBUG
-                sprintf(buffer, "ioctl failed %d %d\n", errno, tr2.len);
+                sprintf(buffer, "ioctl failed %d %d\n", errno, tr.len);
                 _syslog(buffer);
 #endif                
                 usleep(300);
@@ -545,27 +516,41 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             diff = _difftime_us(&start_time, &current_time);
             timeout = (diff > reply_timeout_us);
         } while (!got_reply && !timeout);
+        
+        if (!got_reply)
+        {
+            printf("Sent: ");
+            for (temp = 0; temp < tx_count; temp++)
+            {
+                printf("%02X ", dev->tx_buffer[temp]);
+            }
+            printf("\nGot: ");
+            for (temp = 0; temp < read_amount+1; temp++)
+            {
+                printf("%02X ", dev->rx_buffer[temp]);
+            }
+            printf("\n");
+            
+            printf("rx start, end: %X %X %X\n", (uint32_t)rx_start_ptr, (uint32_t)dev->rx_buffer, (uint32_t)tr.rx_buf);
+        }
     }
 
     if (!got_reply)
     {
         // clear the SPI lock
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_TIMEOUT;
     }
 
-    if (rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] == 
-        tx_buffer[MSG_TX_INDEX_COMMAND])
+    if (dev->rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] == 
+        dev->tx_buffer[MSG_TX_INDEX_COMMAND])
     {
-        switch (rx_buffer[frame_start+MSG_RX_INDEX_STATUS])
+        switch (dev->rx_buffer[frame_start+MSG_RX_INDEX_STATUS])
         {
         case FW_RES_SUCCESS:
             if (rx_data_count > 0)
             {
-                memcpy(rx_data, &rx_buffer[frame_start+MSG_RX_INDEX_DATA], 
+                memcpy(rx_data, &dev->rx_buffer[frame_start+MSG_RX_INDEX_DATA], 
                     rx_data_count);
             }
             ret = RESULT_SUCCESS;
@@ -595,11 +580,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     // clear the SPI lock
     _release_lock(lock_fd);
-
-    free(tx_buffer);
-    free(rx_buffer);
-    free(temp_buffer);
-
     return ret;
 }
 
@@ -799,9 +779,6 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     uint8_t* rx_data;
     uint8_t* ptr;
     int32_t value;
-#ifdef DEBUG
-    char strbuffer[80];
-#endif
 
     if (!_check_addr(address) ||
         (buffer == NULL))
@@ -818,10 +795,6 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     }
 
     // send the read scan data command
-#ifdef DEBUG
-    sprintf(strbuffer, "s: %d\n", sample_count);
-    _syslog(strbuffer);
-#endif    
     ret = _spi_transfer(address, CMD_AINSCANDATA, &sample_count, 2, rx_data,
         sample_count*SAMPLE_SIZE_BYTES, 40*MSEC, 1);
 
@@ -866,7 +839,6 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         if (scaled)
         {
             buffer[count] *= LSB_SIZE;
-            //buffer[count] += VOLTAGE_MIN;
         }
         
         dev->scan_info->channel_index++;
@@ -896,6 +868,7 @@ static void* _scan_thread(void* arg)
     struct mcc172ScanThreadInfo* info = _devices[address]->scan_info;
     bool calibrated;
     bool scaled;
+    bool stop_thread;
     //uint16_t largest_read;
     uint8_t rx_buffer[5];
     bool scan_running;
@@ -911,8 +884,11 @@ static void* _scan_thread(void* arg)
         return NULL;
     }
 
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
     info->thread_running = true;
     info->hw_overrun = false;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+    
     status_count = 0;
 
     if (info->options & OPTS_NOSCALEDATA)
@@ -938,7 +914,7 @@ static void* _scan_thread(void* arg)
 
     done = false;
     sleep_us = MIN_SLEEP_US;
-    while (!info->stop_thread && !done)
+    do
     {
         // read the scan status
         if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5, 
@@ -947,8 +923,11 @@ static void* _scan_thread(void* arg)
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
             max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
             scan_running = (rx_buffer[0] & 0x01) == 0x01;
+            
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
             info->hw_overrun = (rx_buffer[0] & 0x02) == 0x02;
             info->triggered = (rx_buffer[0] & 0x04) == 0x04;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
             status_count++;
 
@@ -958,7 +937,9 @@ static void* _scan_thread(void* arg)
                 _syslog("hw overrun");
 #endif
                 done = true;
+                pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->scan_running = false;
+                pthread_mutex_unlock(&_devices[address]->scan_mutex);
             }
             else if (info->triggered == 0)
             {
@@ -1000,27 +981,26 @@ static void* _scan_thread(void* arg)
                         &info->scan_buffer[info->write_index])) == 
                         RESULT_SUCCESS)
                     {
-#ifdef DEBUG
-                        sprintf(str, "scan_thread_read %d %d %d %d", 
-                            info->write_index, read_count, info->buffer_depth,
-                            available_samples);
-                        _syslog(str);
-#endif
                         info->write_index += read_count;
                         if (info->write_index >= info->buffer_size)
                         {
                             info->write_index = 0;
                         }
 
+                        pthread_mutex_lock(&_devices[address]->scan_mutex);
                         info->buffer_depth += read_count;
+                        pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
                         if (info->buffer_depth > info->buffer_size)
                         {
 #ifdef DEBUG
                             _syslog("buffer overrun");
 #endif
+                            pthread_mutex_lock(&_devices[address]->scan_mutex);
                             info->buffer_overrun = true;
                             info->scan_running = false;
+                            pthread_mutex_unlock(
+                                &_devices[address]->scan_mutex);
                             done = true;
                         }
                         info->samples_transferred += read_count;
@@ -1053,13 +1033,25 @@ static void* _scan_thread(void* arg)
                 if (!scan_running && (available_samples == read_count))
                 {
                     done = true;
+                    pthread_mutex_lock(&_devices[address]->scan_mutex);
                     info->scan_running = false;
+                    pthread_mutex_unlock(&_devices[address]->scan_mutex);
                 }
             }
         }
+        // debug
+        else
+        {
+            done = true;
+        }
 
         usleep(sleep_us);
-    }
+        
+        pthread_mutex_lock(&_devices[address]->scan_mutex);
+        stop_thread = info->stop_thread;
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);
+        
+    } while (!stop_thread && !done);
 
     if (info->scan_running)
     {
@@ -1068,7 +1060,9 @@ static void* _scan_thread(void* arg)
         mcc172_a_in_scan_stop(address);
     }
 
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
     info->thread_running = false;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
     return NULL;
 }
 
@@ -1206,7 +1200,6 @@ int mcc172_open(uint8_t address)
             {
                 // save the firmware version
                 dev->fw_version = id_data[1];
-                return RESULT_SUCCESS;
             }
             else
             {
@@ -1218,6 +1211,8 @@ int mcc172_open(uint8_t address)
 
         attempts++;
     } while ((ret != RESULT_SUCCESS) && (attempts < 2));
+
+    pthread_mutex_init(&dev->scan_mutex, NULL);
 
     _syslog("open");
     return RESULT_SUCCESS;
@@ -1250,10 +1245,11 @@ int mcc172_close(uint8_t address)
     }
 
     mcc172_a_in_scan_cleanup(address);
-
+    
     _devices[address]->handle_count--;
     if (_devices[address]->handle_count == 0)
     {
+        pthread_mutex_destroy(&_devices[address]->scan_mutex);
         close(_devices[address]->spi_fd);
         free(_devices[address]);
         _devices[address] = NULL;
@@ -1459,7 +1455,7 @@ int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 
     // read the configuration from the device
     int ret = _spi_transfer(address, CMD_IEPECONFIG_R, NULL, 0, &buffer, 1,
-        20*MSEC, 0);
+        20*MSEC, 10);
     if (ret == RESULT_SUCCESS)
     {
         *config = (buffer >> channel) & 0x01;
@@ -1505,7 +1501,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     buffer[0] = clock_source;
     buffer[1] = (uint8_t)(divisor - 1);
     result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0, 
-        20*MSEC, 0);
+        20*MSEC, 10);
 
     return result;
 }
@@ -1529,7 +1525,7 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 
     // read the configuration from the device
     result = _spi_transfer(address, CMD_AINCLOCKCONFIG_R, NULL, 0, buffer, 2,
-        20*MSEC, 0);
+        20*MSEC, 10);
     if (result != RESULT_SUCCESS)
     {
         return result;
@@ -1590,9 +1586,6 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     uint32_t scan_count;
     uint8_t clock_source;
     uint8_t synced;
-#ifdef DEBUG
-    char strbuffer[80];
-#endif
 
     if (!_check_addr(address) ||
         (channel_mask == 0) ||
@@ -1638,6 +1631,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     info->channel_index = 0;
 
     // Read the clock config, wait until in sync
+    int count = 0;
     do
     {
         result = mcc172_a_in_clock_config_read(address, &clock_source, 
@@ -1651,8 +1645,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         
         if (synced == 0)
         {
-            usleep(100000);
+            usleep(1000);
         }
+        count++;
     } while (synced == 0);
     
     // Calculate the buffer size
@@ -1725,10 +1720,6 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         {
             info->read_threshold = info->channel_count;
         }
-#ifdef DEBUG
-        sprintf(strbuffer, "r: %d\n", info->read_threshold);
-        _syslog(strbuffer);
-#endif        
     }
 
     pthread_attr_t attr;
@@ -1767,7 +1758,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     buffer[4] = channel_mask;
 
     result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 5, NULL, 0, 
-        20*MSEC, 0);
+        20*MSEC, 10);
 
     if (result != RESULT_SUCCESS)
     {
@@ -1911,14 +1902,17 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
     struct timespec start_time;
     struct timespec current_time;
     uint16_t stat;
-#ifdef DEBUG
-    char str[80];
-#endif
+    uint16_t buffer_depth;
+    bool hw_overrun;
+    bool buffer_overrun;
+    bool triggered;
+    bool scan_running;
+    bool thread_running;
 
     if (!_check_addr(address) ||
         (status == NULL) ||
         ((samples_per_channel > 0) &&
-            ((buffer == NULL) || (buffer_size_samples == 0))))
+        ((buffer == NULL) || (buffer_size_samples == 0))))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1950,11 +1944,22 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
         return RESULT_RESOURCE_UNAVAIL;
     }
 
+    // get thread values
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    buffer_depth = info->buffer_depth;
+    hw_overrun = info->hw_overrun;
+    buffer_overrun = info->buffer_overrun;
+    triggered = info->triggered;
+    scan_running = info->scan_running;
+    thread_running = info->thread_running;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+    
     // Determine how many samples to read
     if (samples_per_channel == -1)
     {
         // return all available, ignore timeout
-        samples_to_read = info->buffer_depth;
+        samples_to_read = COUNT_NORMALIZE(buffer_depth,
+            info->channel_count);
     }
     else
     {
@@ -1977,10 +1982,20 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
         timed_out = false;
         do
         {
-            if (info->buffer_depth >= info->channel_count)
+            // update thread values
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
+            buffer_depth = info->buffer_depth;
+            hw_overrun = info->hw_overrun;
+            buffer_overrun = info->buffer_overrun;
+            triggered = info->triggered;
+            scan_running = info->scan_running;
+            thread_running = info->thread_running;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
+            
+            if (buffer_depth >= info->channel_count)
             {
                 // read in increments of the number of channels in the scan
-                current_read = MIN(info->buffer_depth, samples_to_read);
+                current_read = MIN(buffer_depth, samples_to_read);
                 current_read = COUNT_NORMALIZE(current_read, 
                     info->channel_count);
 
@@ -1992,11 +2007,9 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
                     memcpy(&buffer[samples_read], 
                         &info->scan_buffer[info->read_index],  
                         max_read*sizeof(double));
-
                     samples_read += max_read;
                     memcpy(&buffer[samples_read], &info->scan_buffer[0],
                         (current_read - max_read)*sizeof(double));
-
                     samples_read += (current_read - max_read);
                     info->read_index = (current_read - max_read);
                 }
@@ -2012,12 +2025,11 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
                         info->read_index = 0;
                     }
                 }
-#ifdef DEBUG
-                sprintf(str, "a_in_scan_read %d", current_read);
-                _syslog(str);
-#endif
                 samples_to_read -= current_read;
+                buffer_depth -= current_read;
+                pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->buffer_depth -= current_read;
+                pthread_mutex_unlock(&_devices[address]->scan_mutex);
             }
             usleep(100);
 
@@ -2028,18 +2040,18 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
                     timeout_us);
             }
 
-            if (info->hw_overrun)
+            if (hw_overrun)
             {
                 stat |= STATUS_HW_OVERRUN;
                 error = true;
             }
-            if (info->buffer_overrun)
+            if (buffer_overrun)
             {
                 stat |= STATUS_BUFFER_OVERRUN;
                 error = true;
             }
         } while ((samples_to_read > 0) && !error &&
-            (info->thread_running == false ? info->buffer_depth > 0 : true) &&
+            (thread_running == false ? buffer_depth > 0 : true) &&
             !timed_out);
 
         if (samples_read_per_channel)
@@ -2050,11 +2062,11 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
     else
     {
         // just update status
-        if (info->hw_overrun)
+        if (hw_overrun)
         {
             stat |= STATUS_HW_OVERRUN;
         }
-        if (info->buffer_overrun)
+        if (buffer_overrun)
         {
             stat |= STATUS_BUFFER_OVERRUN;
         }
@@ -2065,11 +2077,11 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
         }
     }
 
-    if (info->triggered)
+    if (triggered)
     {
         stat |= STATUS_TRIGGERED;
     }
-    if (info->scan_running)
+    if (scan_running)
     {
         stat |= STATUS_RUNNING;
     }
@@ -2099,7 +2111,7 @@ int mcc172_a_in_scan_stop(uint8_t address)
 
     // send scan stop command
     int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC, 
-        0);
+        10);
     return ret;
 }
 
@@ -2120,7 +2132,9 @@ int mcc172_a_in_scan_cleanup(uint8_t address)
         {
             // If the thread is running then tell it to stop and wait for it. 
             // It will send the a_in_stop_scan command.
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
             _devices[address]->scan_info->stop_thread = true;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
             pthread_join(_devices[address]->scan_info->handle, NULL);
             _devices[address]->scan_info->handle = 0;
@@ -2129,6 +2143,8 @@ int mcc172_a_in_scan_cleanup(uint8_t address)
         free(_devices[address]->scan_info->scan_buffer);
         free(_devices[address]->scan_info);
         _devices[address]->scan_info = NULL;
+
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);
     }
 
     return RESULT_SUCCESS;
@@ -2152,7 +2168,7 @@ int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
 
     // send the command
     int ret = _spi_transfer(address, CMD_TESTSIGNAL_R, NULL, 0, &buffer, 
-        1, 20*MSEC, 0);
+        1, 20*MSEC, 10);
     if (ret == RESULT_SUCCESS)
     {
         *clock = buffer & 0x01;
@@ -2351,7 +2367,7 @@ int mcc172_enter_bootloader(uint8_t address)
     
         if (gpio_status(IRQ_GPIO))
         {
-            printf("Error: NCHG never went low\n");
+            _syslog("Error: NCHG never went low\n");
             _release_lock(lock_fd);
             return RESULT_TIMEOUT;
         }

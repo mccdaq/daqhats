@@ -42,6 +42,9 @@ int main(int argc, char* argv[])
         case HAT_ID_MCC_152:
             printf("Type: MCC 152\n");
             break;
+        case HAT_ID_MCC_172:
+            printf("Type: MCC 172\n");
+            break;
         default:
             printf("Type: Unknown\n");
             break;
@@ -57,6 +60,14 @@ int main(int argc, char* argv[])
             printf("Bootloader version: %X.%02X\n", (uint8_t)(boot_version >> 8), (uint8_t)boot_version);
             mcc118_close(address);
         }
+        else if (info_list[index].id == HAT_ID_MCC_172)
+        {
+            mcc172_open(address);
+            mcc172_firmware_version(address, &version);
+            printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
+            mcc172_close(address);
+        }
+        
         if (index < (info_count - 1))
         {
             printf("\n");
