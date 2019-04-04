@@ -33,8 +33,7 @@ def main():
     
     try:
         # Get an instance of the selected hat device object.
-        #address = select_hat_device(HatIDs.MCC_134)
-        address = 2
+        address = select_hat_device(HatIDs.MCC_134)
         hat = mcc134(address)
         
         for channel in channels:
