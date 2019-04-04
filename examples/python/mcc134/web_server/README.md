@@ -12,7 +12,7 @@ single client.
 Enter the following commands to install the dependencies. 
 
    ```
-   pip install dash dash-renderer dash-html-components dash-core-components  
+   pip install dash  
    ```
 
 ## Start the web server

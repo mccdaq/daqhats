@@ -2,7 +2,7 @@
     This file contains helper functions for the MCC DAQ HAT Python examples.
 """
 from __future__ import print_function
-from daqhats import hat_list, HatError
+from daqhats import hat_list, HatError, TcTypes
 
 
 def select_hat_device(filter_by_id):
@@ -80,6 +80,40 @@ def enum_mask_to_string(enum_type, bit_mask):
         if item & bit_mask:
             item_names.append(item.name)
     return ', '.join(item_names)
+
+
+def tc_type_to_string(tc_type):
+    # type: (Enum) -> str
+    """
+    This function converts a thermocouple type defined by the TcTypes class to a
+    string corresponding to the thermocouple type.
+
+    Args:
+        tc_type (Enum): The thermocouple type.
+
+    Returns:
+        str: A string corresponding to the thermocouple type.
+
+    """
+    if tc_type == TcTypes.TYPE_J:
+        name = 'J'
+    elif tc_type == TcTypes.TYPE_K:
+        name = 'K'
+    elif tc_type == TcTypes.TYPE_T:
+        name = 'T'
+    elif tc_type == TcTypes.TYPE_E:
+        name = 'E'
+    elif tc_type == TcTypes.TYPE_R:
+        name = 'R'
+    elif tc_type == TcTypes.TYPE_S:
+        name = 'S'
+    elif tc_type == TcTypes.TYPE_B:
+        name = 'B'
+    elif tc_type == TcTypes.TYPE_N:
+        name = 'N'
+    else:
+        name = 'DISABLED'
+    return name
 
 
 def chan_list_to_mask(chan_list):

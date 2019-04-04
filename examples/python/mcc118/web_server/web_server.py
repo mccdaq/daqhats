@@ -5,8 +5,7 @@ This example demonstrates a simple web server providing visualization of data
 from a MCC 118 DAQ HAT device for a single client.  It makes use of the Dash
 Python framework for web-based interfaces and a plotly graph.  To install the
 dependencies for this example, run:
-   $ pip install dash dash-renderer dash-html-components dash-core-components
-   $ pip install plotly
+   $ pip install dash
 
 Running this example:
 1. Start the server by running the web_server.py module in a terminal.
@@ -532,7 +531,7 @@ def update_strip_chart(chart_data_json_str, active_channels):
             x=list(chart_data['samples']),
             y=list(data[chan_idx]),
             name='Channel {0:d}'.format(channel),
-            marker=go.scatter.Marker(color=colors[channel])
+            marker={'color': colors[channel]}
         )
         plot_data.append(scatter_serie)
 

@@ -5,8 +5,7 @@ This example demonstrates a simple web server providing visualization of data
 from a MCC 134 DAQ HAT device for a single client.  It makes use of the Dash
 Python framework for web-based interfaces and a plotly graph.  To install the
 dependencies for this example, run:
-   $ pip install dash dash-renderer dash-html-components dash-core-components
-   $ pip install plotly
+   $ pip install dash
 
 Running this example:
 1. Start the server by running the web_server.py module in a terminal.
@@ -158,23 +157,19 @@ _app.layout = html.Div([
                             dcc.Dropdown(id='tcTypeSelector0',
                                          options=_tc_type_options,
                                          value=TcTypes.TYPE_J,
-                                         clearable=False,
-                                         style={'width': 50}),
+                                         clearable=False),
                             dcc.Dropdown(id='tcTypeSelector1',
                                          options=_tc_type_options,
                                          value=TcTypes.TYPE_J,
-                                         clearable=False,
-                                         style={'width': 50}),
+                                         clearable=False),
                             dcc.Dropdown(id='tcTypeSelector2',
                                          options=_tc_type_options,
                                          value=TcTypes.TYPE_J,
-                                         clearable=False,
-                                         style={'width': 50}),
+                                         clearable=False),
                             dcc.Dropdown(id='tcTypeSelector3',
                                          options=_tc_type_options,
                                          value=TcTypes.TYPE_J,
-                                         clearable=False,
-                                         style={'width': 50})],
+                                         clearable=False)],
                         style={'float': 'left', 'width': 150,
                                'margin-bottom': 8}),
                     html.Button(
@@ -551,15 +546,29 @@ def update_strip_chart(chart_data_json_str, active_channels):
             x=list(chart_data['samples']),
             y=list(data[chan_idx]),
             name='Channel {0:d}'.format(channel),
-            marker=go.scatter.Marker(color=colors[channel])
+            marker={'color': colors[channel]}
         )
         plot_data.append(scatter_serie)
+
+    # Get min and max data values
+    y_min = None
+    y_max = None
+    for chan_data in data:
+        for y_val in chan_data:
+            if y_min is None or (y_val is not None and y_val < y_min):
+                y_min = y_val
+            if y_max is None or (y_val is not None and y_val > y_max):
+                y_max = y_val
+
+    # Set the Y scale
+    y_max = y_max + 5.0 if y_max is not None else 100.0
+    y_min = y_min - 5.0 if y_min is not None else 0.0
 
     figure = {
         'data': plot_data,
         'layout': go.Layout(
             xaxis=dict(title='Samples', range=xaxis_range),
-            yaxis=dict(title='Temperature (&deg;C)'),
+            yaxis=dict(title='Temperature (&deg;C)', range=[y_min, y_max]),
             margin={'l': 50, 'r': 40, 't': 50, 'b': 40, 'pad': 0},
             showlegend=True,
             title='Strip Chart'
