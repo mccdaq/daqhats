@@ -15,7 +15,7 @@
 from __future__ import print_function
 from time import sleep
 from sys import stdout
-from daqhats_utils import select_hat_device, enum_mask_to_string
+from daqhats_utils import select_hat_device, tc_type_to_string
 from daqhats import mcc134, HatIDs, HatError, TcTypes
 
 # Constants
@@ -42,6 +42,7 @@ def main():
         print('\nMCC 134 single data value read example')
         print('    Function demonstrated: mcc134.t_in_read')
         print('    Channels: ' + ', '.join(str(channel) for channel in channels))
+        print('    Thermocouple type: ' + tc_type_to_string(tc_type))
         try:
             input("\nPress 'Enter' to continue")
         except (NameError, SyntaxError):
