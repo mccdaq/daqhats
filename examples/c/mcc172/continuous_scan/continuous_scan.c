@@ -46,7 +46,7 @@ int main(void)
     double timeout = 5.0;
     double scan_rate = 51200.0;
     double actual_scan_rate = 0.0;
-    uint32_t options = OPTS_CONTINUOUS;
+    uint32_t options = OPTS_CONTINUOUS; // | OPTS_NOSCALEDATA;
     uint16_t read_status = 0;
     uint32_t samples_read_per_channel = 0;
     uint8_t synced;
@@ -166,7 +166,7 @@ int main(void)
 
             for (i = 0; i < num_channels; i++)
             {
-                printf("%10.5f V", read_buf[index + i]);
+                printf("%10.5f  ", read_buf[index + i]);
             }
             fflush(stdout);
         }

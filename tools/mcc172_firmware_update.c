@@ -153,13 +153,13 @@ int update_firmware(int address, char* filename)
         {
             printf("Checking existing version...\n");
     
-            printf("Device firmware version   %X.%02X\n", 
+            printf("Device firmware version %X.%02X\n", 
                 (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
         }
     }
     else if (ret == RESULT_INVALID_DEVICE)
     {
-        printf("The device at address %d is not an MCC 172.\n");
+        printf("The device at address %d is not an MCC 172.\n", address);
         free(frame_file_buffer);
         return 1;
     }
@@ -168,7 +168,8 @@ int update_firmware(int address, char* filename)
         ret = mcc172_open_for_update(address);
         if (ret == RESULT_SUCCESS)
         {
-            printf("The device at address %d cannot be confirmed as an MCC 172.\n");
+            printf("The device at address %d cannot be confirmed as an MCC 172.\n",
+                address);
         }
         else
         {
@@ -190,6 +191,8 @@ int update_firmware(int address, char* filename)
         mcc172_close(address);
         return 1;
     }
+    
+    printf("Updating...\n");
     
     mcc172_enter_bootloader(address);
     
@@ -236,9 +239,10 @@ int update_firmware(int address, char* filename)
         if (first_read)
         {
             // check the ID
-            if (rx_data[1] != 0x25)
+            if ((rx_data[1] != 0x25) &&
+                (rx_data[1] != 0xC6))
             {
-                printf("Unexpected device ID 0x%02X\n", rx_data[1]);
+                printf("\nUnexpected device ID 0x%02X\n", rx_data[1]);
             }
             first_read = false;
         }
@@ -246,7 +250,7 @@ int update_firmware(int address, char* filename)
         switch (rx_data[0] & 0xC0)
         {
         case 0xC0:  // WAITING_BOOTLOAD_CMD
-            printf("Status: WAITING_BOOTLOAD_CMD %02X, sending unlock\n", rx_data[0]);
+            //printf("Status: WAITING_BOOTLOAD_CMD %02X, sending unlock\n", rx_data[0]);
             // unlock the device
             tx_data[0] = 0xDC;
             tx_data[1] = 0xAA;
@@ -257,7 +261,7 @@ int update_firmware(int address, char* filename)
             }
             break;
         case 0x80:  // WAITING_FRAME_DATA
-            printf("Status: WAITING_FRAME_DATA %02X, ", rx_data[0]);
+            //printf("Status: WAITING_FRAME_DATA %02X, ", rx_data[0]);
             length = get_next_frame(&ptr, &last_frame);
             if (length == -1)
             {
@@ -271,7 +275,7 @@ int update_firmware(int address, char* filename)
             }
             else
             {
-                printf("sending next frame\n");
+                //printf("sending next frame\n");
                 if (mcc172_bl_transfer(address, ptr, NULL, length) != RESULT_SUCCESS)
                 {
                     printf("Error: ioctl failed\n");
@@ -296,14 +300,14 @@ int update_firmware(int address, char* filename)
             switch (rx_data[0])
             {
             case 0x02:  // FRAME_CRC_CHECK
-                printf("Status: FRAME_CRC_CHECK\n");
+                //printf("Status: FRAME_CRC_CHECK\n");
                 break;
             case 0x03:  // FRAME_CRC_FAIL
                 printf("Status: FRAME_CRC_FAIL\n");
                 error = true;
                 break;
             case 0x04:  // FRAME_CRC_PASS
-                printf("Status: FRAME_CRC_PASS\n");
+                //printf("Status: FRAME_CRC_PASS\n");
                 
                 if (last_frame)
                 {
@@ -369,9 +373,10 @@ int main(int argc, char* argv[])
     }
     
     // check the device
-    printf("Checking device...");
+    printf("Checking device...\n");
+    
     // wait for device to boot the new firmware
-    usleep(800000);
+    sleep(2);
     
     if (mcc172_open(address) != RESULT_SUCCESS)
     {

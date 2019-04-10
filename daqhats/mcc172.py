@@ -1,5 +1,5 @@
 """
-Wraps all of the methods from the MCC 118 library for use in Python.
+Wraps all of the methods from the MCC 172 library for use in Python.
 """
 import sys
 from collections import namedtuple
@@ -7,9 +7,15 @@ from ctypes import c_ubyte, c_int, c_ushort, c_ulong, c_long, c_double, \
     POINTER, c_char_p, byref, create_string_buffer
 from daqhats.hats import Hat, HatError, OptionFlags
 
-class mcc118(Hat): # pylint: disable=invalid-name
+class SourceType(IntEnum):
+    """Clock / trigger source options."""
+    LOCAL = 0     #: Use a local-only source.
+    MASTER = 1    #: Use a local source and set it as master.
+    SLAVE = 2     #: Use a master source from another MCC 172.
+
+class mcc172(Hat): # pylint: disable=invalid-name
     """
-    The class for an MCC 118 board.
+    The class for an MCC 172 board.
 
     Args:
         address (int): board address, must be 0-7.
@@ -18,29 +24,29 @@ class mcc118(Hat): # pylint: disable=invalid-name
         HatError: the board did not respond or was of an incorrect type
     """
 
-    _AIN_NUM_CHANNELS = 8         # Number of analog channels
+    _AIN_NUM_CHANNELS = 2         # Number of analog channels
 
     _STATUS_HW_OVERRUN = 0x0001
     _STATUS_BUFFER_OVERRUN = 0x0002
     _STATUS_TRIGGERED = 0x0004
     _STATUS_RUNNING = 0x0008
 
-    _MAX_SAMPLE_RATE = 100000.0
+    _MAX_SAMPLE_RATE = 51200.0
 
     _dev_info_type = namedtuple(
-        'MCC118DeviceInfo', [
+        'MCC172DeviceInfo', [
             'NUM_AI_CHANNELS', 'AI_MIN_CODE', 'AI_MAX_CODE',
             'AI_MIN_VOLTAGE', 'AI_MAX_VOLTAGE', 'AI_MIN_RANGE',
             'AI_MAX_RANGE'])
 
     _dev_info = _dev_info_type(
-        NUM_AI_CHANNELS=8,
-        AI_MIN_CODE=0,
-        AI_MAX_CODE=4095,
-        AI_MIN_VOLTAGE=-10.0,
-        AI_MAX_VOLTAGE=(10.0 - (20.0/4096)),
-        AI_MIN_RANGE=-10.0,
-        AI_MAX_RANGE=+10.0)
+        NUM_AI_CHANNELS=2,
+        AI_MIN_CODE=-8388608,
+        AI_MAX_CODE=8388607,
+        AI_MIN_VOLTAGE=-5.0,
+        AI_MAX_VOLTAGE=(5.0 - (10.0/16777216)),
+        AI_MIN_RANGE=-5.0,
+        AI_MAX_RANGE=+5.0)
 
     def __init__(self, address=0):
         """
@@ -50,76 +56,85 @@ class mcc118(Hat): # pylint: disable=invalid-name
         Hat.__init__(self, address)
 
         # set up library argtypes and restypes
-        self._lib.mcc118_open.argtypes = [c_ubyte]
-        self._lib.mcc118_open.restype = c_int
+        self._lib.mcc172_open.argtypes = [c_ubyte]
+        self._lib.mcc172_open.restype = c_int
 
-        self._lib.mcc118_close.argtypes = [c_ubyte]
-        self._lib.mcc118_close.restype = c_int
+        self._lib.mcc172_close.argtypes = [c_ubyte]
+        self._lib.mcc172_close.restype = c_int
 
-        self._lib.mcc118_blink_led.argtypes = [c_ubyte, c_ubyte]
-        self._lib.mcc118_blink_led.restype = c_int
+        self._lib.mcc172_blink_led.argtypes = [c_ubyte, c_ubyte]
+        self._lib.mcc172_blink_led.restype = c_int
 
-        self._lib.mcc118_firmware_version.argtypes = [
-            c_ubyte, POINTER(c_ushort), POINTER(c_ushort)]
-        self._lib.mcc118_firmware_version.restype = c_int
+        self._lib.mcc172_firmware_version.argtypes = [
+            c_ubyte, POINTER(c_ushort)]
+        self._lib.mcc172_firmware_version.restype = c_int
 
-        self._lib.mcc118_serial.argtypes = [c_ubyte, c_char_p]
-        self._lib.mcc118_serial.restype = c_int
+        self._lib.mcc172_serial.argtypes = [c_ubyte, c_char_p]
+        self._lib.mcc172_serial.restype = c_int
 
-        self._lib.mcc118_calibration_date.argtypes = [c_ubyte, c_char_p]
-        self._lib.mcc118_calibration_date.restype = c_int
+        self._lib.mcc172_calibration_date.argtypes = [c_ubyte, c_char_p]
+        self._lib.mcc172_calibration_date.restype = c_int
 
-        self._lib.mcc118_calibration_coefficient_read.argtypes = [
+        self._lib.mcc172_calibration_coefficient_read.argtypes = [
             c_ubyte, c_ubyte, POINTER(c_double), POINTER(c_double)]
-        self._lib.mcc118_calibration_coefficient_read.restype = c_int
+        self._lib.mcc172_calibration_coefficient_read.restype = c_int
 
-        self._lib.mcc118_calibration_coefficient_write.argtypes = [
+        self._lib.mcc172_calibration_coefficient_write.argtypes = [
             c_ubyte, c_ubyte, c_double, c_double]
-        self._lib.mcc118_calibration_coefficient_write.restype = c_int
+        self._lib.mcc172_calibration_coefficient_write.restype = c_int
 
-        self._lib.mcc118_trigger_mode.argtypes = [c_ubyte, c_ubyte]
-        self._lib.mcc118_trigger_mode.restype = c_int
-
-        self._lib.mcc118_a_in_read.argtypes = [
-            c_ubyte, c_ubyte, c_ulong, POINTER(c_double)]
-        self._lib.mcc118_a_in_read.restype = c_int
-
-        self._lib.mcc118_a_in_scan_actual_rate.argtypes = [
-            c_ubyte, c_double, POINTER(c_double)]
-        self._lib.mcc118_a_in_scan_actual_rate.restype = c_int
-
-        self._lib.mcc118_a_in_scan_start.argtypes = [
-            c_ubyte, c_ubyte, c_ulong, c_double, c_ulong]
-        self._lib.mcc118_a_in_scan_start.restype = c_int
-
-        self._lib.mcc118_a_in_scan_status.argtypes = [
-            c_ubyte, POINTER(c_ushort), POINTER(c_ulong)]
-        self._lib.mcc118_a_in_scan_status.restype = c_int
-
-        self._lib.mcc118_a_in_scan_buffer_size.argtypes = [
-            c_ubyte, POINTER(c_ulong)]
-        self._lib.mcc118_a_in_scan_buffer_size.restype = c_int
-
-        self._lib.mcc118_a_in_scan_read.restype = c_int
-
-        self._lib.mcc118_a_in_scan_stop.argtypes = [c_ubyte]
-        self._lib.mcc118_a_in_scan_stop.restype = c_int
-
-        self._lib.mcc118_a_in_scan_cleanup.argtypes = [c_ubyte]
-        self._lib.mcc118_a_in_scan_cleanup.restype = c_int
-
-        self._lib.mcc118_a_in_scan_channel_count.argtypes = [c_ubyte]
-        self._lib.mcc118_a_in_scan_channel_count.restype = c_ubyte
-
-        self._lib.mcc118_test_clock.argtypes = [
+        self._lib.mcc172_IEPE_config_read.argtypes = [
             c_ubyte, c_ubyte, POINTER(c_ubyte)]
-        self._lib.mcc118_test_clock.restype = c_int
+        self._lib.mcc172_IEPE_config_read.restype = c_int
 
-        self._lib.mcc118_test_trigger.argtypes = [c_ubyte, POINTER(c_ubyte)]
-        self._lib.mcc118_test_trigger.restype = c_int
+        self._lib.mcc172_IEPE_config_write.argtypes = [
+            c_ubyte, c_ubyte, c_ubyte]
+        self._lib.mcc172_IEPE_config_write.restype = c_int
 
-        result = self._lib.mcc118_open(self._address) 
-        
+        self._lib.mcc172_a_in_clock_config_read.argtypes = [
+            c_ubyte, POINTER(c_ubyte), POINTER(c_double), POINTER(c_ubyte)]
+        self._lib.mcc172_a_in_clock_config_read.restype = c_int
+
+        self._lib.mcc172_a_in_clock_config_write.argtypes = [
+            c_ubyte, c_ubyte, c_double]
+        self._lib.mcc172_a_in_clock_config_write.restype = c_int
+
+        self._lib.mcc172_trigger_config.argtypes = [c_ubyte, c_ubyte, c_ubyte]
+        self._lib.mcc172_trigger_config.restype = c_int
+
+        self._lib.mcc172_a_in_scan_start.argtypes = [
+            c_ubyte, c_ubyte, c_ulong, c_ulong]
+        self._lib.mcc172_a_in_scan_start.restype = c_int
+
+        self._lib.mcc172_a_in_scan_status.argtypes = [
+            c_ubyte, POINTER(c_ushort), POINTER(c_ulong)]
+        self._lib.mcc172_a_in_scan_status.restype = c_int
+
+        self._lib.mcc172_a_in_scan_buffer_size.argtypes = [
+            c_ubyte, POINTER(c_ulong)]
+        self._lib.mcc172_a_in_scan_buffer_size.restype = c_int
+
+        self._lib.mcc172_a_in_scan_read.restype = c_int
+
+        self._lib.mcc172_a_in_scan_stop.argtypes = [c_ubyte]
+        self._lib.mcc172_a_in_scan_stop.restype = c_int
+
+        self._lib.mcc172_a_in_scan_cleanup.argtypes = [c_ubyte]
+        self._lib.mcc172_a_in_scan_cleanup.restype = c_int
+
+        self._lib.mcc172_a_in_scan_channel_count.argtypes = [c_ubyte]
+        self._lib.mcc172_a_in_scan_channel_count.restype = c_ubyte
+
+        self._lib.mcc172_test_signals_read.argtypes = [
+            c_ubyte, POINTER(c_ubyte), POINTER(c_ubyte), POINTER(c_ubyte)]
+        self._lib.mcc172_test_signals_read.restype = c_int
+
+        self._lib.mcc172_test_signals_write.argtypes = [
+            c_ubyte, c_ubyte, c_ubyte, c_ubyte]
+        self._lib.mcc172_test_signals_write.restype = c_int
+
+        result = self._lib.mcc172_open(self._address)
+
         if result == self._RESULT_SUCCESS:
             self._initialized = True
         elif result == self._RESULT_INVALID_BOARD:
@@ -131,8 +146,8 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
     def __del__(self):
         if self._initialized:
-            self._lib.mcc118_a_in_scan_cleanup(self._address)
-            self._lib.mcc118_close(self._address)
+            self._lib.mcc172_a_in_scan_cleanup(self._address)
+            self._lib.mcc172_close(self._address)
         return
 
     @staticmethod
@@ -144,19 +159,19 @@ class mcc118(Hat): # pylint: disable=invalid-name
             namedtuple: a namedtuple containing the following field names
 
             * **NUM_AI_CHANNELS** (int): The number of analog input channels
-              (8.)
-            * **AI_MIN_CODE** (int): The minimum ADC code (0.)
-            * **AI_MAX_CODE** (int): The maximum ADC code (4095.)
+              (2.)
+            * **AI_MIN_CODE** (int): The minimum ADC code (-8388608.)
+            * **AI_MAX_CODE** (int): The maximum ADC code (8388607.)
             * **AI_MIN_VOLTAGE** (float): The voltage corresponding to the
-              minimum ADC code (-10.0.)
+              minimum ADC code (-5.0.)
             * **AI_MAX_VOLTAGE** (float): The voltage corresponding to the
-              maximum ADC code (+10.0 - 1 LSB)
+              maximum ADC code (+5.0 - 1 LSB)
             * **AI_MIN_RANGE** (float): The minimum voltage of the input range
-              (-10.0.)
+              (-5.0.)
             * **AI_MAX_RANGE** (float): The maximum voltage of the input range
-              (+10.0.)
+              (+5.0.)
         """
-        return mcc118._dev_info
+        return mcc172._dev_info
 
     def firmware_version(self):
         """
@@ -166,8 +181,6 @@ class mcc118(Hat): # pylint: disable=invalid-name
             namedtuple: a namedtuple containing the following field names
 
             * **version** (string): The firmware version, i.e "1.03".
-            * **bootloader_version** (string): The bootloader version,
-              i.e "1.01".
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -176,20 +189,14 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         version = c_ushort()
-        boot_version = c_ushort()
-        if (self._lib.mcc118_firmware_version(
-                self._address, byref(version), byref(boot_version))
+        if (self._lib.mcc172_firmware_version(self._address, byref(version))
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         version_str = "{0:X}.{1:02X}".format(
             version.value >> 8, version.value & 0x00FF)
-        boot_str = "{0:X}.{1:02X}".format(
-            boot_version.value >> 8, boot_version.value & 0x00FF)
         version_info = namedtuple(
-            'MCC118VersionInfo', ['version', 'bootloader_version'])
-        return version_info(
-            version=version_str,
-            bootloader_version=boot_str)
+            'MCC172VersionInfo', ['version'])
+        return version_info(version=version_str)
 
     def serial(self):
         """
@@ -206,7 +213,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
         # create string to hold the result
         my_buffer = create_string_buffer(9)
-        if (self._lib.mcc118_serial(self._address, my_buffer)
+        if (self._lib.mcc172_serial(self._address, my_buffer)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         my_serial = my_buffer.value.decode('ascii')
@@ -214,7 +221,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
     def blink_led(self, count):
         """
-        Blink the MCC 118 LED.
+        Blink the MCC 172 LED.
 
         Setting count to 0 will cause the LED to blink continuously until
         blink_led() is called again with a non-zero count.
@@ -228,7 +235,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        if (self._lib.mcc118_blink_led(self._address, count)
+        if (self._lib.mcc172_blink_led(self._address, count)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
@@ -248,7 +255,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
         # create string to hold the result
         my_buffer = create_string_buffer(11)
-        if (self._lib.mcc118_calibration_date(self._address, my_buffer)
+        if (self._lib.mcc172_calibration_date(self._address, my_buffer)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         my_date = my_buffer.value.decode('ascii')
@@ -276,11 +283,11 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
         slope = c_double()
         offset = c_double()
-        if (self._lib.mcc118_calibration_coefficient_read(
+        if (self._lib.mcc172_calibration_coefficient_read(
                 self._address, channel, byref(slope), byref(offset))
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
-        cal_info = namedtuple('MCC118CalInfo', ['slope', 'offset'])
+        cal_info = namedtuple('MCC172CalInfo', ['slope', 'offset'])
         return cal_info(
             slope=slope.value,
             offset=offset.value)
@@ -308,29 +315,23 @@ class mcc118(Hat): # pylint: disable=invalid-name
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        if (self._lib.mcc118_calibration_coefficient_write(
+        if (self._lib.mcc172_calibration_coefficient_write(
                 self._address, channel, slope, offset)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def trigger_mode(self, mode):
+    def IEPE_config_write(self, channel, mode):
         """
-        Set the external trigger input mode.
+        Configure a channel for an IEPE sensor.
 
-        The available modes are:
-
-        * :py:const:`TriggerModes.RISING_EDGE`: Start the scan when the TRIG
-          input transitions from low to high.
-        * :py:const:`TriggerModes.FALLING_EDGE`: Start the scan when the TRIG
-          input transitions from high to low.
-        * :py:const:`TriggerModes.ACTIVE_HIGH`: Start the scan when the TRIG
-          input is high.
-        * :py:const:`TriggerModes.ACTIVE_LOW`: Start the scan when the TRIG
-          input is low.
+        This method turns on / off the IEPE power supply for the specified
+        channel. The power-on default is IEPE power off.
 
         Args:
-            mode (:py:class:`TriggerModes`): The trigger mode.
+            channel (int): The channel, 0 or 1.
+            mode (int): The IEPE mode for the channel, 0 = IEPE off,
+                1 = IEPE on.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -338,92 +339,227 @@ class mcc118(Hat): # pylint: disable=invalid-name
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        if (self._lib.mcc118_trigger_mode(self._address, mode) !=
+        if (self._lib.mcc172_IEPE_config_write(self._address, channel, mode) !=
                 self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def a_in_read(self, channel, options=OptionFlags.DEFAULT):
+    def IEPE_config_read(self, channel):
         """
-        Perform a single reading of an analog input channel and return the
-        value.
+        Read the IEPE configuration for a channel.
 
-        **options** is an ORed combination of OptionFlags. Valid flags for this
-        method are:
-
-        * :py:const:`OptionFlags.DEFAULT`: Return a calibrated voltage value.
-          Any other flags will override DEFAULT behavior.
-        * :py:const:`OptionFlags.NOSCALEDATA`: Return an ADC code (a value
-          between 0 and 4095) rather than voltage.
-        * :py:const:`OptionFlags.NOCALIBRATEDATA`: Return data without the
-          calibration factors applied.
+        This method returns the state of the IEPE power supply for the specified
+        channel
 
         Args:
-            channel (int): The analog input channel number, 0-7.
-            options (int): ORed combination of :py:class:`OptionFlags`,
-                :py:const:`OptionFlags.DEFAULT` if unspecified.
+            channel (int): The channel, 0 or 1.
 
-        Returns:
-            float: the read value
+        Returns
+            int: The IEPE mode for the channel, 0 = IEPE off, 1 = IEPE on.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
                 responds incorrectly.
-            ValueError: the channel number is invalid.
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-
-        if channel not in range(self._AIN_NUM_CHANNELS):
-            raise ValueError("Invalid channel {0}. Must be 0-{1}.".format(
-                channel, self._AIN_NUM_CHANNELS-1))
-
-        data_value = c_double()
-
-        if (self._lib.mcc118_a_in_read(
-                self._address, channel, options, byref(data_value))
-                != self._RESULT_SUCCESS):
+        mode = c_ubyte()
+        if (self._lib.mcc172_IEPE_config_read(self._address, channel,
+                byref(mode)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
-        return data_value.value
+        return mode.value()
 
-    def a_in_scan_actual_rate(self, channel_count, sample_rate_per_channel):
+    def a_in_clock_config_write(self, clock_source, sample_rate_per_channel):
         """
-        Read the actual sample rate per channel for a requested sample rate.
+        Configure the ADC sampling clock.
 
-        The internal scan clock is generated from a 16 MHz clock source so only
-        discrete frequency steps can be achieved.  This function will return the
-        actual rate for a requested channel count and rate setting.
+        This method will configure the ADC sampling clock. The default
+        configuration after opening the device is local mode, 51.2 KHz sampling
+        rate. The clock source must be one of:
+
+        * :py:const:`SourceType.LOCAL`: the clock is generated on this MCC 172
+          and not shared with any other devices.
+        * :py:const:`SourceType.MASTER`: the clock is generated on this MCC 172
+          and shared over the Raspberry Pi header with other MCC 172s. All other
+          MCC 172s must be configured for local or slave clock.
+        * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
+          it receives its clock from the Raspberry Pi header. Another MCC 172
+          must be configured for master clock.
+
+        The ADCs will be synchronized so they sample the inputs at the same
+        time. This requires 128 clock cycles before the first sample is
+        available. When using a master - slave clock configuration there are
+        additional considerations:
+
+        * There should be only one master device; otherwise, you will be
+          connecting multiple outputs together and could damage a device.
+        * Configure the clock on the slave device(s) first, master last. The
+          synchronization will occur when the master clock is configured,
+          causing the ADCs on all the devices to be in sync.
+
+        The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by
+        an integer between 1 and 256. The sample_rate_per_channel will be
+        internally converted to the nearest valid rate. The actual rate can be
+        read back using :py:func:`a_in_clock_config_read`. When used in slave
+        clock configuration, the device will measure the frequency of the
+        incoming master clock after the synchronization period is complete.
+        Calling :py:func:`a_in_clock_config_read` after this will return the
+        measured sample rate.
+
+        Args:
+            clock_source (:py:class:`SourceType`): The ADC clock source.
+            sample_rate_per_channel (float): The requested sampling rate in
+                samples per second per channel.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        result = self._lib.mcc172_a_in_clock_config_write(self._address, 
+            clock_source, sample_rate_per_channel)
+        if result == self._RESULT_BUSY:
+            raise HatError(self._address, "Cannot change the clock "
+                "configuration while a scan is active.");
+        elif result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response.")
+        return
+
+    def a_in_clock_config_read(self):
+        """
+        Read the sampling clock configuration.
+
+        This method will return the sample clock configuration and rate. If the
+        clock is configured for local or master source, then the rate will be 
+        the internally adjusted rate set by the user.  If the clock is
+        configured for slave source, then the rate will be measured from the
+        master clock after the synchronization period has ended. The
+        synchronization status is also returned.
+
+        The clock source will be one of:
+
+        * :py:const:`SourceType.LOCAL`: the clock is generated on this MCC 172
+          and not shared with any other devices.
+        * :py:const:`SourceType.MASTER`: the clock is generated on this MCC 172
+          and shared over the Raspberry Pi header with other MCC 172s.
+        * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
+          it receives its clock from the Raspberry Pi header.
+
+        The sampling rate will not be valid in slave mode if synced is False.
+
+        Returns
+            namedtuple: a namedtuple containing the following field names:
+
+            * **clock_source** (:py:class:`SourceType`): The ADC clock source.
+            * **sample_rate_per_channel** (float): The actual sampling rate in
+                samples per second per channel.
+            * **synced** (bool): True if the ADCs are synchronized, False if a
+              synchronization is in progress.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        clock_source = c_ubyte()
+        sample_rate_per_channel = c_double()
+        synced = c_ubyte();
+        result = self._lib.mcc172_a_in_clock_config_read(self._address, 
+            byref(clock_source), byref(sample_rate_per_channel), byref(synced))
+
+        if result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response.")
+
+        clock_config = namedtuple(
+            'MCC172ClockConfig',
+            ['clock_source', 'sample_rate_per_channel', 'synced'])
+        return clock_config(
+            clock_source=clock_source.value,
+            sample_rate_per_channel=sample_rate_per_channel.value,
+            synced=synced.value != 0)
+
+    def trigger_config(self, trigger_source, trigger_mode):
+        """
+        Configure the digital trigger.
+
+        The analog input scan may be configured to start saving the acquired
+        data when the digital trigger is in the desired state. A single device
+        trigger may also be shared with multiple boards. This command sets the
+        trigger source and mode.
+
+        The trigger source must be one of:
+
+        * :py:const:`SourceType.LOCAL`: the trigger terminal on this MCC 172 is
+          used and not shared with any other devices.
+        * :py:const:`SourceType.MASTER`: the trigger terminal on this MCC 172 is
+          used and is shared as the master trigger for other MCC 172s.
+        * :py:const:`SourceType.SLAVE`: the trigger terminal on this MCC 172 is
+          not used, it receives its trigger from the master MCC 172.
+
+        The trigger mode must be one of:
+
+        * :py:const:`TriggerModes.RISING_EDGE`: Start saving data when the
+          trigger transitions from low to high.
+        * :py:const:`TriggerModes.FALLING_EDGE`: Start saving data when the
+          trigger transitions from high to low.
+        * :py:const:`TriggerModes.ACTIVE_HIGH`: Start saving data when the
+          trigger is high.
+        * :py:const:`TriggerModes.ACTIVE_LOW`: Start saving data when the
+          trigger is low.
+
+        Args:
+            trigger_source (:py:class:`SourceType`): The trigger source.
+            trigger_mode (:py:class:`TriggerModes`): The trigger mode.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        result = self._lib.mcc172_trigger_mode(self._address, trigger_source, 
+            trigger_mode)
+        if result == self._RESULT_BUSY:
+            raise HatError(self._address, "Cannot write trigger configuration "
+                "while a scan is active.")
+        elif result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response.")
+        return
+
+    def a_in_scan_actual_rate(self, sample_rate_per_channel):
+        """
+        Calculate the actual sample rate per channel for a requested sample
+        rate.
+
+        The scan clock is generated from a 51.2 KHz clock source divided by an
+        integer between 1 and 256, so only discrete frequency steps can be
+        achieved.  This method will return the actual rate for a requested 
+        sample rate.
 
         This function does not perform any actions with a board, it simply
         calculates the rate.
 
         Args:
-            channel_count (int): The number of channels in the scan, 1-8.
             sample_rate_per_channel (float): The desired per-channel rate of the
-                internal sampling clock, max 100,000.0.
+                internal sampling clock.
 
         Returns:
             float: the actual sample rate
-
-        Raises:
-            ValueError: a scan argument is invalid.
         """
-        if not self._initialized:
-            raise HatError(self._address, "Not initialized.")
-        data_value = c_double()
+        divisor = 51200.0 / sample_rate_per_channel + 0.5
+        if divisor < 1.0:
+            divisor = 1.0
+        elif divisor > 256.0
+            divisor = 256.0
+            
+        sample_rate = 51200.0 / int(divisor)
+        return sample_rate
 
-        if (self._lib.mcc118_a_in_scan_actual_rate(
-                channel_count, sample_rate_per_channel, byref(data_value))
-                != self._RESULT_SUCCESS):
-            raise ValueError(
-                "The specified parameters are invalid or outside the device "
-                "capabilities.")
-        return data_value.value
-
-    def a_in_scan_start(self, channel_mask, samples_per_channel,
-                        sample_rate_per_channel, options):
+    def a_in_scan_start(self, channel_mask, samples_per_channel, options):
         """
-        Start a hardware-paced analog input channel scan.
+        Start capturing analog input data.
 
         The scan runs as a separate thread from the user's code. This function
         will allocate a scan buffer and start the thread that reads data from
@@ -435,6 +571,11 @@ class mcc118(Hat): # pylint: disable=invalid-name
         data has been read; this frees all resources from the scan and allows
         additional scans to be performed.
 
+        The scan cannot be started until the ADCs are synchronized, so this
+        function will not return until that has completed. It is best to wait
+        for sync using :py:func:`a_in_clock_config_read` before starting the
+        scan.
+
         The scan state has defined terminology:
 
         * **Active**: :py:func:`a_in_scan_start` has been called and the device
@@ -442,32 +583,26 @@ class mcc118(Hat): # pylint: disable=invalid-name
           not been cleaned up by calling :py:func:`a_in_scan_cleanup`, so
           another scan may not be started.
         * **Running**: The scan is active and the device is still acquiring
-          data. Certain methods like :py:func:`a_in_read` will return an error
-          because the device is busy.
+          data. Certain methods like :py:func:`a_in_clock_config_write` will
+          return an error because the device is busy.
 
         The scan options that may be used are:
 
         * :py:const:`OptionFlags.DEFAULT`: Return scaled and calibrated data,
-          internal scan clock, no trigger, and finite operation. Any other flags
-          will override DEFAULT behavior.
+          do not use a trigger, and finite operation. Any other flags will
+          override DEFAULT behavior.
         * :py:const:`OptionFlags.NOSCALEDATA`: Return ADC codes (values between
-          0 and 4095) rather than voltage.
+          -8,388,608 and 8,388,607) rather than voltage.
         * :py:const:`OptionFlags.NOCALIBRATEDATA`: Return data without the
           calibration factors applied.
-        * :py:const:`OptionFlags.EXTCLOCK`: Use an external 3.3V or 5V logic
-          signal at the CLK input as the scan clock. Multiple devices can be
-          synchronized by connecting the CLK pins together and using this flag
-          on all but one device so they will be clocked by the single device
-          using its internal clock. **sample_rate_per_channel** is only used for
-          buffer sizing.
-        * :py:const:`OptionFlags.EXTTRIGGER`: Hold off the scan (after calling
-          :py:func:`a_in_scan_start`) until the trigger condition is met. The
-          trigger is a 3.3V or 5V logic signal applied to the TRIG pin.
-        * :py:const:`OptionFlags.CONTINUOUS`: Scans continuously until stopped
-          by the user by calling :py:func:`a_in_scan_stop` and writes data to a
-          circular buffer. The data must be read before being overwritten to
-          avoid a buffer overrun error. **samples_per_channel** is only used for
-          buffer sizing.
+        * :py:const:`OptionFlags.EXTTRIGGER`: Do not start saving data (after
+          calling :py:func:`a_in_scan_start`) until the trigger condition is
+          met. The trigger is configured with :py:func:`trigger_config`.
+        * :py:const:`OptionFlags.CONTINUOUS`: Read analog data continuously
+          until stopped by the user by calling :py:func:`a_in_scan_stop` and
+          write data to a circular buffer. The data must be read before being
+          overwritten to avoid a buffer overrun error. **samples_per_channel**
+          is only used for buffer sizing.
 
         The scan buffer size will be allocated as follows:
 
@@ -476,14 +611,13 @@ class mcc118(Hat): # pylint: disable=invalid-name
         **Continuous mode:** Either **samples_per_channel** or the value in the
         table below, whichever is greater.
 
-        ==============      =========================
-        Sample Rate         Buffer Size (per channel)
-        ==============      =========================
-        Not specified       10 kS
-        0-100 S/s           1 kS
-        100-10k S/s         10 kS
-        10k-100k S/s        100 kS
-        ==============      =========================
+        ===============      =========================
+        Sample Rate          Buffer Size (per channel)
+        ===============      =========================
+        200-1024 S/s         1 KS
+        1280-10.24 KS/s      10 KS
+        12.8 or higher       100 KS
+        ===============      =========================
 
         Specifying a very large value for samples_per_channel could use too much
         of the Raspberry Pi memory. If the memory allocation fails, the function
@@ -496,13 +630,10 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
         Args:
             channel_mask (int): A bit mask of the desired channels (0x01 -
-                0xFF).
+                0x03).
             samples_per_channel (int): The number of samples to acquire per
                 channel (finite mode,) or or can be used to set a larger scan
                 buffer size than the default value (continuous mode.)
-            sample_rate_per_channel (float): The per-channel rate of the
-                internal scan clock, or the expected maximum rate of an external
-                scan clock, max 100,000.0.
             options (int): An ORed combination of :py:class:`OptionFlags` flags
                 that control the scan.
 
@@ -515,23 +646,17 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
 
         # Perform some argument checking
-        if channel_mask == 0:
-            raise ValueError("channel_mask must be nonzero.")
+        if (channel_mask == 0) or (channel_mask > 3):
+            raise ValueError("channel_mask must be 1 - 3")
 
         num_channels = 0
-        for index in range(8):
+        for index in range(2):
             bit_mask = 1 << index
             if (channel_mask & bit_mask) != 0:
                 num_channels += 1
 
-        if num_channels * sample_rate_per_channel > self._MAX_SAMPLE_RATE:
-            raise ValueError(
-                "Invalid sample_rate_per_channel, exceeds maximum rate for "
-                "device.")
-
-        result = self._lib.mcc118_a_in_scan_start(
-            self._address, channel_mask, samples_per_channel,
-            sample_rate_per_channel, options)
+        result = self._lib.mcc172_a_in_scan_start(
+            self._address, channel_mask, samples_per_channel, options)
 
         if result == self._RESULT_BAD_PARAMETER:
             raise ValueError("Invalid scan parameter.")
@@ -563,7 +688,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
         data_value = c_ulong()
 
-        result = self._lib.mcc118_a_in_scan_buffer_size(
+        result = self._lib.mcc172_a_in_scan_buffer_size(
             self._address, byref(data_value))
 
         if result == self._RESULT_RESOURCE_UNAVAIL:
@@ -606,7 +731,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         status = c_ushort(0)
         samples_available = c_ulong(0)
 
-        result = self._lib.mcc118_a_in_scan_status(
+        result = self._lib.mcc172_a_in_scan_status(
             self._address, byref(status), byref(samples_available))
 
         if result == self._RESULT_RESOURCE_UNAVAIL:
@@ -616,7 +741,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 result))
 
         scan_status = namedtuple(
-            'MCC118ScanStatus',
+            'MCC172ScanStatus',
             ['running', 'hardware_overrun', 'buffer_overrun', 'triggered',
              'samples_available'])
         return scan_status(
@@ -672,9 +797,9 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        num_channels = self._lib.mcc118_a_in_scan_channel_count(self._address)
+        num_channels = self._lib.mcc172_a_in_scan_channel_count(self._address)
 
-        self._lib.mcc118_a_in_scan_read.argtypes = [
+        self._lib.mcc172_a_in_scan_read.argtypes = [
             c_ubyte, POINTER(c_ushort), c_long, c_double, POINTER(c_double),
             c_ulong, POINTER(c_ulong)]
 
@@ -688,7 +813,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
             # first, get the number of available samples
             samples_available = c_ulong(0)
-            result = self._lib.mcc118_a_in_scan_status(
+            result = self._lib.mcc172_a_in_scan_status(
                 self._address, byref(status), byref(samples_available))
 
             if result != self._RESULT_SUCCESS:
@@ -715,7 +840,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise ValueError("Invalid samples_per_channel {}.".format(
                 samples_per_channel))
 
-        result = self._lib.mcc118_a_in_scan_read(
+        result = self._lib.mcc172_a_in_scan_read(
             self._address, byref(status), samples_to_read, timeout, data_buffer,
             buffer_size, byref(samples_read_per_channel))
 
@@ -738,7 +863,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             data_list = [data_buffer[i] for i in xrange(total_read)]
 
         scan_status = namedtuple(
-            'MCC118ScanRead',
+            'MCC172ScanRead',
             ['running', 'hardware_overrun', 'buffer_overrun', 'triggered',
              'timeout', 'data'])
         return scan_status(
@@ -801,12 +926,12 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        self._lib.mcc118_a_in_scan_read.argtypes = [
+        self._lib.mcc172_a_in_scan_read.argtypes = [
             c_ubyte, POINTER(c_ushort), c_long, c_double,
             ndpointer(c_double, flags="C_CONTIGUOUS"), c_ulong,
             POINTER(c_ulong)]
 
-        num_channels = self._lib.mcc118_a_in_scan_channel_count(self._address)
+        num_channels = self._lib.mcc172_a_in_scan_channel_count(self._address)
         samples_read_per_channel = c_ulong()
         status = c_ushort()
         timed_out = False
@@ -817,7 +942,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
             # first, get the number of available samples
             samples_available = c_ulong(0)
-            result = self._lib.mcc118_a_in_scan_status(
+            result = self._lib.mcc172_a_in_scan_status(
                 self._address, byref(status), byref(samples_available))
 
             if result != self._RESULT_SUCCESS:
@@ -844,7 +969,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise ValueError("Invalid samples_per_channel {}.".format(
                 samples_per_channel))
 
-        result = self._lib.mcc118_a_in_scan_read(
+        result = self._lib.mcc172_a_in_scan_read(
             self._address, byref(status), samples_to_read, timeout, data_buffer,
             buffer_size, byref(samples_read_per_channel))
 
@@ -864,7 +989,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             data_buffer = numpy.resize(data_buffer, (total_read,))
 
         scan_status = namedtuple(
-            'MCC118ScanRead',
+            'MCC172ScanRead',
             ['running', 'hardware_overrun', 'buffer_overrun', 'triggered',
              'timeout', 'data'])
         return scan_status(
@@ -889,7 +1014,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        num_channels = self._lib.mcc118_a_in_scan_channel_count(self._address)
+        num_channels = self._lib.mcc172_a_in_scan_channel_count(self._address)
         return num_channels
 
     def a_in_scan_stop(self):
@@ -907,7 +1032,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        if (self._lib.mcc118_a_in_scan_stop(self._address)
+        if (self._lib.mcc172_a_in_scan_stop(self._address)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
 
@@ -928,7 +1053,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        if (self._lib.mcc118_a_in_scan_cleanup(self._address)
+        if (self._lib.mcc172_a_in_scan_cleanup(self._address)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
 
@@ -965,7 +1090,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise ValueError("Invalid mode. Must be 0-3.")
 
         data_value = c_ubyte()
-        result = self._lib.mcc118_test_clock(self._address, mode,
+        result = self._lib.mcc172_test_clock(self._address, mode,
                                              byref(data_value))
         if result == self._RESULT_BUSY:
             raise HatError(self._address,
@@ -991,7 +1116,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
 
         data_value = c_ubyte()
-        result = self._lib.mcc118_test_trigger(self._address, byref(data_value))
+        result = self._lib.mcc172_test_trigger(self._address, byref(data_value))
         if result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
         return data_value.value

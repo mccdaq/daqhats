@@ -29,9 +29,10 @@
 
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
-#define RANGE_MIN               (-5.0)
-#define RANGE_MAX               (+5.0)
-#define LSB_SIZE                ((RANGE_MAX - RANGE_MIN)/(MAX_CODE+1))
+#define RANGE_MIN               (-2.5)
+#define RANGE_MAX               (+2.5)
+#define LSB_SIZE                ((RANGE_MAX - RANGE_MIN)/ \
+                                (MAX_CODE - MIN_CODE + 1))
 #define VOLTAGE_MIN             RANGE_MIN
 #define VOLTAGE_MAX             (RANGE_MAX - LSB_SIZE)
 #define NUM_CHANNELS            2
@@ -517,6 +518,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             timeout = (diff > reply_timeout_us);
         } while (!got_reply && !timeout);
         
+#if 0        
         if (!got_reply)
         {
             printf("Sent: ");
@@ -530,9 +532,8 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
                 printf("%02X ", dev->rx_buffer[temp]);
             }
             printf("\n");
-            
-            printf("rx start, end: %X %X %X\n", (uint32_t)rx_start_ptr, (uint32_t)dev->rx_buffer, (uint32_t)tr.rx_buf);
         }
+#endif        
     }
 
     if (!got_reply)
@@ -1212,10 +1213,19 @@ int mcc172_open(uint8_t address)
         attempts++;
     } while ((ret != RESULT_SUCCESS) && (attempts < 2));
 
-    pthread_mutex_init(&dev->scan_mutex, NULL);
+    if (ret == RESULT_SUCCESS)
+    {
+        pthread_mutex_init(&dev->scan_mutex, NULL);
 
-    _syslog("open");
-    return RESULT_SUCCESS;
+        _syslog("open");
+        return RESULT_SUCCESS;
+    }
+    else
+    {
+        free(dev);
+        _devices[address] = NULL;
+        return ret;
+    }
 }
 
 /******************************************************************************
@@ -2344,12 +2354,12 @@ int mcc172_enter_bootloader(uint8_t address)
 
     // toggle reset until irq goes low (indicating ready for commands)
     count = 0;
-    while (gpio_status(IRQ_GPIO) && (count <= 10))
+    while (gpio_status(IRQ_GPIO) && (count < 10))
     {
-        usleep(10*1000);
         gpio_write(RESET_GPIO, 1);
-        usleep(1*1000);
+        usleep(2*1000ul);
         gpio_write(RESET_GPIO, 0);
+        usleep(55*1000ul);
         
         count++;
     }
@@ -2436,6 +2446,22 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
+#if 0    
+    printf("Sent: ");
+    for (temp = 0; temp < transfer_count; temp++)
+    {
+        printf("%02X ", ((uint8_t*)tx_data)[temp]);
+    }
+    if (rx_data != NULL)
+    {
+        printf("\nGot: ");
+        for (temp = 0; temp < transfer_count; temp++)
+        {
+            printf("%02X ", ((uint8_t*)rx_data)[temp]);
+        }
+    }
+    printf("\n");
+#endif
     
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
