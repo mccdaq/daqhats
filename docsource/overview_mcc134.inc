@@ -55,6 +55,30 @@ Functional block diagram
 	:align: center
 	:alt: MCC 134 block diagram
 
+Functional details
+------------------
+
+Best practices for accurate thermocouple measurements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In all use cases, the MCC 134 will achieve results within the maximum
+thermocouple accuracy specifications. In most cases, the MCC 134 will achieve
+the typical specifications. To achieve the most accurate thermocouple readings,
+MCC recommends the following practices:
+
+- Reduce the load on the Raspberry Pi processor.
+  Running a program that fully loads all 4 cores on the Raspberry Pi
+  processor can raise the temperature of the processor above 70 °C. Running a
+  program that only loads 1 core will operate approximately 20° cooler.
+- Keep environmental temperature variations to a minimum.
+  For instance, do not place the MCC 134 near a heat source or cooling source
+  that cycles on and off. Sudden environmental changes will lead to increased
+  errors.
+- Provide a steady airflow, such as from a fan.
+  A steady airflow can dissipate heat and reduce errors.
+- With multiple MCC DAQ Hats configured in a stack, place the MCC 134 farthest
+  from the Raspberry Pi board. Since the Raspberry Pi is a significant heat
+  source, placing the MCC 134 farthest from the Pi will provide better results.
+
 Specifications
 --------------
 
