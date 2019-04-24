@@ -3,7 +3,7 @@ Wraps the global methods from the MCC Hat library for use in Python.
 """
 from collections import namedtuple
 from ctypes import cdll, Structure, c_ubyte, c_ushort, c_char, c_int, POINTER, \
-    CFUNCTYPE, cast, py_object, c_void_p, pointer
+    CFUNCTYPE, c_void_p
 from enum import IntEnum
 
 _HAT_CALLBACK = None
@@ -79,7 +79,7 @@ class HatCallback(object):
         if not callable(function):
             raise TypeError("Argument 1 must be a function or method.")
         self.function = function
-        self.cbfunctype = CFUNCTYPE(None, c_void_p)
+        self.cbfunctype = CFUNCTYPE(None)
         self.cbfunc = None
         self.user_data = None
 
@@ -89,7 +89,7 @@ class HatCallback(object):
         get passed to the library function, and assign it to a variable to
         avoid it getting garbage collected.
         """
-        def func(user_data):
+        def func():
             """
             Function wrapper.
             """
@@ -100,7 +100,7 @@ class HatCallback(object):
     def handle_callback(self):
         """
         This is directly called from the interrupt thread. It calls the user's
-        callback, passing the user_data object that gets set with 
+        callback, passing the user_data object that gets set with
         interrupt_callback_enable().
         """
         self.function(self.user_data)
@@ -192,7 +192,7 @@ def interrupt_state():
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return False
 
     _libc.hat_interrupt_state.argtypes = []
     _libc.hat_interrupt_state.restype = c_int
@@ -208,7 +208,7 @@ def wait_for_interrupt(timeout):
 
     Pass a timeout in seconds. Pass -1 to wait forever or 0 to return
     immediately. If the interrupt has not occurred before the timeout elapses
-    the function will return 0.
+    the function will return False.
 
     This function only applies when using devices that can generate an
     interrupt:
@@ -221,7 +221,7 @@ def wait_for_interrupt(timeout):
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return False
 
     _libc.hat_wait_for_interrupt.argtypes = [c_int]
     _libc.hat_wait_for_interrupt.restype = c_int
@@ -293,7 +293,7 @@ def interrupt_callback_enable(callback, user_data):
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return
 
     # callback must be an instance of HatCallback; legacy code may already
     # encapsulate it, so handle both cases
@@ -327,7 +327,7 @@ def interrupt_callback_disable():
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return
 
     _libc.hat_interrupt_callback_disable.argtypes = []
     _libc.hat_interrupt_callback_disable.restype = c_int
