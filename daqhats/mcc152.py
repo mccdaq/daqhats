@@ -135,7 +135,7 @@ class mcc152(Hat): # pylint: disable=invalid-name,too-many-public-methods
 
         if result == self._RESULT_SUCCESS:
             self._initialized = True
-        elif result == self._RESULT_INVALID_BOARD:
+        elif result == self._RESULT_INVALID_DEVICE:
             raise HatError(self._address, "Invalid board type.")
         else:
             raise HatError(self._address, "Board not responding.")
