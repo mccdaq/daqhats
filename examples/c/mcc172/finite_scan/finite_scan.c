@@ -56,6 +56,7 @@ int main(void)
     uint32_t samples_read_per_channel = 0;
     uint8_t synced;
     uint8_t clock_source;
+    uint8_t iepe_enable;
 
     /*
     // Select an MCC172 HAT device to use.
@@ -73,6 +74,31 @@ int main(void)
     result = mcc172_open(address);
     STOP_ON_ERROR(result);
 
+    // Turn on IEPE supply?
+    printf("Enable IEPE power [y or n]?  ");
+    scanf("%c", &c);
+    if ((c == 'y') || (c == 'Y'))
+    {
+        iepe_enable = 1;
+    }
+    else if ((c == 'n') || (c == 'N'))
+    {
+        iepe_enable = 0;
+    }
+    else
+    {
+        printf("Error: Invalid selection\n");
+        mcc172_close(address);
+        return 1;
+    }
+    
+    for (i = 0; i < num_channels; i++)
+    {
+        result = mcc172_IEPE_config_write(address, channel_array[i], 
+            iepe_enable);
+        STOP_ON_ERROR(result);
+    }
+    
     // Set the ADC clock to the desired rate.
     result = mcc172_a_in_clock_config_write(address, 0, scan_rate);
     STOP_ON_ERROR(result);
@@ -94,6 +120,7 @@ int main(void)
     printf("    Functions demonstrated:\n");
     printf("        mcc172_a_in_scan_start\n");
     printf("        mcc172_a_in_scan_read\n");
+    printf("    IEPE power: %s\n", iepe_enable ? "on" : "off");
     printf("    Channels: %s\n", channel_string);
     printf("    Samples per channel: %d\n", samples_per_channel);
     printf("    Requested scan rate: %-10.2f\n", scan_rate);

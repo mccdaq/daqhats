@@ -56,6 +56,7 @@ int main(void)
     uint32_t samples_per_channel = 2 * scan_rate;
     double read_buf[user_buffer_size];
     int total_samples_read = 0;
+    uint8_t iepe_enable;
 
     int32_t read_request_size = READ_ALL_AVAILABLE;
 
@@ -76,6 +77,31 @@ int main(void)
     result = mcc172_open(address);
     STOP_ON_ERROR(result);
     printf("open\n");
+    
+    // Turn on IEPE supply?
+    printf("Enable IEPE power [y or n]?  ");
+    scanf("%c", &c);
+    if ((c == 'y') || (c == 'Y'))
+    {
+        iepe_enable = 1;
+    }
+    else if ((c == 'n') || (c == 'N'))
+    {
+        iepe_enable = 0;
+    }
+    else
+    {
+        printf("Error: Invalid selection\n");
+        mcc172_close(address);
+        return 1;
+    }
+    
+    for (i = 0; i < num_channels; i++)
+    {
+        result = mcc172_IEPE_config_write(address, channel_array[i], 
+            iepe_enable);
+        STOP_ON_ERROR(result);
+    }
     
     // Set the ADC clock to the desired rate.
     result = mcc172_a_in_clock_config_write(address, 0, scan_rate);
