@@ -111,8 +111,13 @@ class mcc134(Hat): # pylint: disable=invalid-name
             c_ubyte, c_ubyte, POINTER(c_double)]
         self._lib.mcc134_cjc_read.restype = c_int
 
-        if self._lib.mcc134_open(self._address) != self._RESULT_SUCCESS:
-            self._initialized = False
+        result = self._lib.mcc134_open(self._address)
+
+        if result == self._RESULT_SUCCESS:
+            self._initialized = True
+        elif result == self._RESULT_INVALID_DEVICE:
+            raise HatError(self._address, "Invalid board type.")
+        else:
             raise HatError(self._address, "Board not responding.")
 
         return
