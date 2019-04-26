@@ -183,7 +183,7 @@ struct mcc172Device
     struct mcc172FactoryData factory_data;   // Factory data
     struct mcc172ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
-    
+
     uint8_t tx_buffer[MAX_SPI_TRANSFER];
     uint8_t temp_buffer[MAX_SPI_TRANSFER];
     uint8_t rx_buffer[MAX_SPI_TRANSFER];

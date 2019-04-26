@@ -39,15 +39,15 @@ int main(void)
     uint8_t num_channels = convert_chan_mask_to_array(channel_mask,
         channel_array);
 
-    uint32_t samples_per_channel = 100000;
+    uint32_t samples_per_channel = 10240;
     uint32_t buffer_size = samples_per_channel * num_channels;
     double read_buf[buffer_size];
     int total_samples_read = 0;
 
-    int32_t read_request_size = 500;
+    int32_t read_request_size = -1;     // read all available samples
     double timeout = 5.0;
 
-    double scan_rate = 51200.0;
+    double scan_rate = 10240.0;
     double actual_scan_rate = 0.0;
 
     uint32_t options = OPTS_DEFAULT;
@@ -168,11 +168,12 @@ int main(void)
 
         total_samples_read += samples_read_per_channel;
 
-        // Display the last sample for each channel.
-        printf("\r%12.0d    %10.0d ", samples_read_per_channel,
-            total_samples_read);
         if (samples_read_per_channel > 0)
         {
+            // Display the last sample for each channel.
+            printf("\r%12.0d    %10.0d ", samples_read_per_channel,
+                total_samples_read);
+
             int index = samples_read_per_channel * num_channels - num_channels;
 
             for (i = 0; i < num_channels; i++)
@@ -180,7 +181,10 @@ int main(void)
                 printf("%10.5f V", read_buf[index + i]);
             }
             fflush(stdout);
+            
         }
+ 
+        usleep(1000);
     }
     while ((result == RESULT_SUCCESS) && 
            ((read_status & STATUS_RUNNING) == STATUS_RUNNING) && 

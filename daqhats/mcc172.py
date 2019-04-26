@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """
 Wraps all of the methods from the MCC 172 library for use in Python.
 """
@@ -5,15 +6,17 @@ import sys
 from collections import namedtuple
 from ctypes import c_ubyte, c_int, c_ushort, c_ulong, c_long, c_double, \
     POINTER, c_char_p, byref, create_string_buffer
-from daqhats.hats import Hat, HatError, OptionFlags
+from enum import IntEnum, unique
+from daqhats.hats import Hat, HatError
 
+@unique
 class SourceType(IntEnum):
     """Clock / trigger source options."""
     LOCAL = 0     #: Use a local-only source.
     MASTER = 1    #: Use a local source and set it as master.
     SLAVE = 2     #: Use a master source from another MCC 172.
 
-class mcc172(Hat): # pylint: disable=invalid-name
+class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
     """
     The class for an MCC 172 board.
 
@@ -48,7 +51,7 @@ class mcc172(Hat): # pylint: disable=invalid-name
         AI_MIN_RANGE=-5.0,
         AI_MAX_RANGE=+5.0)
 
-    def __init__(self, address=0):
+    def __init__(self, address=0): # pylint: disable=too-many-statements
         """
         Initialize the class.
         """
@@ -137,7 +140,7 @@ class mcc172(Hat): # pylint: disable=invalid-name
 
         if result == self._RESULT_SUCCESS:
             self._initialized = True
-        elif result == self._RESULT_INVALID_BOARD:
+        elif result == self._RESULT_INVALID_DEVICE:
             raise HatError(self._address, "Invalid board type.")
         else:
             raise HatError(self._address, "Board not responding.")
@@ -321,7 +324,7 @@ class mcc172(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def IEPE_config_write(self, channel, mode):
+    def iepe_config_write(self, channel, mode):
         """
         Configure a channel for an IEPE sensor.
 
@@ -344,7 +347,7 @@ class mcc172(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def IEPE_config_read(self, channel):
+    def iepe_config_read(self, channel):
         """
         Read the IEPE configuration for a channel.
 
@@ -364,8 +367,8 @@ class mcc172(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         mode = c_ubyte()
-        if (self._lib.mcc172_IEPE_config_read(self._address, channel,
-                byref(mode)) != self._RESULT_SUCCESS):
+        if (self._lib.mcc172_IEPE_config_read(
+                self._address, channel, byref(mode)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return mode.value()
 
@@ -417,11 +420,12 @@ class mcc172(Hat): # pylint: disable=invalid-name
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        result = self._lib.mcc172_a_in_clock_config_write(self._address, 
-            clock_source, sample_rate_per_channel)
+        result = self._lib.mcc172_a_in_clock_config_write(
+            self._address, clock_source, sample_rate_per_channel)
         if result == self._RESULT_BUSY:
-            raise HatError(self._address, "Cannot change the clock "
-                "configuration while a scan is active.");
+            raise HatError(
+                self._address, "Cannot change the clock "
+                "configuration while a scan is active.")
         elif result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
         return
@@ -431,7 +435,7 @@ class mcc172(Hat): # pylint: disable=invalid-name
         Read the sampling clock configuration.
 
         This method will return the sample clock configuration and rate. If the
-        clock is configured for local or master source, then the rate will be 
+        clock is configured for local or master source, then the rate will be
         the internally adjusted rate set by the user.  If the clock is
         configured for slave source, then the rate will be measured from the
         master clock after the synchronization period has ended. The
@@ -465,9 +469,10 @@ class mcc172(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Not initialized.")
         clock_source = c_ubyte()
         sample_rate_per_channel = c_double()
-        synced = c_ubyte();
-        result = self._lib.mcc172_a_in_clock_config_read(self._address, 
-            byref(clock_source), byref(sample_rate_per_channel), byref(synced))
+        synced = c_ubyte()
+        result = self._lib.mcc172_a_in_clock_config_read(
+            self._address, byref(clock_source), byref(sample_rate_per_channel),
+            byref(synced))
 
         if result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
@@ -519,23 +524,25 @@ class mcc172(Hat): # pylint: disable=invalid-name
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        result = self._lib.mcc172_trigger_mode(self._address, trigger_source, 
-            trigger_mode)
+        result = self._lib.mcc172_trigger_mode(
+            self._address, trigger_source, trigger_mode)
         if result == self._RESULT_BUSY:
-            raise HatError(self._address, "Cannot write trigger configuration "
+            raise HatError(
+                self._address, "Cannot write trigger configuration "
                 "while a scan is active.")
         elif result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def a_in_scan_actual_rate(self, sample_rate_per_channel):
+    @staticmethod
+    def a_in_scan_actual_rate(sample_rate_per_channel):
         """
         Calculate the actual sample rate per channel for a requested sample
         rate.
 
         The scan clock is generated from a 51.2 KHz clock source divided by an
         integer between 1 and 256, so only discrete frequency steps can be
-        achieved.  This method will return the actual rate for a requested 
+        achieved.  This method will return the actual rate for a requested
         sample rate.
 
         This function does not perform any actions with a board, it simply
@@ -551,9 +558,9 @@ class mcc172(Hat): # pylint: disable=invalid-name
         divisor = 51200.0 / sample_rate_per_channel + 0.5
         if divisor < 1.0:
             divisor = 1.0
-        elif divisor > 256.0
+        elif divisor > 256.0:
             divisor = 256.0
-            
+
         sample_rate = 51200.0 / int(divisor)
         return sample_rate
 
