@@ -1410,7 +1410,7 @@ int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel,
 /******************************************************************************
   Configure a channel for an IEPE sensor.
  *****************************************************************************/
-int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config)
+int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config)
 {
     uint8_t buffer;
     if (!_check_addr(address) ||
@@ -1452,7 +1452,7 @@ int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config)
 /******************************************************************************
   Read the IEPE configuration for a channel.
  *****************************************************************************/
-int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config)
+int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 {
     uint8_t buffer;
     

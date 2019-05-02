@@ -16,9 +16,9 @@ struct MCC172DeviceInfo
     /// The number of analog input channels (2.)
     const uint8_t NUM_AI_CHANNELS;
     /// The minimum ADC code (-8,388,608.)
-    const uint32_t AI_MIN_CODE;
+    const int32_t AI_MIN_CODE;
     /// The maximum ADC code (8,388,607.)
-    const uint32_t AI_MAX_CODE;
+    const int32_t AI_MAX_CODE;
     /// The input voltage corresponding to the minimum code (-5.0V.)
     const double AI_MIN_VOLTAGE;
     /// The input voltage corresponding to the maximum code (+5.0V - 1 LSB.)
@@ -181,7 +181,7 @@ int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel,
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config);
+int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config);
 
 /**
 *   @brief Write the MCC 172 IEPE configuration for a single channel.
@@ -198,7 +198,7 @@ int mcc172_IEPE_config_read(uint8_t address, uint8_t channel, uint8_t* config);
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc172_IEPE_config_write(uint8_t address, uint8_t channel, uint8_t config);
+int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 
 /**
 *   @brief Read the sampling clock configuration.

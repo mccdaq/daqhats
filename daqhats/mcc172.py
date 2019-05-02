@@ -458,8 +458,8 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             * **clock_source** (:py:class:`SourceType`): The ADC clock source.
             * **sample_rate_per_channel** (float): The actual sampling rate in
                 samples per second per channel.
-            * **synced** (bool): True if the ADCs are synchronized, False if a
-              synchronization is in progress.
+            * **synchronized** (bool): True if the ADCs are synchronized, False
+              if a synchronization is in progress.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -479,11 +479,11 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
         clock_config = namedtuple(
             'MCC172ClockConfig',
-            ['clock_source', 'sample_rate_per_channel', 'synced'])
+            ['clock_source', 'sample_rate_per_channel', 'synchronized'])
         return clock_config(
             clock_source=clock_source.value,
             sample_rate_per_channel=sample_rate_per_channel.value,
-            synced=synced.value != 0)
+            synchronized=synced.value != 0)
 
     def trigger_config(self, trigger_source, trigger_mode):
         """

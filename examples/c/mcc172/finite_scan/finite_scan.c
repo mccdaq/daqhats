@@ -94,7 +94,7 @@ int main(void)
     
     for (i = 0; i < num_channels; i++)
     {
-        result = mcc172_IEPE_config_write(address, channel_array[i], 
+        result = mcc172_iepe_config_write(address, channel_array[i], 
             iepe_enable);
         STOP_ON_ERROR(result);
     }
