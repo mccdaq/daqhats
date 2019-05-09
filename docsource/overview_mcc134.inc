@@ -81,8 +81,8 @@ MCC recommends the following practices:
   significant heat source, placing the MCC 134 farthest from the Pi will
   increase accuracy.
 
-For additional information, refer to the `Measuring Thermocouples with the
-MCC 134 <https://www.mccdaq.com/TechTips/TechTip-11.aspx>`_ Tech Tip.
+For additional information, refer to the `Measuring Thermocouples with Raspberry Pi
+and the MCC 134 <https://www.mccdaq.com/TechTips/TechTip-11.aspx>`_ Tech Tip.
 
 Specifications
 --------------
