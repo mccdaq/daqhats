@@ -287,7 +287,7 @@ interrupt:</p>
 <dd><p>Wait for an interrupt from a DAQ HAT to occur.</p>
 <p>Pass a timeout in seconds. Pass -1 to wait forever or 0 to return
 immediately. If the interrupt has not occurred before the timeout elapses
-the function will return 0.</p>
+the function will return False.</p>
 <p>This function only applies when using devices that can generate an
 interrupt:</p>
 <ul class="simple">
@@ -2923,7 +2923,7 @@ responds incorrectly.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Measurement Computing.
+        &copy; Copyright 2019, Measurement Computing.
 
     </p>
   </div>
