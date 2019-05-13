@@ -91,6 +91,7 @@ int main(void)
         mcc172_close(address);
         return 1;
     }
+    flush_stdin();
     
     for (i = 0; i < num_channels; i++)
     {

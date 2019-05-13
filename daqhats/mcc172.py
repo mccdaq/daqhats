@@ -86,13 +86,13 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             c_ubyte, c_ubyte, c_double, c_double]
         self._lib.mcc172_calibration_coefficient_write.restype = c_int
 
-        self._lib.mcc172_IEPE_config_read.argtypes = [
+        self._lib.mcc172_iepe_config_read.argtypes = [
             c_ubyte, c_ubyte, POINTER(c_ubyte)]
-        self._lib.mcc172_IEPE_config_read.restype = c_int
+        self._lib.mcc172_iepe_config_read.restype = c_int
 
-        self._lib.mcc172_IEPE_config_write.argtypes = [
+        self._lib.mcc172_iepe_config_write.argtypes = [
             c_ubyte, c_ubyte, c_ubyte]
-        self._lib.mcc172_IEPE_config_write.restype = c_int
+        self._lib.mcc172_iepe_config_write.restype = c_int
 
         self._lib.mcc172_a_in_clock_config_read.argtypes = [
             c_ubyte, POINTER(c_ubyte), POINTER(c_double), POINTER(c_ubyte)]
@@ -342,7 +342,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        if (self._lib.mcc172_IEPE_config_write(self._address, channel, mode) !=
+        if (self._lib.mcc172_iepe_config_write(self._address, channel, mode) !=
                 self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
@@ -367,7 +367,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         mode = c_ubyte()
-        if (self._lib.mcc172_IEPE_config_read(
+        if (self._lib.mcc172_iepe_config_read(
                 self._address, channel, byref(mode)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return mode.value()

@@ -29,8 +29,8 @@
 
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
-#define RANGE_MIN               (-2.5)
-#define RANGE_MAX               (+2.5)
+#define RANGE_MIN               (-5.0)
+#define RANGE_MAX               (+5.0)
 #define LSB_SIZE                ((RANGE_MAX - RANGE_MIN)/ \
                                 (MAX_CODE - MIN_CODE + 1))
 #define VOLTAGE_MIN             RANGE_MIN
@@ -1797,6 +1797,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     pthread_attr_destroy(&attr);
 
     dev->scan_info->scan_running = true;
+
+    // Short sleep to allow thread to init
+    usleep(1);
 
     return RESULT_SUCCESS;
 }
