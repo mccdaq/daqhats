@@ -45,7 +45,7 @@ enum SourceType
 extern "C" {
 #endif
 
-int mcc172_test(uint8_t address, double* value);
+//int mcc172_test(uint8_t address, double* value);
 
 /**
 *   @brief Open a connection to the MCC 172 device at the specified address.
@@ -135,7 +135,7 @@ int mcc172_calibration_date(uint8_t address, char* buffer);
 *
 *   The coefficients are applied in the library as:
 *
-*       calibrated_ADC_code = (raw_ADC_code * slope) + offset
+*       calibrated_ADC_code = (raw_ADC_code - offset) * slope
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param channel  The channel number (0 - 1).
@@ -158,7 +158,7 @@ int mcc172_calibration_coefficient_read(uint8_t address, uint8_t channel,
 *
 *   The coefficients are applied in the library as:
 *
-*       calibrated_ADC_code = (raw_ADC_code * slope) + offset
+*       calibrated_ADC_code = (raw_ADC_code - offset) * slope
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param channel  The channel number (0 - 1).
@@ -176,8 +176,8 @@ int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel,
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param channel  The channel number (0 - 1).
 *   @param config   Receives the configuration for the specified channel:
-*       0: IEPE power off
-*       1: IEPE power on
+*       - 0: IEPE power off
+*       - 1: IEPE power on
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
@@ -193,8 +193,8 @@ int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config);
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param channel  The channel number (0 - 1).
 *   @param config   The IEPE configuration for the specified channel:
-*       0: IEPE power off
-*       1: IEPE power on
+*       - 0: IEPE power off
+*       - 1: IEPE power on
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
@@ -212,12 +212,12 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 *
 *   The clock source will be one of the following values:
 *
-*       - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The clock is generated on this MCC
-*         172 and not shared with other MCC 172s.
-*       - [SOURCE_MASTER](@ref SOURCE_MASTER): The clock is generated on this
-*         MCC 172 and is shared as the master clock for other MCC 172s.
-*       - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
-*         172, it receives its clock from the master MCC 172.
+*   - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The clock is generated on this MCC
+*     172 and not shared with other MCC 172s.
+*   - [SOURCE_MASTER](@ref SOURCE_MASTER): The clock is generated on this
+*     MCC 172 and is shared as the master clock for other MCC 172s.
+*   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
+*     172, it receives its clock from the master MCC 172.
 *
 *   The sampling rate will not be valid in slave mode if synced is equal to 0. 
 *
@@ -243,24 +243,24 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *
 *   The clock_source must be one of:
 *
-*       - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The clock is generated on this MCC
-*         172 and not shared with other MCC 172s.
-*       - [SOURCE_MASTER](@ref SOURCE_MASTER): The clock is generated on this
-*         MCC 172 and is shared as the master clock for other MCC 172s. All
-*         other MCC 172s must be configured for local or slave clock.
-*       - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
-*         172, it receives its clock from the master MCC 172.
+*   - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The clock is generated on this MCC
+*     172 and not shared with other MCC 172s.
+*   - [SOURCE_MASTER](@ref SOURCE_MASTER): The clock is generated on this
+*     MCC 172 and is shared as the master clock for other MCC 172s. All
+*     other MCC 172s must be configured for local or slave clock.
+*   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
+*     172, it receives its clock from the master MCC 172.
 *
 *   The ADCs will be synchronized so they sample the inputs at the same time.
 *   This requires 128 clock cycles before the first sample is available. When
 *   using a master - slave clock configuration there are additional
 *   considerations:
 *
-*       - There should be only one master device; otherwise, you will be
-*       connecting multiple outputs together and could damage a device.
-*       - Configure the clock on the slave device(s) first, master last. The
-*       synchronization will occur when the master clock is configured, causing
-*       the ADCs on all the devices to be in sync.
+*   - There should be only one master device; otherwise, you will be
+*     connecting multiple outputs together and could damage a device.
+*   - Configure the clock on the slave device(s) first, master last. The
+*     synchronization will occur when the master clock is configured, causing
+*     the ADCs on all the devices to be in sync.
 *
 *   The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by an
 *   integer between 1 and 256. The sample_rate_per_channel will be internally
@@ -292,12 +292,12 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
 *
 *   The trigger source must be one of:
 *
-*       - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The trigger terminal on this MCC
-*         172 is used and not shared with other MCC 172s.
-*       - [SOURCE_MASTER](@ref SOURCE_MASTER): The trigger terminal on this MCC
-*         172 is used and is shared as the master trigger for other MCC 172s.
-*       - [SOURCE_SLAVE](@ref SOURCE_SLAVE): The trigger terminal on this MCC
-*         172 is not used, it receives its trigger from the master MCC 172.
+*   - [SOURCE_LOCAL](@ref SOURCE_LOCAL): The trigger terminal on this MCC
+*     172 is used and not shared with other MCC 172s.
+*   - [SOURCE_MASTER](@ref SOURCE_MASTER): The trigger terminal on this MCC
+*     172 is used and is shared as the master trigger for other MCC 172s.
+*   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): The trigger terminal on this MCC
+*     172 is not used, it receives its trigger from the master MCC 172.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param source   The trigger source, one of the
@@ -369,9 +369,9 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode);
 *   =====================      =========================
 *   Sample Rate                Buffer Size (per channel)
 *   =====================      =========================
-*   200-1024 S/s                 1 KS
-*   1280-10.24 KS/s             10 KS
-*   12.8, 25.6, 51.2 KS/s      100 KS
+*   200-1024 S/s                 1 kS
+*   1280-10.24 kS/s             10 kS
+*   12.8, 25.6, 51.2 kS/s      100 kS
 *   =====================      =========================
 *   \endverbatim
 *

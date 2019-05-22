@@ -270,7 +270,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
         The coefficients are applied in the library as: ::
 
-            calibrated_ADC_code = (raw_ADC_code * slope) + offset
+            calibrated_ADC_code = (raw_ADC_code - offset) * slope
 
         Returns:
             namedtuple: a namedtuple containing the following field names
@@ -306,7 +306,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
         The coefficients are applied in the library as: ::
 
-            calibrated_ADC_code = (raw_ADC_code * slope) + offset
+            calibrated_ADC_code = (raw_ADC_code - offset) * slope
 
         Args:
             slope (float): The new slope value.
@@ -457,7 +457,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
             * **clock_source** (:py:class:`SourceType`): The ADC clock source.
             * **sample_rate_per_channel** (float): The actual sampling rate in
-                samples per second per channel.
+              samples per second per channel.
             * **synchronized** (bool): True if the ADCs are synchronized, False
               if a synchronization is in progress.
 
@@ -618,13 +618,13 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         **Continuous mode:** Either **samples_per_channel** or the value in the
         table below, whichever is greater.
 
-        ===============      =========================
-        Sample Rate          Buffer Size (per channel)
-        ===============      =========================
-        200-1024 S/s         1 KS
-        1280-10.24 KS/s      10 KS
-        12.8 or higher       100 KS
-        ===============      =========================
+        =================      =========================
+        Sample Rate            Buffer Size (per channel)
+        =================      =========================
+        200-1024 S/s             1 kS
+        1280-10.24 kS/s         10 kS
+        12.8 kS or higher      100 kS
+        =================      =========================
 
         Specifying a very large value for samples_per_channel could use too much
         of the Raspberry Pi memory. If the memory allocation fails, the function
@@ -1012,7 +1012,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         Read the number of channels in the current analog input scan.
 
         Returns:
-            int: the number of channels (0 if no scan is active, 1-8 otherwise)
+            int: the number of channels (0 if no scan is active, 1-2 otherwise)
 
         Raises:
             HatError: the board is not initialized, does not respond, or

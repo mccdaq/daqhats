@@ -829,10 +829,14 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
             
         if (calibrated)
         {
-            // apply the appropriate cal factor to each sample in the list
-            buffer[count] *= dev->scan_info->slopes[
+            // apply the appropriate cal factors to each sample in the list
+            
+            // remove offset error
+            buffer[count] -= dev->scan_info->offsets[
                 dev->scan_info->channel_index];
-            buffer[count] += dev->scan_info->offsets[
+                
+            // remove gain error
+            buffer[count] *= dev->scan_info->slopes[
                 dev->scan_info->channel_index];
         }
 
