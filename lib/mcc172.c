@@ -26,6 +26,7 @@
 // *****************************************************************************
 // Constants
 #define DEBUG
+//#define RESET_ACTIVE_LOW
 
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
@@ -178,9 +179,9 @@ struct mcc172Device
     uint16_t handle_count;      // the number of handles open to this device
     uint16_t fw_version;        // firmware version
     int spi_fd;                 // SPI file descriptor
-    uint8_t trigger_source;      // Trigger source
+    uint8_t trigger_source;     // Trigger source
     uint8_t trigger_mode;       // Trigger mode
-    struct mcc172FactoryData factory_data;   // Factory data
+    struct mcc172FactoryData factory_data;  // Factory data
     struct mcc172ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
 
@@ -1123,7 +1124,11 @@ int mcc172_open(uint8_t address)
         }
 
         // ensure GPIO signals are initialized
+#ifdef RESET_ACTIVE_LOW        
+        gpio_write(RESET_GPIO, 1);
+#else
         gpio_write(RESET_GPIO, 0);
+#endif        
         gpio_dir(RESET_GPIO, 0);
         
         gpio_dir(IRQ_GPIO, 1);
@@ -2284,8 +2289,12 @@ int mcc172_open_for_update(uint8_t address)
         }
 
         // ensure GPIO signals are initialized
-        gpio_dir(RESET_GPIO, 0);
+#ifdef RESET_ACTIVE_LOW        
+        gpio_write(RESET_GPIO, 1);
+#else
         gpio_write(RESET_GPIO, 0);
+#endif
+        gpio_dir(RESET_GPIO, 0);
         
         gpio_dir(IRQ_GPIO, 1);
         
@@ -2361,13 +2370,18 @@ int mcc172_enter_bootloader(uint8_t address)
 
     // toggle reset until irq goes low (indicating ready for commands)
     count = 0;
-    while (gpio_status(IRQ_GPIO) && (count < 10))
+    while (gpio_status(IRQ_GPIO) && (count < 20))
     {
+#ifdef RESET_ACTIVE_LOW        
+        gpio_write(RESET_GPIO, 0);
+        usleep(2*1000ul);
+        gpio_write(RESET_GPIO, 1);
+#else
         gpio_write(RESET_GPIO, 1);
         usleep(2*1000ul);
         gpio_write(RESET_GPIO, 0);
+#endif        
         usleep(55*1000ul);
-        
         count++;
     }
 

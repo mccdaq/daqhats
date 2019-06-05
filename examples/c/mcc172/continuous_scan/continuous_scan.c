@@ -69,7 +69,7 @@ int main(void)
         return -1;
     }
     */
-    address = 3;
+    address = 0;
 
     printf ("\nSelected MCC 172 device at address %d\n", address);
 

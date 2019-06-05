@@ -60,7 +60,7 @@ double quadratic_interpolate(double bin0, double bin1, double bin2)
     y1 = fabs(bin0);
     y2 = fabs(bin1);
     y3 = fabs(bin2);
-    
+
     d = (y3 - y1) / (2 * (2 * y2 - y1 - y3));
 
     return d;
@@ -91,7 +91,7 @@ void calculate_real_fft(double* data, int n_samples, double max_v,
     fftw_complex* out;
     fftw_plan p;
     int i;
-    
+
     // Allocate the FFT buffers and create the plan.
     in = (double*)fftw_malloc(sizeof(double) * n_samples);
     out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (n_samples/2 + 1));
@@ -102,7 +102,7 @@ void calculate_real_fft(double* data, int n_samples, double max_v,
     {
         in[i] = window(i, n_samples) * data[i] / max_v;
     }
-    
+
     // Perform the FFT.
     fftw_execute(p);
 
@@ -189,7 +189,7 @@ int main(void)
         return -1;
     }
     */
-    address = 3;
+    address = 0;
     
     printf ("\nSelected MCC 172 device at address %d\n", address);
 
