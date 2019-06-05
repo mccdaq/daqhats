@@ -744,6 +744,7 @@ int mcc134_open(uint8_t address)
         for (i = 0; i < NUM_TC_CHANNELS; i++)
         {
             dev->tc_types[i] = TC_DISABLED;
+            dev->tc_codes[i] = 0;
         }
 
         if (custom_size > 0)
