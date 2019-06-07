@@ -12,8 +12,8 @@
 """
 from __future__ import print_function
 from sys import version_info
-from daqhats_utils import select_hat_device
 from daqhats import mcc152, OptionFlags, HatIDs, HatError
+from daqhats_utils import select_hat_device
 
 def get_input_value():
     """

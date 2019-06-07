@@ -54,7 +54,7 @@ def send_trigger(event, value1="", value2="", value3=""):
 def main():
     """ Main function """
     log_period = 5*60
-    
+
     if KEY == "<my_key>":
         print("The default key must be changed to the user's personal IFTTT "
               "Webhooks key before using this example.")
