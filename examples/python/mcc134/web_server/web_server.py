@@ -33,7 +33,7 @@ _app = Dash(__name__)   # pylint: disable=invalid-name,no-member
 _app.css.config.serve_locally = True
 _app.scripts.config.serve_locally = True
 
-_hat = None  # Store the hat object in a global for use in multiple callbacks.
+_HAT = None  # Store the hat object in a global for use in multiple callbacks.
 
 MCC134_CHANNEL_COUNT = 4
 
@@ -56,11 +56,12 @@ def create_hat_selector():
         hat_selection_options.append(option)
 
     selection = None
-    if len(hat_selection_options) > 0:
+    if hat_selection_options:
         selection = hat_selection_options[0]['value']
 
-    return dcc.Dropdown(id='hatSelector', options=hat_selection_options,
-                        value=selection, clearable=False)
+    return dcc.Dropdown(    # pylint: disable=no-member
+        id='hatSelector', options=hat_selection_options,
+        value=selection, clearable=False)
 
 
 def init_chart_data(number_of_channels, number_of_samples):
@@ -88,7 +89,7 @@ def init_chart_data(number_of_channels, number_of_samples):
 
 # Define the HTML layout for the user interface, consisting of
 # dash-html-components and dash-core-components.
-_tc_type_options = [{'label': 'J', 'value': TcTypes.TYPE_J},
+_TC_TYPE_OPTIONS = [{'label': 'J', 'value': TcTypes.TYPE_J},
                     {'label': 'K', 'value': TcTypes.TYPE_K},
                     {'label': 'T', 'value': TcTypes.TYPE_T},
                     {'label': 'E', 'value': TcTypes.TYPE_E},
@@ -97,6 +98,7 @@ _tc_type_options = [{'label': 'J', 'value': TcTypes.TYPE_J},
                     {'label': 'B', 'value': TcTypes.TYPE_B},
                     {'label': 'N', 'value': TcTypes.TYPE_N}]
 
+# pylint: disable=no-member
 _app.layout = html.Div([
     html.H1(
         children='MCC 134 DAQ HAT Web Server Example',
@@ -155,19 +157,19 @@ _app.layout = html.Div([
                                               'display': 'block',
                                               'margin-top': 10}),
                             dcc.Dropdown(id='tcTypeSelector0',
-                                         options=_tc_type_options,
+                                         options=_TC_TYPE_OPTIONS,
                                          value=TcTypes.TYPE_J,
                                          clearable=False),
                             dcc.Dropdown(id='tcTypeSelector1',
-                                         options=_tc_type_options,
+                                         options=_TC_TYPE_OPTIONS,
                                          value=TcTypes.TYPE_J,
                                          clearable=False),
                             dcc.Dropdown(id='tcTypeSelector2',
-                                         options=_tc_type_options,
+                                         options=_TC_TYPE_OPTIONS,
                                          value=TcTypes.TYPE_J,
                                          clearable=False),
                             dcc.Dropdown(id='tcTypeSelector3',
-                                         options=_tc_type_options,
+                                         options=_TC_TYPE_OPTIONS,
                                          value=TcTypes.TYPE_J,
                                          clearable=False)],
                         style={'float': 'left', 'width': 150,
@@ -197,6 +199,7 @@ _app.layout = html.Div([
         id='status',
         style={'display': 'none'}),
 ])
+# pylint: enable=no-member
 
 
 @_app.callback(
@@ -242,15 +245,15 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
                 hat_descriptor = json.loads(hat_descriptor_json_str)
                 # The hat object is retained as a global for use in
                 # other callbacks.
-                global _hat
-                _hat = mcc134(hat_descriptor['address'])
+                global _HAT     # pylint: disable=global-statement
+                _HAT = mcc134(hat_descriptor['address'])
 
-                if len(active_channels) > 0:
+                if active_channels:
                     # Set the TC type for all active channels to the selected TC
                     # type prior to acquiring data.
                     tc_types = [tc_type0, tc_type1, tc_type2, tc_type3]
                     for channel in active_channels:
-                        _hat.tc_type_write(channel, tc_types[channel])
+                        _HAT.tc_type_write(channel, tc_types[channel])
                     output = 'configured'
         elif button_label == 'Start':
             output = 'running'
@@ -355,6 +358,7 @@ def disable_channel_checkboxes(acq_state):
     [State('tcTypeSelectors', 'style')]
 )
 def disable_tc_type_selector_dropdowns(acq_state, div_style):
+    # pylint: disable=invalid-name
     """
     A callback function to disable all TC Type selector dropdowns when
     the application status changes to configured or running.
@@ -399,7 +403,7 @@ def update_start_stop_button_name(acq_state):
      State('samplesToDisplay', 'value'),
      State('channelSelections', 'values')]
 )
-def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
+def update_strip_chart_data(_n_intervals, acq_state, chart_data_json_str,
                             samples_to_display_val, active_channels):
     """
     A callback function to update the chart data stored in the chartData HTML
@@ -409,7 +413,7 @@ def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
     https://dash.plot.ly/sharing-data-between-callbacks).
 
     Args:
-        n_intervals (int): Number of timer intervals - triggers the callback.
+        _n_intervals (int): Number of timer intervals - triggers the callback.
         acq_state (str): The application state of "idle", "configured",
             "running" or "error" - triggers the callback.
         chart_data_json_str (str): A string representation of a JSON object
@@ -426,7 +430,7 @@ def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
     samples_to_display = int(samples_to_display_val)
     num_channels = len(active_channels)
     if acq_state == 'running':
-        hat = globals()['_hat']
+        hat = globals()['_HAT']
         if hat is not None:
             chart_data = json.loads(chart_data_json_str)
 
@@ -533,7 +537,7 @@ def update_strip_chart(chart_data_json_str, active_channels):
     data = []
     xaxis_range = [0, 1000]
     chart_data = json.loads(chart_data_json_str)
-    if 'samples' in chart_data and len(chart_data['samples']) > 0:
+    if 'samples' in chart_data and chart_data['samples']:
         xaxis_range = [min(chart_data['samples']), max(chart_data['samples'])]
     if 'data' in chart_data:
         data = chart_data['data']

@@ -34,7 +34,7 @@ _app = Dash(__name__)   # pylint: disable=invalid-name,no-member
 _app.css.config.serve_locally = True
 _app.scripts.config.serve_locally = True
 
-_hat = None  # Store the hat object in a global for use in multiple callbacks.
+_HAT = None  # Store the hat object in a global for use in multiple callbacks.
 
 MCC118_CHANNEL_COUNT = 8
 ALL_AVAILABLE = -1
@@ -59,11 +59,12 @@ def create_hat_selector():
         hat_selection_options.append(option)
 
     selection = None
-    if len(hat_selection_options) > 0:
+    if hat_selection_options:
         selection = hat_selection_options[0]['value']
 
-    return dcc.Dropdown(id='hatSelector', options=hat_selection_options,
-                        value=selection, clearable=False)
+    return dcc.Dropdown(        # pylint: disable=no-member
+        id='hatSelector', options=hat_selection_options,
+        value=selection, clearable=False)
 
 
 def init_chart_data(number_of_channels, number_of_samples):
@@ -91,6 +92,7 @@ def init_chart_data(number_of_channels, number_of_samples):
 
 # Define the HTML layout for the user interface, consisting of
 # dash-html-components and dash-core-components.
+# pylint: disable=no-member
 _app.layout = html.Div([
     html.H1(
         children='MCC 118 DAQ HAT Web Server Example',
@@ -173,7 +175,7 @@ _app.layout = html.Div([
         style={'display': 'none'}
     ),
 ])
-
+# pylint: enable=no-member
 
 @_app.callback(
     Output('status', 'children'),
@@ -209,15 +211,15 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
     if n_clicks is not None and n_clicks > 0:
         if button_label == 'Configure':
             if (1 < samples_to_display <= 1000
-                    and len(active_channels) > 0
+                    and active_channels
                     and sample_rate_val <= (100000 / len(active_channels))):
                 # If configuring, create the hat object.
                 if hat_descriptor_json_str:
                     hat_descriptor = json.loads(hat_descriptor_json_str)
                     # The hat object is retained as a global for use in
                     # other callbacks.
-                    global _hat
-                    _hat = mcc118(hat_descriptor['address'])
+                    global _HAT     # pylint: disable=global-statement
+                    _HAT = mcc118(hat_descriptor['address'])
                     output = 'configured'
             else:
                 output = 'error'
@@ -227,7 +229,7 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
             channel_mask = 0x0
             for channel in active_channels:
                 channel_mask |= 1 << channel
-            hat = globals()['_hat']
+            hat = globals()['_HAT']
             # Buffer 5 seconds of data
             samples_to_buffer = int(5 * sample_rate)
             hat.a_in_scan_start(channel_mask, samples_to_buffer,
@@ -237,7 +239,7 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
         elif button_label == 'Stop':
             # If stopping, call the a_in_scan_stop and a_in_scan_cleanup
             # functions.
-            hat = globals()['_hat']
+            hat = globals()['_HAT']
             hat.a_in_scan_stop()
             hat.a_in_scan_cleanup()
             output = 'idle'
@@ -390,7 +392,7 @@ def update_start_stop_button_name(acq_state):
      State('samplesToDisplay', 'value'),
      State('channelSelections', 'values')]
 )
-def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
+def update_strip_chart_data(_n_intervals, acq_state, chart_data_json_str,
                             samples_to_display_val, active_channels):
     """
     A callback function to update the chart data stored in the chartData HTML
@@ -400,7 +402,7 @@ def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
     https://dash.plot.ly/sharing-data-between-callbacks).
 
     Args:
-        n_intervals (int): Number of timer intervals - triggers the callback.
+        _n_intervals (int): Number of timer intervals - triggers the callback.
         acq_state (str): The application state of "idle", "configured",
             "running" or "error" - triggers the callback.
         chart_data_json_str (str): A string representation of a JSON object
@@ -417,7 +419,7 @@ def update_strip_chart_data(n_intervals, acq_state, chart_data_json_str,
     samples_to_display = int(samples_to_display_val)
     num_channels = len(active_channels)
     if acq_state == 'running':
-        hat = globals()['_hat']
+        hat = globals()['_HAT']
         if hat is not None:
             chart_data = json.loads(chart_data_json_str)
 
@@ -517,7 +519,7 @@ def update_strip_chart(chart_data_json_str, active_channels):
     data = []
     xaxis_range = [0, 1000]
     chart_data = json.loads(chart_data_json_str)
-    if 'samples' in chart_data and len(chart_data['samples']) > 0:
+    if 'samples' in chart_data and chart_data['samples']:
         xaxis_range = [min(chart_data['samples']), max(chart_data['samples'])]
     if 'data' in chart_data:
         data = chart_data['data']
