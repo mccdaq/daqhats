@@ -19,11 +19,11 @@
 """
 from __future__ import print_function
 from sys import version_info
-from daqhats_utils import select_hat_device
-from daqhats import mcc152, HatIDs, HatError, DIOConfigItem, \
+from daqhats import mcc152, HatIDs, DIOConfigItem, \
     interrupt_callback_enable, HatCallback, interrupt_callback_disable
+from daqhats_utils import select_hat_device
 
-# Use a global variable for our board object so it is accessible from the 
+# Use a global variable for our board object so it is accessible from the
 # interrupt callback.
 HAT = None
 
@@ -74,7 +74,8 @@ def main():
 
     print("\nUsing address {}.\n".format(address))
 
-    global HAT
+    global HAT  # pylint: disable=global-statement
+
     HAT = mcc152(address)
 
     # Reset the DIO to defaults (all channels input, pull-up resistors

@@ -331,6 +331,8 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
     buffer[3] = CMD_NOP;
     buffer[4] = CMD_NOP;
     
+    memset(rbuffer, 0, 5);
+
     if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) != 
         RESULT_SUCCESS)
     {
