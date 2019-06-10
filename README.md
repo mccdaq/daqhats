@@ -60,25 +60,27 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    will also detect the HAT board EEPROMs and save the contents, if needed.
 
    ```sh
-   cd ~/daqhats_dev
+   cd ~/daqhats
    sudo ./install.sh
    ```   
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot, 
 then repeat steps 5 - 7.
    
-You can now run the example programs under ~/daqhats_dev/examples and create your own 
+You can now run the example programs under ~/daqhats/examples and create your own 
 programs. Refer to the [Examples](#examples) section below for more information.
 
-There are simple control panel programs for each device type in ~/daqhats_dev/tools. These 
-may only be used when running the graphical version of Raspbian, and they provide easy 
-access to the main features of each device type.
+If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
+available under the Accessories start menu. This utility will allow you to list the
+detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
+control applications for each DAQ HAT to perform simple operations. The code for these
+programs is in the daqhats/tools/applications directory.
 
 #### List the installed boards
-You can use the tool **daqhats_list_boards** to display a list of the detected 
-MCC DAQ HATs.  This list is generated from the EEPROM images, so it will not be 
-correct if you change the board stack without updating the EEPROM images 
-(see below.)
+You can use the DAQ HAT Manager or the **daqhats_list_boards** command to display a
+list of the detected MCC DAQ HATs.  This list is generated from the EEPROM images, so
+it will not be correct if you change the board stack without updating the EEPROM
+images (see below.)
 
 #### Update the EEPROM images
 If you change your board stack, you must update the saved EEPROM images so that 
@@ -92,7 +94,7 @@ sudo daqhats_read_eeproms
 If you want to uninstall the the daqhats library, use the following commands:
 
 ```sh
-cd ~/daqhats_dev
+cd ~/daqhats
 sudo ./uninstall.sh
 ```
 
@@ -104,12 +106,12 @@ MCC 118 address in your board stack. This example demonstrates how to update the
 firmware on the MCC 118 that is installed at address 0.
 
 ```sh
-mcc118_firmware_update 0 ~/daqhats_dev/tools/MCC_118.hex
+mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
 ```
 
 ## Examples
 The daqhats library includes example programs developed with C/C++ and Python. 
-The examples are available under ~/daqhats_dev/examples, and are provided in the 
+The examples are available under ~/daqhats/examples, and are provided in the 
 following formats:
 
 - console-based (C/C++ and Python)
