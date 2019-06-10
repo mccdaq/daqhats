@@ -15,12 +15,15 @@
 """
 from __future__ import print_function
 import sys
-from daqhats_utils import select_hat_device
 from daqhats import mcc152, HatIDs, HatError, DIOConfigItem
+from daqhats_utils import select_hat_device
 
 def get_input():
+    """
+    Get a value from the user.
+    """
     max_value = (1 << mcc152.info().NUM_DIO_CHANNELS)
-    
+
     while True:
         # Wait for the user to enter a response
         message = "Enter the output value, non-numeric character to exit: "
@@ -84,14 +87,14 @@ def main():
     while run_loop and not error:
         write_value = get_input()
 
-        if write_value == None:
+        if write_value is None:
             run_loop = False
         else:
             try:
                 hat.dio_output_write_port(write_value)
             except (HatError, ValueError):
                 error = True
-        
+
         if error:
             print("Error writing the outputs.")
 

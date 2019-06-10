@@ -107,6 +107,47 @@ void convert_trigger_mode_to_string(uint8_t trigger_mode,
     return;
 }
 
+/* This function converts the thermocouple type defined by the tc_type
+   parameter to a string representation and returns the string
+   respresentation. */
+void convert_tc_type_to_string(uint8_t tc_type, 
+    char* tc_type_str)
+{
+    switch (tc_type) 
+    {
+    case TC_TYPE_J:
+        strcpy(tc_type_str, "J");
+        break;
+    case TC_TYPE_K:
+        strcpy(tc_type_str, "K");
+        break;
+    case TC_TYPE_T:
+        strcpy(tc_type_str, "T");
+        break;
+    case TC_TYPE_E:
+        strcpy(tc_type_str, "E");
+        break;
+    case TC_TYPE_R:
+        strcpy(tc_type_str, "R");
+        break;
+    case TC_TYPE_S:
+        strcpy(tc_type_str, "S");
+        break;
+    case TC_TYPE_B:
+        strcpy(tc_type_str, "B");
+        break;
+    case TC_TYPE_N:
+        strcpy(tc_type_str, "N");
+        break;
+    case TC_DISABLED:
+    default:
+        strcpy(tc_type_str, "DISABLED");
+        break;
+    }
+    return;
+}
+
+
 /* This function converts the mask of channels defined by the channel_mask
    parameter and sets the chans_str parameter, which is passed by reference,
    to a comma separated string respresentation of the channel numbers. */

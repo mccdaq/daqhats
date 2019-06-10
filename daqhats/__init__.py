@@ -6,3 +6,4 @@ from daqhats.hats import HatError, hat_list, HatIDs, TriggerModes, \
     interrupt_callback_enable, interrupt_callback_disable, HatCallback
 from daqhats.mcc118 import mcc118
 from daqhats.mcc152 import mcc152, DIOConfigItem
+from daqhats.mcc134 import mcc134, TcTypes

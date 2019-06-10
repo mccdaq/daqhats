@@ -12,10 +12,8 @@ single client.
 Enter the following commands to install the dependencies. 
 
    ```
-   pip install dash dash-renderer dash-html-components dash-core-components
+   pip install dash  
    ```
-
-Note: if later versions of Dash are installed they should be uninstalled before installing these versions.
 
 ## Start the web server
 1. To start the web server and run the example, open a terminal window and enter the 

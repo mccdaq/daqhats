@@ -53,6 +53,12 @@ def send_trigger(event, value1="", value2="", value3=""):
 
 def main():
     """ Main function """
+    log_period = 5*60
+
+    if KEY == "<my_key>":
+        print("The default key must be changed to the user's personal IFTTT "
+              "Webhooks key before using this example.")
+        sys.exit()
 
     # Find the first MCC 118
     mylist = hats.hat_list(filter_by_id=hats.HatIDs.MCC_118)
@@ -70,7 +76,7 @@ def main():
         send_trigger(EVENT_NAME, "{:.3f}".format(value_0),
                      "{:.3f}".format(value_1))
         print("Sent data {0:.3f}, {1:.3f}.".format(value_0, value_1))
-        time.sleep(5*60)
+        time.sleep(log_period)
 
 if __name__ == '__main__':
     main()
