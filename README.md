@@ -56,8 +56,9 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    git clone https://github.com/mccdaq/daqhats.git
    ```
 7. Build and install the shared library, tools, and optional Python support. The 
-   installer will ask if you want to install Python 2 support. It 
-   will also detect the HAT board EEPROMs and save the contents, if needed.
+   installer will install Python 3 support by default and ask if you want to install
+   Python 2 support. It will also detect the HAT board EEPROMs and save the contents,
+   if needed.
 
    ```sh
    cd ~/daqhats
@@ -84,7 +85,8 @@ images (see below.)
 
 #### Update the EEPROM images
 If you change your board stack, you must update the saved EEPROM images so that 
-the library has the correct board information:
+the library has the correct board information. You can use the DAQ HAT Manager or the
+command:
 
 ```sh
 sudo daqhats_read_eeproms
