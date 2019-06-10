@@ -788,8 +788,8 @@ RECURSIVE              = NO
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../../lib/cJSON.h ../../lib/cJSON.c 
-#../../lib/gpio.h ../../lib/gpio.c ../../lib/nist.h ../../lib/nist.c
+EXCLUDE                = ../../lib/cJSON.h ../../lib/cJSON.c  ../../lib/nist.h ../../lib/nist.c
+#../../lib/gpio.h ../../lib/gpio.c
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

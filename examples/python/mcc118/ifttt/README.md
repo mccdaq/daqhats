@@ -49,7 +49,7 @@ value.
     key = "<my_key>"
     ```
 
-## Start the IFTTT trigger service
+## Start the IFTTT logging service
 1. Open ifttt_log.py from an IDE, or execute in a terminal window:  
    ```sh
    cd ~/daqhats/examples/python/mcc118/ifttt
@@ -61,6 +61,11 @@ signed in.
 3. Open the Google Sheets file named **voltage_data** in the path specified when
 you created the applet. The spreadsheet dynamically updates with data as it is
 acquired.
+
+> If your applet fails to run, verify the trigger and action settings. 
+> Some users may need to edit or update their connection settings to work with 
+the Google Sheets service. This may be found by searching for Google Sheets in 
+the **Services** section of **My Applets**, then selecting **Settings**.
 
 ## Support/Feedback
 Contact technical support through our 

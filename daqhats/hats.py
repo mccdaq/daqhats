@@ -3,13 +3,16 @@ Wraps the global methods from the MCC Hat library for use in Python.
 """
 from collections import namedtuple
 from ctypes import cdll, Structure, c_ubyte, c_ushort, c_char, c_int, POINTER, \
-    CFUNCTYPE, cast, py_object, c_void_p, pointer
+    CFUNCTYPE, c_void_p
 from enum import IntEnum
+
+_HAT_CALLBACK = None
 
 class HatIDs(IntEnum):
     """Known MCC HAT IDs."""
     ANY = 0             #: Match any MCC ID in :py:func:`hat_list`
     MCC_118 = 0x0142    #: MCC 118 ID
+    MCC_134 = 0x0143    #: MCC 134 ID
     MCC_152 = 0x0144    #: MCC 152 ID
 
 class TriggerModes(IntEnum):
@@ -28,6 +31,7 @@ class OptionFlags(IntEnum):
     EXTCLOCK = 0x0004        #: Use an external clock source.
     EXTTRIGGER = 0x0008      #: Use an external trigger source.
     CONTINUOUS = 0x0010      #: Run until explicitly stopped.
+    TEMPERATURE = 0x0020     #: Return temperature (MCC 134)
 
 # exception class
 class HatError(Exception):
@@ -75,7 +79,7 @@ class HatCallback(object):
         if not callable(function):
             raise TypeError("Argument 1 must be a function or method.")
         self.function = function
-        self.cbfunctype = CFUNCTYPE(None, c_void_p)
+        self.cbfunctype = CFUNCTYPE(None)
         self.cbfunc = None
         self.user_data = None
 
@@ -85,7 +89,7 @@ class HatCallback(object):
         get passed to the library function, and assign it to a variable to
         avoid it getting garbage collected.
         """
-        def func(user_data):
+        def func():
             """
             Function wrapper.
             """
@@ -96,7 +100,7 @@ class HatCallback(object):
     def handle_callback(self):
         """
         This is directly called from the interrupt thread. It calls the user's
-        callback, passing the user_data object that gets set with 
+        callback, passing the user_data object that gets set with
         interrupt_callback_enable().
         """
         self.function(self.user_data)
@@ -180,15 +184,15 @@ def interrupt_state():
 
     This function only applies when using devices that can generate an
     interrupt:
-    
+
     * MCC 152
-        
+
     Returns:
         bool: The interrupt status.
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return False
 
     _libc.hat_interrupt_state.argtypes = []
     _libc.hat_interrupt_state.restype = c_int
@@ -204,11 +208,11 @@ def wait_for_interrupt(timeout):
 
     Pass a timeout in seconds. Pass -1 to wait forever or 0 to return
     immediately. If the interrupt has not occurred before the timeout elapses
-    the function will return 0.
+    the function will return False.
 
     This function only applies when using devices that can generate an
     interrupt:
-    
+
     * MCC 152
 
     Returns:
@@ -217,7 +221,7 @@ def wait_for_interrupt(timeout):
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return False
 
     _libc.hat_wait_for_interrupt.argtypes = [c_int]
     _libc.hat_wait_for_interrupt.restype = c_int
@@ -252,8 +256,8 @@ def interrupt_callback_enable(callback, user_data):
     if an interrupt occurs. The data argument to this function will be passed
     to the callback function when it is called.
 
-    The callback function must be encapsulated in a :py:class:`HatCallback`
-    class. For example: ::
+    The callback function must have the form "callback(user_data)". For
+    example: ::
 
         def my_function(data):
             # This is my callback function.
@@ -261,8 +265,7 @@ def interrupt_callback_enable(callback, user_data):
             data[0] += 1
 
         value = [0]
-        callback = HatCallback(my_function)
-        interrupt_enable_callback(callback, value)
+        interrupt_enable_callback(my_function, value)
 
     In this example *my_function()* will be called when the interrupt occurs,
     and the list *value* will be passed as the user_data. Inside the callback it
@@ -277,12 +280,11 @@ def interrupt_callback_enable(callback, user_data):
 
     This function only applies when using devices that can generate an
     interrupt:
-    
+
     * MCC 152
 
     Args:
-        callback (:py:class:`HatCallback`): The callback function encapsulated
-            in a :py:class:`HatCallback` class.
+        callback (callback function): The callback function.
         user_data (object)      Optional Python object or data to pass to the
             callback function.
 
@@ -291,14 +293,17 @@ def interrupt_callback_enable(callback, user_data):
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return
 
-    # callback must be an instance of HatCallback
-    if not isinstance(callback, HatCallback):
-        raise TypeError("Argument 1 must be an instance of HatCallback")
+    # callback must be an instance of HatCallback; legacy code may already
+    # encapsulate it, so handle both cases
+    if isinstance(callback, HatCallback):
+        my_callback = callback
+    else:
+        my_callback = HatCallback(callback)
 
     # function argtype is provided by callback class
-    _libc.hat_interrupt_callback_enable.argtypes = [callback.cbfunctype,
+    _libc.hat_interrupt_callback_enable.argtypes = [my_callback.cbfunctype,
                                                     c_void_p]
     _libc.hat_interrupt_callback_enable.restype = c_int
 
@@ -309,6 +314,9 @@ def interrupt_callback_enable(callback, user_data):
     if (_libc.hat_interrupt_callback_enable(callback.get_callback_func(),
                                             None) != 0):
         raise Exception("Could not enable callback function.")
+    # save reference so it isn't garbage collected
+    global _HAT_CALLBACK # pylint: disable=global-statement
+    _HAT_CALLBACK = my_callback
 
 def interrupt_callback_disable():
     """
@@ -319,13 +327,13 @@ def interrupt_callback_disable():
     """
     _libc = _load_daqhats_library()
     if _libc == 0:
-        return []
+        return
 
     _libc.hat_interrupt_callback_disable.argtypes = []
     _libc.hat_interrupt_callback_disable.restype = c_int
 
     if _libc.hat_interrupt_callback_disable() != 0:
-        raise Exception("Could not disabled callback function.")
+        raise Exception("Could not disable callback function.")
 
 class Hat(object): # pylint: disable=too-few-public-methods
     """
