@@ -208,22 +208,27 @@
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.</p>
 <p>You can now run the example programs under ~/daqhats/examples and create your own programs.</p>
+<p>If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
+available under the Accessories start menu. This utility will allow you to list the
+detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
+control applications for each DAQ HAT to perform simple operations. The code for these
+programs is in the daqhats/tools/applications directory.</p>
+<p>You may display a list of the detected boards at any time with the DAQ HAT Manager or
+the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">daqhats_list_boards</span>
+</pre></div>
+</div>
+<p>If you change your board stackup and have more than one HAT board attached you must
+update the saved EEPROM images for the library to have the correct board information.
+You can use the DAQ HAT Manager or the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">daqhats_read_eeproms</span>
+</pre></div>
+</div>
 <p>To uninstall the package use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">daqhats</span>
 <span class="n">sudo</span> <span class="o">./</span><span class="n">uninstall</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
-<p>If you change your board stackup and have more than one HAT board attached you must update the saved EEPROM images for the library to have the correct board information:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">daqhats_read_eeproms</span>
-</pre></div>
-</div>
-<p>You may display a list of the detected boards at any time with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">daqhats_list_boards</span>
-</pre></div>
-</div>
-<p>There are simple control panel programs for each device type in the tools directory.
-These may only be used under the graphical version of Raspbian, and provide easy
-access to the main features of each device type.</p>
 </div>
 <div class="section" id="firmware-updates">
 <h2>Firmware Updates<a class="headerlink" href="#firmware-updates" title="Permalink to this headline">¶</a></h2>

@@ -27,7 +27,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 ## Install Instructions
 1. Power off the Raspberry Pi and attach one or more DAQ HAT boards, using unique 
    address settings for each. Refer to 
-   [Installing the HAT board](https://nwright-mcc.github.io/daqhats/hardware.html) 
+   [Installing the HAT board](https://mccdaq.github.io/daqhats/hardware.html) 
    for detailed information.
    When using a single board, leave it at address 0 (all address jumpers removed.) 
    One board must always be at address 0 to ensure that the OS reads a HAT EEPROM
@@ -53,7 +53,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 
    ```sh
    cd ~
-   git clone https://github.com/nwright-mcc/daqhats.git daqhats_dev
+   git clone https://github.com/mccdaq/daqhats.git
    ```
 7. Build and install the shared library, tools, and optional Python support. The 
    installer will install Python 3 support by default and ask if you want to install
@@ -61,7 +61,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    if needed.
 
    ```sh
-   cd ~/daqhats_dev
+   cd ~/daqhats
    sudo ./install.sh
    ```   
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
@@ -96,7 +96,7 @@ sudo daqhats_read_eeproms
 If you want to uninstall the the daqhats library, use the following commands:
 
 ```sh
-cd ~/daqhats_dev
+cd ~/daqhats
 sudo ./uninstall.sh
 ```
 
@@ -113,7 +113,7 @@ mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
 
 ## Examples
 The daqhats library includes example programs developed with C/C++ and Python. 
-The examples are available under ~/daqhats_dev/examples, and are provided in the 
+The examples are available under ~/daqhats/examples, and are provided in the 
 following formats:
 
 - console-based (C/C++ and Python)
@@ -159,4 +159,4 @@ our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
 ## Documentation 
 Documentation for the daqhats library is available at 
-https://nwright-mcc.github.io/daqhats/index.html.
+https://mccdaq.github.io/daqhats/index.html.

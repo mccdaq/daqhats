@@ -73,22 +73,6 @@ firmware on the MCC 118 that is installed at address 0::
 
     mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
 
-There are simple control panel programs for each device type in the tools directory.
-These may only be used under the graphical version of Raspbian, and provide easy
-access to the main features of each device type.
-
-Firmware Updates
-****************
-
-MCC 118
--------
-Use the firmware update tool to update the firmware on your MCC 118 board(s).
-The "0" in the example below is the board address. Repeat the command for each
-MCC 118 address in your board stack. This example demonstrates how to update the
-firmware on the MCC 118 that is installed at address 0::
-
-    mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
-
 Creating a C program
 ********************
 
