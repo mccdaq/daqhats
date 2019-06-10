@@ -22,10 +22,10 @@
 """
 from __future__ import print_function
 from sys import stdout
-from daqhats_utils import (enum_mask_to_string, chan_list_to_mask,
-                           validate_channels)
 from daqhats import (hat_list, mcc118, OptionFlags, HatIDs, TriggerModes,
                      HatError)
+from daqhats_utils import (enum_mask_to_string, chan_list_to_mask,
+                           validate_channels)
 
 # Constants
 DEVICE_COUNT = 2

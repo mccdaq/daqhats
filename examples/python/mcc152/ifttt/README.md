@@ -31,7 +31,7 @@ contains "DIO trigger occurred" (without quotes) and the body so it contains
 (without quotes). Click the **Create action** button.
 7. Review the summary statement, then click the **Finish** button.
 
-## Obtain the IFTTT WebHooks Documentation key 
+## Obtain the IFTTT WebHooks Documentation key
 Update the variable "key" in the example program with the key from the IFTTT
 Webhooks documentation for the variable "key".  You can find this key by:
 1. At [https://ifttt.com](https://ifttt.com) click **My Applets** and then
@@ -57,6 +57,11 @@ value.
    
 2. Shortly after a change occurs on DIO 0 you should receive an email from the
 IFTTT service.
+
+> If your applet fails to run, verify the trigger and action settings. 
+> Some users may need to edit or update their connection settings to work with 
+the Email service. This may be found by searching for Email in the **Services** 
+section of **My Applets**, then selecting **Settings**.
 
 ## Support/Feedback
 Contact technical support through our 

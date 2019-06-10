@@ -40,6 +40,7 @@ Methods
     :py:func:`mcc152.dio_config_read_bit`        Read a digital I/O configuration item value for a single channel.
     :py:func:`mcc152.dio_config_read_port`       Read a digital I/O configuration item value for all channels.
     :py:func:`mcc152.dio_config_read_tuple`      Read a digital I/O configuration item value for all channels as a tuple.
+    :py:func:`mcc152.address`                    Read the board's address.
     ===========================================  ========================================================================
 
 Data

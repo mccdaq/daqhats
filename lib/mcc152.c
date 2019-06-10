@@ -229,7 +229,7 @@ int mcc152_open(uint8_t address)
             }
             else
             {
-                return RESULT_BAD_PARAMETER;
+                return RESULT_INVALID_DEVICE;
             }
         }
         else
@@ -248,7 +248,7 @@ int mcc152_open(uint8_t address)
         dev->handle_count = 1;
         dev->spi_device = 0;
         
-        if (custom_size > 0) 
+        if (custom_size > 0)
         {
             // if the EEPROM is initialized then use the version to determine
             // which SPI device is used for the DAC
@@ -259,19 +259,33 @@ int mcc152_open(uint8_t address)
 
             // convert the JSON custom data to parameters
             cJSON* root = cJSON_Parse(custom_data);
-            if (!_parse_factory_data(root, &dev->factory_data))
+            if (root == NULL)
             {
-                // invalid custom data, use default values
+                // error parsing the JSON data
                 _set_defaults(&dev->factory_data);
+                printf("Warning - address %d using factory EEPROM default "
+                    "values\n", address);
             }
-            cJSON_Delete(root);
-            
+            else
+            {
+                if (!_parse_factory_data(root, &dev->factory_data))
+                {
+                    // invalid custom data, use default values
+                    _set_defaults(&dev->factory_data);
+                    printf("Warning - address %d using factory EEPROM default "
+                        "values\n", address);
+                }
+                cJSON_Delete(root);
+            }
+
             free(custom_data);
         }
         else
         {
             // use default parameters, board probably has an empty EEPROM.
             _set_defaults(&dev->factory_data);
+            printf("Warning - address %d using factory EEPROM default "
+                "values\n", address);
         }
 
         // initialize the DAC

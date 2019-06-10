@@ -14,12 +14,11 @@ from tkinter import messagebox
 #import tkMessageBox
 import tkinter.font
 
-class MCC152ControlApp:
+class ControlApp:
     
     def __init__(self, master):
         self.master = master
-        title = "MCC 152 Control Panel"
-        master.title(title)
+        master.title("MCC 152 Control Panel")
     
         # Initialize variables
         self.device_open = False
@@ -27,22 +26,11 @@ class MCC152ControlApp:
         self.board = None
 
         # GUI Setup
-        titlefont = tkinter.font.Font(
-            family=tkinter.font.nametofont("TkCaptionFont")["family"],
-            size=tkinter.font.nametofont("TkCaptionFont")["size"],
-            weight=tkinter.font.nametofont("TkCaptionFont")["weight"])
-        titlewidth = titlefont.measure(title)
-        master.minsize(titlewidth + 160, 0)
-        
-        master.resizable(False, False)
-        
+
         self.BOLD_FONT = tkinter.font.Font(
             family=tkinter.font.nametofont("TkDefaultFont")["family"],
             size=tkinter.font.nametofont("TkDefaultFont")["size"],
             weight="bold")
-
-        img = Image("photo", file="/usr/share/mcc/daqhats/icon.png")
-        master.tk.call('wm', 'iconphoto', master._w, img)
 
         # Create and organize frames
         self.top_frame = LabelFrame(master, text="Select Device")
@@ -241,10 +229,6 @@ class MCC152ControlApp:
         self.master.destroy()
 
 
-def main():
-    root = Tk()
-    MCC152ControlApp(root)
-    root.mainloop()
-
-if __name__ == '__main__':
-    main()
+root = Tk()
+app = ControlApp(root)
+root.mainloop()

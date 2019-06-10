@@ -15,12 +15,15 @@
 """
 from __future__ import print_function
 import sys
-from daqhats_utils import select_hat_device
 from daqhats import mcc152, HatIDs, HatError, DIOConfigItem
+from daqhats_utils import select_hat_device
 
 def get_channel():
+    """
+    Get a channel number from the user.
+    """
     num_channels = mcc152.info().NUM_DIO_CHANNELS
-    
+
     while True:
         # Wait for the user to enter a response
         message = "Enter a channel between 0 and {},".format(num_channels - 1)
@@ -45,6 +48,9 @@ def get_channel():
                 return value
 
 def get_value():
+    """
+    Get a value from the user.
+    """
     while True:
         # Wait for the user to enter a response
         message = ("Enter the output value, 0 or 1, non-numeric character to "
@@ -69,14 +75,17 @@ def get_value():
                 return value
 
 def get_input():
+    """
+    Get a channel and value from the user.
+    """
     channel = get_channel()
-    if channel == None:
+    if channel is None:
         return (None, None)
-        
+
     value = get_value()
-    if value == None:
+    if value is None:
         return (None, None)
-    
+
     print()
     return (channel, value)
 
@@ -120,14 +129,14 @@ def main():
     while run_loop and not error:
         channel, value = get_input()
 
-        if channel == None:
+        if channel is None:
             run_loop = False
         else:
             try:
                 hat.dio_output_write_bit(channel, value)
             except (HatError, ValueError):
                 error = True
-        
+
         if error:
             print("Error writing the output.")
 

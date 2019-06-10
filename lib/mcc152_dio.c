@@ -3,13 +3,21 @@
 *   Measurement Computing Corp.
 *   This file contains functions used with the I/O expander on the MCC 152.
 *
-*   07/18/2018
+*   05/14/2019
 */
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+/*
+ * linux/i2c-dev.h provided by i2c-tools contains the symbols defined in linux/i2c.h.
+ * The i2c.h will be only included if a well-known symbol is not defined, because it
+ * can redefine symbols and break the build.
+ */
+#ifndef I2C_FUNC_I2C
+#include <linux/i2c.h>
+#endif
+
 #include "daqhats.h"
 #include "util.h"
 #include "mcc152_dio.h"

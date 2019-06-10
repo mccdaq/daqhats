@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.1.0 documentation</title>
+  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.2.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.1.0
+                1.2.0
               </div>
             
           
@@ -106,21 +106,37 @@
 <li class="toctree-l3"><a class="reference internal" href="#specifications">Specifications</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#mcc-152">MCC 152</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-134">MCC 134</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Board components</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id2">Screw terminals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id3">Address jumpers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#dio-power-jumper-w3">DIO Power jumper (W3)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id4">Status LED</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id5">Header connector</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#id6">Functional block diagram</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id7">Functional details</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs">Mixing 3.3V and 5V digital inputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#best-practices-for-accurate-thermocouple-measurements">Best practices for accurate thermocouple measurements</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#id8">Specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-152">MCC 152</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id9">Board components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id10">Screw terminals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Address jumpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dio-power-jumper-w3">DIO Power jumper (W3)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">Status LED</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id13">Header connector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">Functional block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id15">Functional details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs">Mixing 3.3V and 5V digital inputs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id16">Specifications</a></li>
 </ul>
 </li>
 </ul>
@@ -273,6 +289,78 @@ firmware on the MCC 118 that is installed at address 0:</p>
 <p><a class="reference external" href="_static/esmcc118.pdf">MCC 118 Electrical Specifications</a></p>
 </div>
 </div>
+<div class="section" id="mcc-134">
+<h2>MCC 134<a class="headerlink" href="#mcc-134" title="Permalink to this headline">¶</a></h2>
+<p>The MCC 134 is a 4-channel thermocouple input board with the following features:</p>
+<ul class="simple">
+<li>24-bit A/D converter</li>
+<li>Onboard sensor for cold junction compensation</li>
+<li>Linearization for J, K, R, S, T, N, E, B type thermocouples</li>
+<li>Open thermocouple detection</li>
+<li>Thermocouple inputs are electrically isolated from the Raspberry Pi for use in harsh environments</li>
+</ul>
+<img alt="MCC 134 circuit board" class="align-center" src="_images/mcc134-web.jpg" />
+<div class="section" id="id1">
+<h3>Board components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Screw terminals<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (+x-): Differential thermocouple input terminals.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h4>Address jumpers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h4>Status LED<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>The LED turns on when the board is connected to a Raspberry Pi with external power applied.</p>
+</div>
+<div class="section" id="id5">
+<h4>Header connector<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>Functional block diagram<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<img alt="MCC 134 block diagram" class="align-center" src="_images/mcc134-diag-web.jpg" />
+</div>
+<div class="section" id="id7">
+<h3>Functional details<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="best-practices-for-accurate-thermocouple-measurements">
+<h4>Best practices for accurate thermocouple measurements<a class="headerlink" href="#best-practices-for-accurate-thermocouple-measurements" title="Permalink to this headline">¶</a></h4>
+<p>The MCC 134 should achive results within the the maximum thermocouple
+accuracy specifications when operating within the documented environmental
+conditions. Operating in conditions with excessive temperature transients or
+airflow may affect results. In most cases, the MCC 134 will achieve the
+typical specifications. To achieve the most accurate thermocouple readings,
+MCC recommends the following practices:</p>
+<ul class="simple">
+<li><em>Reduce the load on the Raspberry Pi processor.</em> Running a program that fully
+loads all 4 cores on the Raspberry Pi processor can raise the temperature
+of the processor above 70 °C. Running a program that only loads 1 core will
+operate approximately 20 °C cooler.</li>
+<li><em>Minimize environmental temperature variations.</em> Place the MCC 134 away from
+heat or cooling sources that cycle on and off. Sudden environmental changes
+may lead to increased errors.</li>
+<li><em>Provide a steady airflow, such as from a fan.</em> A steady airflow can
+dissipate heat and reduce errors.</li>
+<li><em>When configuring multiple MCC DAQ Hats in a stack, position the MCC 134
+farthest from the Raspberry Pi board.</em> Since the Raspberry Pi is a
+significant heat source, placing the MCC 134 farthest from the Pi will
+increase accuracy.</li>
+</ul>
+<p>For additional information, refer to the <a class="reference external" href="https://www.mccdaq.com/TechTips/TechTip-11.aspx">Measuring Thermocouples with Raspberry Pi
+and the MCC 134</a> Tech Tip.</p>
+</div>
+</div>
+<div class="section" id="id8">
+<h3>Specifications<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="_static/esmcc134.pdf">MCC 134 Electrical Specifications</a></p>
+</div>
+</div>
 <div class="section" id="mcc-152">
 <h2>MCC 152<a class="headerlink" href="#mcc-152" title="Permalink to this headline">¶</a></h2>
 <p>The MCC 152 is an analog output / digital I/O board with the following features:</p>
@@ -295,10 +383,10 @@ firmware on the MCC 118 that is installed at address 0:</p>
 </li>
 </ul>
 <img alt="MCC 152 circuit board" class="align-center" src="_images/mcc152-web.jpg" />
-<div class="section" id="id1">
-<h3>Board components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id2">
-<h4>Screw terminals<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id9">
+<h3>Board components<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h4>Screw terminals<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><strong>AO0</strong> to <strong>AO1</strong> (AOx): Analog output terminals.</li>
 <li><strong>DIO0</strong> to <strong>DIO7</strong> (DIOx): Digital input/output terminals.</li>
@@ -308,8 +396,8 @@ with jumper W3.)</li>
 <li><strong>DGND</strong> (DGND): Common ground for the digital I/O terminals.</li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h4>Address jumpers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id11">
+<h4>Address jumpers<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
 <li><strong>A0</strong> to <strong>A2</strong>: Used to identify each DAQ HAT when multiple boards are
 connected. The first DAQ HAT connected to the Raspberry Pi must be at address 0
@@ -326,23 +414,23 @@ Refer to <a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs"
 the DIO supply voltage.</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h4>Status LED<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id12">
+<h4>Status LED<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external power
 applied.</p>
 </div>
-<div class="section" id="id5">
-<h4>Header connector<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="id13">
+<h4>Header connector<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a>
 for more information about the header connector.</p>
 </div>
 </div>
-<div class="section" id="id6">
-<h3>Functional block diagram<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id14">
+<h3>Functional block diagram<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
 <img alt="MCC 152 block diagram" class="align-center" src="_images/mcc152-diag-web.jpg" />
 </div>
-<div class="section" id="id7">
-<h3>Functional details<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id15">
+<h3>Functional details<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="mixing-3-3v-and-5v-digital-inputs">
 <h4>Mixing 3.3V and 5V digital inputs<a class="headerlink" href="#mixing-3-3v-and-5v-digital-inputs" title="Permalink to this headline">¶</a></h4>
 <p>The MCC 152 digital inputs are tolerant of 5V signals when the DIO is set to 3.3V
@@ -354,8 +442,8 @@ using a series resistor of 700 ohms or larger.</p>
 <img alt="MCC 152 resistor example" class="align-center" src="_images/mcc152-resistor-example-web.png" />
 </div>
 </div>
-<div class="section" id="id8">
-<h3>Specifications<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>Specifications<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <p><a class="reference external" href="_static/esmcc152.pdf">MCC 152 Electrical Specifications</a></p>
 </div>
 </div>
@@ -381,7 +469,7 @@ using a series resistor of 700 ohms or larger.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Measurement Computing.
+        &copy; Copyright 2019, Measurement Computing.
 
     </p>
   </div>
@@ -403,7 +491,7 @@ using a series resistor of 700 ohms or larger.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.1.0',
+            VERSION:'1.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
