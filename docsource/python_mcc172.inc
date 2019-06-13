@@ -25,10 +25,10 @@ Methods
     :py:func:`mcc172.calibration_date`                  Read the calibration date.
     :py:func:`mcc172.calibration_coefficient_read`      Read the calibration coefficients for a channel.
     :py:func:`mcc172.calibration_coefficient_write`     Write the calibration coefficients for a channel.
-    :py:func:`iepe_config_read`                         Read the IEPE configuration for a channel.
-    :py:func:`iepe_config_write`                        Write the IEPE configuration for a channel.
-    :py:func:`a_in_clock_config_read`                   Read the sampling clock configuration.
-    :py:func:`a_in_clock_config_write`                  Write the sampling clock configuration.
+    :py:func:`mcc172.iepe_config_read`                  Read the IEPE configuration for a channel.
+    :py:func:`mcc172.iepe_config_write`                 Write the IEPE configuration for a channel.
+    :py:func:`mcc172.a_in_clock_config_read`            Read the sampling clock configuration.
+    :py:func:`mcc172.a_in_clock_config_write`           Write the sampling clock configuration.
     :py:func:`mcc172.trigger_config`                    Configure the external trigger input.
     :py:func:`mcc172.a_in_scan_actual_rate`             Read the actual sample rate for a requested sample rate.
     :py:func:`mcc172.a_in_scan_start`                   Start a hardware-paced analog input scan.

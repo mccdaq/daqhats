@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.2.0 documentation</title>
+  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.3.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.2.0
+                1.3.0
               </div>
             
           
@@ -137,6 +137,25 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#id16">Specifications</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mcc-172">MCC 172</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id17">Board components</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#connectors">10-32 connectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id18">Screw terminals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id19">Address jumpers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id20">Status LED</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id21">Header connector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id22">Functional block diagram</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id23">Functional details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#adc-clock">ADC clock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id24">Trigger</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#id25">Firmware updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id26">Specifications</a></li>
 </ul>
 </li>
 </ul>
@@ -447,6 +466,100 @@ using a series resistor of 700 ohms or larger.</p>
 <p><a class="reference external" href="_static/esmcc152.pdf">MCC 152 Electrical Specifications</a></p>
 </div>
 </div>
+<div class="section" id="mcc-172">
+<h2>MCC 172<a class="headerlink" href="#mcc-172" title="Permalink to this headline">¶</a></h2>
+<p>The MCC 172 is a 2-channel analog voltage input board with the following features:</p>
+<ul class="simple">
+<li>Two 24-bit, 51.2 kS/s A/D converters (one per channel)</li>
+<li>±5 V AC coupled differential analog inputs</li>
+<li>IEPE sensor support</li>
+<li>10-32 and screw terminal connectors for the analog inputs</li>
+<li>ADC conversions can be synchronized between multiple boards</li>
+<li>Onboard sample buffers</li>
+<li>Digital trigger input</li>
+</ul>
+<img alt="MCC 172 circuit board" class="align-center" src="_images/mcc118-web.jpg" />
+<div class="section" id="id17">
+<h3>Board components<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="connectors">
+<h4>10-32 connectors<a class="headerlink" href="#connectors" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Ch 0</strong> and <strong>Ch 1</strong>: Analog input connectors (do not use both 10-32 and
+screw terminals at the same time for an input channel).</li>
+</ul>
+</div>
+<div class="section" id="id18">
+<h4>Screw terminals<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>Ch 0</strong> and <strong>Ch 1</strong>: Analog input terminals  (do not use both 10-32 and
+screw terminals at the same time for an input channel).</li>
+<li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode
+is software configurable for edge or level sensitive, rising or falling edge,
+high or low level.</li>
+<li><strong>DGND</strong> (GND): Digital ground for the trigger terminal.</li>
+</ul>
+</div>
+<div class="section" id="id19">
+<h4>Address jumpers<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected.
+The first HAT connected to the Raspberry Pi must be at address 0 (no jumper).
+Install jumpers on each additional connected board to set the desired address.
+Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended
+addressing method.</li>
+</ul>
+</div>
+<div class="section" id="id20">
+<h4>Status LED<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
+<p>The LED turns on when the board is connected to a Raspberry Pi with external
+power applied and flashes when communicating with the board. The LED may be
+blinked by the user.</p>
+</div>
+<div class="section" id="id21">
+<h4>Header connector<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<p>The board header is used to connect with the Raspberry Pi. Refer to
+<a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
+</div>
+</div>
+<div class="section" id="id22">
+<h3>Functional block diagram<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<img alt="MCC 172 block diagram" class="align-center" src="_images/mcc172-diag-web.png" />
+</div>
+<div class="section" id="id23">
+<h3>Functional details<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="adc-clock">
+<h4>ADC clock<a class="headerlink" href="#adc-clock" title="Permalink to this headline">¶</a></h4>
+<p>The ADCs on a board share the same clock and are synchronized to start
+conversions at the same time for synchronous data.  The clock and synchronize
+signals may also be shared across the Raspberry Pi GPIO header to synchronize
+multiple MCC 172s.  The clock is programmable for various sampling rates between
+51.2 kS/s and 200 S/s.</p>
+</div>
+<div class="section" id="id24">
+<h4>Trigger<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+<p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog
+input scan until the desired condition is met at the trigger input.  The trigger
+input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition
+may be rising edge, falling edge, high level, or low level.  The trigger may
+also be shared across the Raspberry Pi GPIO header to synchronize multiple
+MCC 172s.</p>
+</div>
+</div>
+<div class="section" id="id25">
+<h3>Firmware updates<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<p>Use the firmware update tool to update the firmware on your MCC 172 board(s).
+The “0” in the example below is the board address. Repeat the command for each
+MCC 172 address in your board stack. This example demonstrates how to update the
+firmware on the MCC 172 that is installed at address 0:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc172_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_172</span><span class="o">.</span><span class="n">fw</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id26">
+<h3>Specifications<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference external" href="_static/esmcc118.pdf">MCC 172 Electrical Specifications</a></p>
+</div>
+</div>
 </div>
 
 
@@ -491,7 +604,7 @@ using a series resistor of 700 ohms or larger.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.2.0',
+            VERSION:'1.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
