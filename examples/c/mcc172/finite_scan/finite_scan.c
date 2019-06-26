@@ -58,15 +58,12 @@ int main(void)
     uint8_t clock_source;
     uint8_t iepe_enable;
 
-    /*
     // Select an MCC172 HAT device to use.
     if (select_hat_device(HAT_ID_MCC_172, &address))
     {
         // Error getting device.
         return -1;
     }
-    */
-    address = 3;
     
     printf ("\nSelected MCC 172 device at address %d\n", address);
 
