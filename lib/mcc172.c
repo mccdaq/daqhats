@@ -26,7 +26,7 @@
 // *****************************************************************************
 // Constants
 #define DEBUG
-//#define RESET_ACTIVE_LOW
+#define RESET_ACTIVE_LOW
 
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
