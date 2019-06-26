@@ -62,14 +62,11 @@ int main(void)
 
 
     // Select an MCC 172 HAT device to use.
-    /*
     if (select_hat_device(HAT_ID_MCC_172, &address))
     {
         // Error getting device.
         return -1;
     }
-    */
-    address = 0;
 
     printf ("\nSelected MCC 172 device at address %d\n", address);
 
