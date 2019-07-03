@@ -1,3 +1,6 @@
+1.2.0.1:
+    - Fixed compile warnings in Raspbian Buster.
+
 1.2.0:
     - Added support for the MCC 134.
     - Fixed conflict with libi2c-dev.
