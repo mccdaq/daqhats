@@ -60,7 +60,7 @@ Functional details
 
 Best practices for accurate thermocouple measurements
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The MCC 134 should achive results within the the maximum thermocouple
+The MCC 134 should achieve results within the maximum thermocouple
 accuracy specifications when operating within the documented environmental
 conditions. Operating in conditions with excessive temperature transients or
 airflow may affect results. In most cases, the MCC 134 will achieve the
