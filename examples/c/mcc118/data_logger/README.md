@@ -14,9 +14,9 @@ This example can be run from a terminal window, or accessed with an IDE such as 
  > Project files are supplied for **Geany** and **CodeBlocks**. 
 
 ## Install the Dependencies
-Install **GTK+**: 
+Install required packages: 
   ```sh
-    sudo apt-get install libgtk-3-dev
+    sudo apt-get install libgtk-3-dev at-spi2-core autoconf libtool
   ```
 Install **GTKDatabox**:
   ```sh
@@ -26,13 +26,8 @@ Install **GTKDatabox**:
     ./autogen.sh
     ./configure
     sudo make install
-  ```
- Install **D-Bus AT-SPI**:
-  ```sh
-    sudo apt-get install at-spi2-core
-  ```
 
-> You may need to run ldconfig after installing the dependencies.
+> Run ldconfig after installing the dependencies.
   ```sh
     sudo ldconfig
   ```
