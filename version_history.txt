@@ -1,5 +1,6 @@
 1.2.0.1:
     - Fixed compile warnings in Raspbian Buster.
+    - Fixed Python web server examples for compatibility with Dash 1.0.
 
 1.2.0:
     - Added support for the MCC 134.

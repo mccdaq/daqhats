@@ -147,7 +147,7 @@ _app.layout = html.Div([
                                     {'label': 'Channel 2', 'value': 2},
                                     {'label': 'Channel 3', 'value': 3}],
                                 labelStyle={'display': 'block', 'height': 36},
-                                values=[0])],
+                                value=[0])],
                         style={'float': 'left', 'width': 150}),
                     html.Div(
                         id='tcTypeSelectors',
@@ -207,7 +207,7 @@ _app.layout = html.Div([
     [Input('startStopButton', 'n_clicks')],
     [State('startStopButton', 'children'),
      State('hatSelector', 'value'),
-     State('channelSelections', 'values'),
+     State('channelSelections', 'value'),
      State('tcTypeSelector0', 'value'),
      State('tcTypeSelector1', 'value'),
      State('tcTypeSelector2', 'value'),
@@ -401,7 +401,7 @@ def update_start_stop_button_name(acq_state):
      Input('status', 'children')],
     [State('chartData', 'children'),
      State('samplesToDisplay', 'value'),
-     State('channelSelections', 'values')]
+     State('channelSelections', 'value')]
 )
 def update_strip_chart_data(_n_intervals, acq_state, chart_data_json_str,
                             samples_to_display_val, active_channels):
@@ -518,7 +518,7 @@ def add_samples_to_data(samples_to_display, num_chans, chart_data, data):
 @_app.callback(
     Output('stripChart', 'figure'),
     [Input('chartData', 'children')],
-    [State('channelSelections', 'values')]
+    [State('channelSelections', 'value')]
 )
 def update_strip_chart(chart_data_json_str, active_channels):
     """
@@ -612,7 +612,7 @@ def update_chart_info(_figure, chart_data_json_str):
     [Input('chartData', 'children'),
      Input('status', 'children')],
     [State('hatSelector', 'value'),
-     State('channelSelections', 'values')]
+     State('channelSelections', 'value')]
 )  # pylint: disable=too-many-arguments
 def update_error_message(chart_data_json_str, acq_state, hat_selection,
                          active_channels):
