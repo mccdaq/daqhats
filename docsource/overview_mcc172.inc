@@ -13,13 +13,13 @@ The MCC 172 is a 2-channel analog voltage input board with the following feature
 
 .. only:: html
 
-    .. image:: images/mcc118-web.jpg
+    .. image:: images/mcc172-web.jpg
         :align: center
         :alt: MCC 172 circuit board
 
 .. only:: latex
 
-    .. image:: images/mcc118.jpg
+    .. image:: images/mcc172.jpg
         :align: center
         :alt: MCC 172 circuit board
 
@@ -63,13 +63,13 @@ Functional block diagram
 
 .. only:: html
 
-    .. image:: images/mcc172-diag-web.png
+    .. image:: images/mcc172-diag-web.jpg
 	:align: center
 	:alt: MCC 172 block diagram
 
 .. only:: latex
 
-    .. image:: images/mcc172-diag.png
+    .. image:: images/mcc172-diag.jpg
 	:align: center
 	:alt: MCC 172 block diagram
 
