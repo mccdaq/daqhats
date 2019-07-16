@@ -81,7 +81,7 @@ struct MCC172DeviceInfo mcc172_device_info =
 
 #define CMD_READ_REPLY          0x7F
 
-#define MAX_TX_DATA_SIZE        (256)    // size of transmit / receive SPI 
+#define MAX_TX_DATA_SIZE        (256)    // size of transmit / receive SPI
                                          // buffer in device
 
 #define MSG_START               (0xDB)
@@ -121,9 +121,9 @@ struct MCC172DeviceInfo mcc172_device_info =
 #define FW_RES_OTHER_ERROR      0x06
 
 
-#define SERIAL_SIZE     (8+1)   ///< The maximum size of the serial number 
+#define SERIAL_SIZE     (8+1)   ///< The maximum size of the serial number
                                 // string, plus NULL.
-#define CAL_DATE_SIZE   (10+1)  ///< The maximum size of the calibration date 
+#define CAL_DATE_SIZE   (10+1)  ///< The maximum size of the calibration date
                                 // string, plus NULL.
 
 #define MAX_SCAN_BUFFER_SIZE_SAMPLES    (16ul*1024ul*1024ul)    // 16 MS
@@ -203,12 +203,12 @@ static bool log_open = false;
 #endif
 
 static const char* const spi_device = SPI_DEVICE_0; // the spidev device
-static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
+static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0,
                                                     // CPHA=1)
 static const uint8_t spi_bits = 8;                  // 8 bits per transfer
-static const uint32_t spi_speed = 18000000;         // maximum SPI clock 
+static const uint32_t spi_speed = 18000000;         // maximum SPI clock
                                                     // frequency
-static const uint16_t spi_delay = 0;                // delay in us before 
+static const uint16_t spi_delay = 0;                // delay in us before
                                                     // removing CS
 
 // *****************************************************************************
@@ -246,7 +246,7 @@ static bool _check_addr(uint8_t address)
 /******************************************************************************
   Parse a buffer and look for a valid message
  *****************************************************************************/
-static bool _parse_buffer(uint8_t* buffer, uint16_t length, 
+static bool _parse_buffer(uint8_t* buffer, uint16_t length,
     uint16_t* frame_start, uint16_t* frame_length, uint16_t* remaining)
 {
     uint8_t* ptr = buffer;
@@ -279,7 +279,7 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
                 parse_state++;
             }
             break;
-        case 1: // command     
+        case 1: // command
             parse_state++;
             break;
         case 2: // status
@@ -324,14 +324,14 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
     *remaining = _remaining;
     *frame_length = _frame_length;
     *frame_start = _frame_start;
-    
+
     return found_frame;
 }
 
 /******************************************************************************
   Create a message frame for sending to the device
  *****************************************************************************/
-static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count, 
+static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
     void* data)
 {
     if (count > MAX_TX_DATA_SIZE)
@@ -369,8 +369,8 @@ static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
 
 void* rx_start_ptr;
 
-static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data, 
-    uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count, 
+static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
+    uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count,
     uint32_t reply_timeout_us, uint32_t retry_us)
 {
     struct timespec start_time;
@@ -390,7 +390,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     struct spi_ioc_transfer tr;
 
     memset(&tr, 0, sizeof(struct spi_ioc_transfer));
-    
+
     if (!_check_addr(address) ||                // check address failed
         (tx_data_count && (tx_data == NULL)) || // no tx buffer when count != 0
         (rx_data_count && (rx_data == NULL)))   // no rx buffer when count != 0
@@ -446,7 +446,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     }
 
     clock_gettime(CLOCK_MONOTONIC, &start_time);
-    
+
     if (retry_us)
         usleep(retry_us);
 
@@ -457,7 +457,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     uint16_t remaining = 0;
     uint16_t read_amount = rx_data_count + MSG_RX_HEADER_SIZE;
 
-    // only read the first byte of the reply in order to test for the device 
+    // only read the first byte of the reply in order to test for the device
     // readiness
     tr.tx_buf = (uintptr_t)NULL;//(uintptr_t)dev->temp_buffer;
     tr.rx_buf = (uintptr_t)dev->rx_buffer;
@@ -488,7 +488,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         timeout = (diff > reply_timeout_us);
     } while (!got_reply && !timeout);
 
-   
+
     if (got_reply)
     {
         // read the rest of the reply
@@ -502,7 +502,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
             {
                 // parse the reply
-                got_reply = _parse_buffer(dev->rx_buffer, read_amount+1, 
+                got_reply = _parse_buffer(dev->rx_buffer, read_amount+1,
                     &frame_start, &frame_length, &remaining);
             }
             else
@@ -510,7 +510,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 #ifdef DEBUG
                 sprintf(buffer, "ioctl failed %d %d\n", errno, tr.len);
                 _syslog(buffer);
-#endif                
+#endif
                 usleep(300);
             }
 
@@ -518,8 +518,8 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             diff = _difftime_us(&start_time, &current_time);
             timeout = (diff > reply_timeout_us);
         } while (!got_reply && !timeout);
-        
-#if 0        
+
+#if 0
         if (!got_reply)
         {
             printf("Sent: ");
@@ -534,7 +534,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             }
             printf("\n");
         }
-#endif        
+#endif
     }
 
     if (!got_reply)
@@ -544,7 +544,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         return RESULT_TIMEOUT;
     }
 
-    if (dev->rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] == 
+    if (dev->rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] ==
         dev->tx_buffer[MSG_TX_INDEX_COMMAND])
     {
         switch (dev->rx_buffer[frame_start+MSG_RX_INDEX_STATUS])
@@ -552,7 +552,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         case FW_RES_SUCCESS:
             if (rx_data_count > 0)
             {
-                memcpy(rx_data, &dev->rx_buffer[frame_start+MSG_RX_INDEX_DATA], 
+                memcpy(rx_data, &dev->rx_buffer[frame_start+MSG_RX_INDEX_DATA],
                     rx_data_count);
             }
             ret = RESULT_SUCCESS;
@@ -679,7 +679,7 @@ static int _parse_factory_data(cJSON* root, struct mcc172FactoryData* data)
                     calchild->valuestring)
                 {
                     // Found the calibration date
-                    strncpy(data->cal_date, calchild->valuestring, 
+                    strncpy(data->cal_date, calchild->valuestring,
                         CAL_DATE_SIZE);
                     got_date = true;
                 }
@@ -812,30 +812,30 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         // convert 24-bit value to signed 32-bit
         if (ptr[0] & 0x80)
         {
-            value = 0xFF000000 | 
-                ((uint32_t)ptr[0] << 16) | 
-                ((uint32_t)ptr[1] << 8)  | 
+            value = 0xFF000000 |
+                ((uint32_t)ptr[0] << 16) |
+                ((uint32_t)ptr[1] << 8)  |
                 ptr[2];
         }
         else
         {
-            value = 0x00000000 | 
-                ((uint32_t)ptr[0] << 16) | 
-                ((uint32_t)ptr[1] << 8)  | 
+            value = 0x00000000 |
+                ((uint32_t)ptr[0] << 16) |
+                ((uint32_t)ptr[1] << 8)  |
                 ptr[2];
         }
         ptr += SAMPLE_SIZE_BYTES;
-        
+
         buffer[count] = (double)value;
-            
+
         if (calibrated)
         {
             // apply the appropriate cal factors to each sample in the list
-            
+
             // remove offset error
             buffer[count] -= dev->scan_info->offsets[
                 dev->scan_info->channel_index];
-                
+
             // remove gain error
             buffer[count] *= dev->scan_info->slopes[
                 dev->scan_info->channel_index];
@@ -846,7 +846,7 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         {
             buffer[count] *= LSB_SIZE;
         }
-        
+
         dev->scan_info->channel_index++;
         if (dev->scan_info->channel_index >= dev->scan_info->channel_count)
         {
@@ -894,7 +894,7 @@ static void* _scan_thread(void* arg)
     info->thread_running = true;
     info->hw_overrun = false;
     pthread_mutex_unlock(&_devices[address]->scan_mutex);
-    
+
     status_count = 0;
 
     if (info->options & OPTS_NOSCALEDATA)
@@ -923,13 +923,13 @@ static void* _scan_thread(void* arg)
     do
     {
         // read the scan status
-        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5, 
+        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
             1*MSEC, 20) == RESULT_SUCCESS)
         {
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
             max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
             scan_running = (rx_buffer[0] & 0x01) == 0x01;
-            
+
             pthread_mutex_lock(&_devices[address]->scan_mutex);
             info->hw_overrun = (rx_buffer[0] & 0x02) == 0x02;
             info->triggered = (rx_buffer[0] & 0x04) == 0x04;
@@ -982,9 +982,9 @@ static void* _scan_thread(void* arg)
                         read_count = (info->buffer_size - info->write_index);
                     }
 
-                    if ((error = _a_in_read_scan_data(address, read_count, 
-                        scaled, calibrated, 
-                        &info->scan_buffer[info->write_index])) == 
+                    if ((error = _a_in_read_scan_data(address, read_count,
+                        scaled, calibrated,
+                        &info->scan_buffer[info->write_index])) ==
                         RESULT_SUCCESS)
                     {
                         info->write_index += read_count;
@@ -1052,11 +1052,11 @@ static void* _scan_thread(void* arg)
         }
 
         usleep(sleep_us);
-        
+
         pthread_mutex_lock(&_devices[address]->scan_mutex);
         stop_thread = info->stop_thread;
         pthread_mutex_unlock(&_devices[address]->scan_mutex);
-        
+
     } while (!stop_thread && !done);
 
     if (info->scan_running)
@@ -1098,10 +1098,10 @@ int mcc172_open(uint8_t address)
 
     if (_devices[address] == NULL)
     {
-        // this is either the first time this device is being opened or it is 
+        // this is either the first time this device is being opened or it is
         // not a 172
 
-        // read the EEPROM file(s), verify that it is an MCC 172, and get the 
+        // read the EEPROM file(s), verify that it is an MCC 172, and get the
         // cal data
         if (_hat_info(address, &info, NULL, &custom_size) == RESULT_SUCCESS)
         {
@@ -1117,22 +1117,49 @@ int mcc172_open(uint8_t address)
         }
         else
         {
-            // no EEPROM info was found - allow opening the board with an 
+            // no EEPROM info was found - allow opening the board with an
             // uninitialized EEPROM
             custom_size = 0;
             custom_data = NULL;
         }
 
         // ensure GPIO signals are initialized
-#ifdef RESET_ACTIVE_LOW        
-        gpio_write(RESET_GPIO, 1);
+        gpio_dir(IRQ_GPIO, 1);
+
+#ifdef RESET_ACTIVE_LOW
+        // Signal defaults to low, so micro would be held in reset if library
+        // has not been opened since boot.  In that case, add extra delay for
+        // micro to start.
+        if (gpio_status(RESET_GPIO) == 0)
+        {
+            gpio_write(RESET_GPIO, 1);
+            gpio_dir(RESET_GPIO, 0);
+
+            int lock_fd;
+
+            // Obtain a spi lock
+            if ((lock_fd = _obtain_lock()) < 0)
+            {
+                // could not get a lock within 5 seconds, report as a timeout
+                return RESULT_LOCK_TIMEOUT;
+            }
+
+            _set_address(address);
+            _release_lock(lock_fd);
+
+            sleep(2);
+        }
+        else
+        {
+            gpio_write(RESET_GPIO, 1);
+            gpio_dir(RESET_GPIO, 0);
+        }
 #else
         gpio_write(RESET_GPIO, 0);
-#endif        
         gpio_dir(RESET_GPIO, 0);
-        
-        gpio_dir(IRQ_GPIO, 1);
-        
+#endif
+
+
         // create a struct to hold device instance data
         _devices[address] = (struct mcc172Device*)calloc(
             1, sizeof(struct mcc172Device));
@@ -1188,7 +1215,7 @@ int mcc172_open(uint8_t address)
     }
     else
     {
-        // the device has already been opened and initialized, increment 
+        // the device has already been opened and initialized, increment
         // reference count
         dev = _devices[address];
         dev->handle_count++;
@@ -1199,12 +1226,12 @@ int mcc172_open(uint8_t address)
     do
     {
         // Try to communicate with the device and verify that it is an MCC 172
-        ret = _spi_transfer(address, CMD_ID, NULL, 0, id_data, 
+        ret = _spi_transfer(address, CMD_ID, NULL, 0, id_data,
             2*sizeof(uint16_t), 20*MSEC, 10);
 
         if (ret == RESULT_SUCCESS)
         {
-            // the ID command returns the product ID, compare it with the MCC 
+            // the ID command returns the product ID, compare it with the MCC
             // 172
             if (id_data[0] == HAT_ID_MCC_172)
             {
@@ -1264,7 +1291,7 @@ int mcc172_close(uint8_t address)
     }
 
     mcc172_a_in_scan_cleanup(address);
-    
+
     _devices[address]->handle_count--;
     if (_devices[address]->handle_count == 0)
     {
@@ -1296,7 +1323,7 @@ int mcc172_blink_led(uint8_t address, uint8_t count)
     }
 
     // send command
-    int ret = _spi_transfer(address, CMD_BLINK, &count, 1, NULL, 0, 20*MSEC, 
+    int ret = _spi_transfer(address, CMD_BLINK, &count, 1, NULL, 0, 20*MSEC,
         0);
     return ret;
 }
@@ -1376,7 +1403,7 @@ int mcc172_calibration_date(uint8_t address, char* buffer)
 /******************************************************************************
   Read the calibration coefficients.
  *****************************************************************************/
-int mcc172_calibration_coefficient_read(uint8_t address, uint8_t channel, 
+int mcc172_calibration_coefficient_read(uint8_t address, uint8_t channel,
     double* slope, double* offset)
 {
     // validate parameters
@@ -1396,7 +1423,7 @@ int mcc172_calibration_coefficient_read(uint8_t address, uint8_t channel,
 /******************************************************************************
   Write the calibration coefficients.
  *****************************************************************************/
-int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel, 
+int mcc172_calibration_coefficient_write(uint8_t address, uint8_t channel,
     double slope, double offset)
 {
     // validate parameters
@@ -1451,7 +1478,7 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config)
     {
         buffer |= (1 << channel);
     }
-    
+
     // write the configuration to the device
     ret = _spi_transfer(address, CMD_IEPECONFIG_W, &buffer, 1, NULL, 0,
         20*MSEC, 0);
@@ -1464,7 +1491,7 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config)
 int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 {
     uint8_t buffer;
-    
+
     if (!_check_addr(address) ||
         (channel >= NUM_CHANNELS) ||
         (config == NULL))
@@ -1491,7 +1518,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     double divisor;
     int result;
     uint8_t buffer[2];
-    
+
     if (!_check_addr(address) ||
         (clock_source > 1))
     {
@@ -1506,7 +1533,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
 
     // set the sample rate to one supported by the device
     divisor = MAX_SAMPLE_RATE / sample_rate_per_channel + 0.5;
-    
+
     if (divisor < 1.0)
     {
         divisor = 1.0;
@@ -1515,11 +1542,11 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     {
         divisor = 256.0;
     }
-    
+
     // write the configuration to the device
     buffer[0] = clock_source;
     buffer[1] = (uint8_t)(divisor - 1);
-    result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0, 
+    result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0,
         20*MSEC, 10);
 
     return result;
@@ -1533,10 +1560,10 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 {
     int result;
     uint8_t buffer[2];
-    
+
     if (!_check_addr(address) ||
         (clock_source == NULL) ||
-        (sample_rate == NULL) || 
+        (sample_rate == NULL) ||
         (synced == NULL))
     {
         return RESULT_BAD_PARAMETER;
@@ -1549,11 +1576,11 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
     {
         return result;
     }
-    
+
     *clock_source = buffer[0] & 0x03;
     *synced = (buffer[0] >> 7) & 0x01;
     *sample_rate = MAX_SAMPLE_RATE / ((double)buffer[1] + 1);
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -1563,9 +1590,9 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode)
 {
     uint8_t buffer;
-    
+
     if (!_check_addr(address) ||
-        (source > 2) || 
+        (source > 2) ||
         (mode > TRIG_ACTIVE_LOW))
     {
         return RESULT_BAD_PARAMETER;
@@ -1581,7 +1608,7 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode)
     buffer = (mode << 2) | (source);
     _devices[address]->trigger_source = source;
     _devices[address]->trigger_mode = mode;
-    int ret = _spi_transfer(address, CMD_TRIGGERCONFIG_W, &buffer, 1, NULL, 0, 
+    int ret = _spi_transfer(address, CMD_TRIGGERCONFIG_W, &buffer, 1, NULL, 0,
         20*MSEC, 0);
 
     return ret;
@@ -1592,7 +1619,7 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode)
   structure and scan buffer, send the start command to the device, then start a
   scan data thread that constantly reads the scan status and data.
  *****************************************************************************/
-int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask, 
+int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     uint32_t samples_per_channel, uint32_t options)
 {
     int result;
@@ -1637,7 +1664,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     {
         if (channel_mask & (1 << channel))
         {
-            // save the channel list and coefficients for calibrating the 
+            // save the channel list and coefficients for calibrating the
             // incoming data
             info->channels[num_channels] = channel;
             info->slopes[num_channels] = dev->factory_data.slopes[channel];
@@ -1653,7 +1680,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     int count = 0;
     do
     {
-        result = mcc172_a_in_clock_config_read(address, &clock_source, 
+        result = mcc172_a_in_clock_config_read(address, &clock_source,
             &sample_rate_per_channel, &synced);
         if (result != RESULT_SUCCESS)
         {
@@ -1661,14 +1688,14 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
             dev->scan_info = NULL;
             return result;
         }
-        
+
         if (synced == 0)
         {
             usleep(1000);
         }
         count++;
     } while (synced == 0);
-    
+
     // Calculate the buffer size
     if (options & OPTS_CONTINUOUS)
     {
@@ -1680,7 +1707,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         // < 1024 S/s   1 kS per channel
         // < 10.24 kS/s 10 kS per channel
         // < 100 kS/s   100 kS per channel
-        
+
         if (sample_rate_per_channel <= 1024.0)
         {
             info->buffer_size = 1000;
@@ -1689,7 +1716,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         {
             info->buffer_size = 10000;
         }
-        else 
+        else
         {
             info->buffer_size = 100000;
         }
@@ -1701,7 +1728,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
     else
     {
-        // Finite scan - buffer size is the number of channels * 
+        // Finite scan - buffer size is the number of channels *
         // samples_per_channel,
         info->buffer_size = samples_per_channel;
     }
@@ -1733,7 +1760,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         {
             info->read_threshold = MAX_SAMPLES_READ;
         };
-        info->read_threshold = COUNT_NORMALIZE(info->read_threshold, 
+        info->read_threshold = COUNT_NORMALIZE(info->read_threshold,
             info->channel_count);
         if (info->read_threshold == 0)
         {
@@ -1776,7 +1803,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     buffer[3] = (uint8_t)(scan_count >> 24);
     buffer[4] = channel_mask;
 
-    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 5, NULL, 0, 
+    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 5, NULL, 0,
         20*MSEC, 10);
 
     if (result != RESULT_SUCCESS)
@@ -1791,7 +1818,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
-    if ((result = pthread_create(&info->handle, &attr, &_scan_thread, 
+    if ((result = pthread_create(&info->handle, &attr, &_scan_thread,
         temp_address)) != 0)
     {
         free(temp_address);
@@ -1814,7 +1841,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 }
 
 /******************************************************************************
-  Return the size of the internal scan buffer in samples (0 if scan is not 
+  Return the size of the internal scan buffer in samples (0 if scan is not
   running).
  *****************************************************************************/
 int mcc172_a_in_scan_buffer_size(uint8_t address, uint32_t* buffer_size_samples)
@@ -1851,7 +1878,7 @@ int mcc172_a_in_scan_channel_count(uint8_t address)
 /******************************************************************************
   Read the scan status and amount of data in the scan buffer.
  *****************************************************************************/
-int mcc172_a_in_scan_status(uint8_t address, uint16_t* status, 
+int mcc172_a_in_scan_status(uint8_t address, uint16_t* status,
     uint32_t* samples_per_channel)
 {
     struct mcc172ScanThreadInfo* info;
@@ -1908,7 +1935,7 @@ int mcc172_a_in_scan_status(uint8_t address, uint16_t* status,
   negative, wait indefinitely.  If it is 0,  return immediately with the
   available data.
  *****************************************************************************/
-int mcc172_a_in_scan_read(uint8_t address, uint16_t* status, 
+int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
     int32_t samples_per_channel, double timeout, double* buffer,
     uint32_t buffer_size_samples, uint32_t* samples_read_per_channel)
 {
@@ -1975,7 +2002,7 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
     scan_running = info->scan_running;
     thread_running = info->thread_running;
     pthread_mutex_unlock(&_devices[address]->scan_mutex);
-    
+
     // Determine how many samples to read
     if (samples_per_channel == -1)
     {
@@ -1991,9 +2018,9 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
 
     if (buffer_size_samples < samples_to_read)
     {
-        // buffer is not large enough, so read the amount of samples that will 
+        // buffer is not large enough, so read the amount of samples that will
         // fit
-        samples_to_read = COUNT_NORMALIZE(buffer_size_samples, 
+        samples_to_read = COUNT_NORMALIZE(buffer_size_samples,
             info->channel_count);
     }
 
@@ -2013,12 +2040,12 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             scan_running = info->scan_running;
             thread_running = info->thread_running;
             pthread_mutex_unlock(&_devices[address]->scan_mutex);
-            
+
             if (buffer_depth >= info->channel_count)
             {
                 // read in increments of the number of channels in the scan
                 current_read = MIN(buffer_depth, samples_to_read);
-                current_read = COUNT_NORMALIZE(current_read, 
+                current_read = COUNT_NORMALIZE(current_read,
                     info->channel_count);
 
                 // check for a wrap at the end of the scan buffer
@@ -2026,8 +2053,8 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
                 if (max_read < current_read)
                 {
                     // when wrapping, perform two copies
-                    memcpy(&buffer[samples_read], 
-                        &info->scan_buffer[info->read_index],  
+                    memcpy(&buffer[samples_read],
+                        &info->scan_buffer[info->read_index],
                         max_read*sizeof(double));
                     samples_read += max_read;
                     memcpy(&buffer[samples_read], &info->scan_buffer[0],
@@ -2037,7 +2064,7 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
                 }
                 else
                 {
-                    memcpy(&buffer[samples_read], 
+                    memcpy(&buffer[samples_read],
                         &info->scan_buffer[info->read_index],
                         current_read*sizeof(double));
                     samples_read += current_read;
@@ -2058,7 +2085,7 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             if (!no_timeout)
             {
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
-                timed_out = (_difftime_us(&start_time, &current_time) >= 
+                timed_out = (_difftime_us(&start_time, &current_time) >=
                     timeout_us);
             }
 
@@ -2132,7 +2159,7 @@ int mcc172_a_in_scan_stop(uint8_t address)
     }
 
     // send scan stop command
-    int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC, 
+    int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC,
         10);
     return ret;
 }
@@ -2152,7 +2179,7 @@ int mcc172_a_in_scan_cleanup(uint8_t address)
     {
         if (_devices[address]->scan_info->handle != 0)
         {
-            // If the thread is running then tell it to stop and wait for it. 
+            // If the thread is running then tell it to stop and wait for it.
             // It will send the a_in_stop_scan command.
             pthread_mutex_lock(&_devices[address]->scan_mutex);
             _devices[address]->scan_info->stop_thread = true;
@@ -2179,7 +2206,7 @@ int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
     uint8_t* trigger)
 {
     uint8_t buffer;
-    
+
     if (!_check_addr(address) ||
         (clock == NULL) ||
         (sync == NULL) ||
@@ -2189,7 +2216,7 @@ int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
     }
 
     // send the command
-    int ret = _spi_transfer(address, CMD_TESTSIGNAL_R, NULL, 0, &buffer, 
+    int ret = _spi_transfer(address, CMD_TESTSIGNAL_R, NULL, 0, &buffer,
         1, 20*MSEC, 10);
     if (ret == RESULT_SUCCESS)
     {
@@ -2207,7 +2234,7 @@ int mcc172_test_signals_write(uint8_t address, uint8_t mode, uint8_t clock,
     uint8_t sync)
 {
     uint8_t buffer;
-    
+
     if (!_check_addr(address))
     {
         return RESULT_BAD_PARAMETER;
@@ -2235,7 +2262,7 @@ int mcc172_test_signals_write(uint8_t address, uint8_t mode, uint8_t clock,
 
 
 /******************************************************************************
-  Open a non-responding or unprogrammed MCC 172 for firmware update - do not 
+  Open a non-responding or unprogrammed MCC 172 for firmware update - do not
   try to communicate with the micro.
  *****************************************************************************/
 int mcc172_open_for_update(uint8_t address)
@@ -2245,7 +2272,7 @@ int mcc172_open_for_update(uint8_t address)
     char* custom_data;
     uint16_t custom_size;
     struct mcc172Device* dev;
-    
+
     _mcc172_lib_init();
 
     // validate the parameters
@@ -2260,13 +2287,13 @@ int mcc172_open_for_update(uint8_t address)
     {
         return result;
     }
-    
+
     if (_devices[address] == NULL)
     {
-        // this is either the first time this device is being opened or it is 
+        // this is either the first time this device is being opened or it is
         // not a 172
 
-        // read the EEPROM file(s), verify that it is an MCC 172, and get the 
+        // read the EEPROM file(s), verify that it is an MCC 172, and get the
         // cal data
         if (_hat_info(address, &info, NULL, &custom_size) == RESULT_SUCCESS)
         {
@@ -2282,22 +2309,22 @@ int mcc172_open_for_update(uint8_t address)
         }
         else
         {
-            // no EEPROM info was found - allow opening the board with an 
+            // no EEPROM info was found - allow opening the board with an
             // uninitialized EEPROM
             custom_size = 0;
             custom_data = NULL;
         }
 
         // ensure GPIO signals are initialized
-#ifdef RESET_ACTIVE_LOW        
+#ifdef RESET_ACTIVE_LOW
         gpio_write(RESET_GPIO, 1);
 #else
         gpio_write(RESET_GPIO, 0);
 #endif
         gpio_dir(RESET_GPIO, 0);
-        
+
         gpio_dir(IRQ_GPIO, 1);
-        
+
         // create a struct to hold device instance data
         _devices[address] = (struct mcc172Device*)calloc(
             1, sizeof(struct mcc172Device));
@@ -2339,7 +2366,7 @@ int mcc172_open_for_update(uint8_t address)
     }
     else
     {
-        // the device has already been opened and initialized, increment 
+        // the device has already been opened and initialized, increment
         // reference count
         dev = _devices[address];
         dev->handle_count++;
@@ -2353,12 +2380,12 @@ int mcc172_enter_bootloader(uint8_t address)
 {
     int lock_fd;
     int count;
-    
+
     if (!_check_addr(address))                  // check address failed
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
@@ -2372,7 +2399,7 @@ int mcc172_enter_bootloader(uint8_t address)
     count = 0;
     while (gpio_status(IRQ_GPIO) && (count < 20))
     {
-#ifdef RESET_ACTIVE_LOW        
+#ifdef RESET_ACTIVE_LOW
         gpio_write(RESET_GPIO, 0);
         usleep(2*1000ul);
         gpio_write(RESET_GPIO, 1);
@@ -2380,7 +2407,7 @@ int mcc172_enter_bootloader(uint8_t address)
         gpio_write(RESET_GPIO, 1);
         usleep(2*1000ul);
         gpio_write(RESET_GPIO, 0);
-#endif        
+#endif
         usleep(55*1000ul);
         count++;
     }
@@ -2395,7 +2422,7 @@ int mcc172_enter_bootloader(uint8_t address)
             usleep(1*1000);
             count += 10;
         }
-    
+
         if (gpio_status(IRQ_GPIO))
         {
             _syslog("Error: NCHG never went low\n");
@@ -2403,7 +2430,7 @@ int mcc172_enter_bootloader(uint8_t address)
             return RESULT_TIMEOUT;
         }
     }
-    
+
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
 }
@@ -2413,19 +2440,19 @@ int mcc172_bl_ready(void)
     return !gpio_status(IRQ_GPIO);
 }
 
-int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data, 
+int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
     uint16_t transfer_count)
 {
     int lock_fd;
     int ret;
     int temp;
     struct mcc172Device* dev = _devices[address];
-    
+
     if (!_check_addr(address))                  // check address failed
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
@@ -2467,7 +2494,7 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
-#if 0    
+#if 0
     printf("Sent: ");
     for (temp = 0; temp < transfer_count; temp++)
     {
@@ -2483,7 +2510,7 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
     }
     printf("\n");
 #endif
-    
+
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
 }

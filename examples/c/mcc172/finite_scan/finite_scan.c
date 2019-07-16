@@ -64,7 +64,7 @@ int main(void)
         // Error getting device.
         return -1;
     }
-    
+
     printf ("\nSelected MCC 172 device at address %d\n", address);
 
     // Open a connection to the device.
@@ -89,26 +89,24 @@ int main(void)
         return 1;
     }
     flush_stdin();
-    
+
     for (i = 0; i < num_channels; i++)
     {
-        result = mcc172_iepe_config_write(address, channel_array[i], 
+        result = mcc172_iepe_config_write(address, channel_array[i],
             iepe_enable);
         STOP_ON_ERROR(result);
     }
-    
+
     // Set the ADC clock to the desired rate.
     result = mcc172_a_in_clock_config_write(address, 0, scan_rate);
     STOP_ON_ERROR(result);
-    printf("clock write\n");
-    
+
     // Wait for the ADCs to synchronize.
     do
     {
         result = mcc172_a_in_clock_config_read(address, &clock_source,
             &actual_scan_rate, &synced);
         STOP_ON_ERROR(result);
-        printf("clock read\n");
         usleep(5000);
     } while (synced == 0);
 
@@ -179,13 +177,13 @@ int main(void)
                 printf("%10.5f V", read_buf[index + i]);
             }
             fflush(stdout);
-            
+
         }
- 
+
         usleep(1000);
     }
-    while ((result == RESULT_SUCCESS) && 
-           ((read_status & STATUS_RUNNING) == STATUS_RUNNING) && 
+    while ((result == RESULT_SUCCESS) &&
+           ((read_status & STATUS_RUNNING) == STATUS_RUNNING) &&
            !enter_press());
 
     printf ("\n");
