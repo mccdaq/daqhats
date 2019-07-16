@@ -11,16 +11,16 @@ Installation
 2. Power on the Pi and log in.  Open a terminal window if using the graphical interface.
 3. Update your package list::
 
-    sudo apt-get update
+    sudo apt update
     
 4. **Optional:** Update your installed packages and reboot::
    
-    sudo apt-get dist-upgrade
+    sudo apt full-upgrade
     sudo reboot
     
 5. Install git (if not installed)::
 
-    sudo apt-get install git
+    sudo apt install git
     
 6. Download this package to your user folder with git::
 

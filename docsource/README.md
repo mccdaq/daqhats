@@ -11,7 +11,7 @@ Follow these steps to generate the documentation for the MCC HAT library:
 1. Install breathe, pip, doxygen, sphinx, and sphinx_rtd_theme.
 
     ```
-    sudo apt-get install doxygen python-pip
+    sudo apt install doxygen python-pip
     sudo pip install breathe sphinx sphinx_rtd_theme
     ```
 2. Create the C documentation with doxygen (inside the docsource directory)
@@ -36,7 +36,7 @@ Some additional large packages are required (approximately 1.5 GB) to build the 
 1. Install texlive, latexmk, and texlive-latex-extra.
 
     ```
-    sudo apt-get install texlive latexmk texlive-latex-extra
+    sudo apt install texlive latexmk texlive-latex-extra
     ```
 2. Repeat steps #2 and 3 above to create the C and html documentation.
 3. Run sphinx to generate the pdf output.

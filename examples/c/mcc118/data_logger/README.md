@@ -15,7 +15,7 @@ Project files are supplied for **Geany** and **CodeBlocks**.
 ## Install the Dependencies
 Install required packages: 
   ```sh
-  sudo apt-get install libgtk-3-dev at-spi2-core autoconf libtool
+  sudo apt install libgtk-3-dev at-spi2-core autoconf libtool
   ```
 Install **GTKDatabox**:
   ```sh
@@ -42,7 +42,7 @@ To run the example from a terminal window, enter the following commands:
 **Geany** is one of the editors supplied with Raspbian, so is probably already installed on your
 **Raspberry Pi**. If not, or to check for updates, run the following in a terminal:
   ```sh
-  sudo apt-get install geany
+  sudo apt install geany
   ```
 To build the project, press Shift+F9 or select Make from the Build menu. Select the `logger.c` 
 file, then press F5 or select Execute from the Build menu.
@@ -50,7 +50,7 @@ file, then press F5 or select Execute from the Build menu.
 ## Running the example from CodeBlocks
 To install **CodeBlocks**, run the following in a terminal:
   ```sh
-  sudo apt-get install codeblocks
+  sudo apt install codeblocks
   ```
 Click `Build`, then `Run` to run the example.
 
