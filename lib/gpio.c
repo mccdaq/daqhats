@@ -213,7 +213,7 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
 {
     int event_fd;
     int value_fd;
-    char basename[64];
+    char basename[30];
     char event_filename[64];
     char value_filename[64];
     char buffer[32];
@@ -231,7 +231,7 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
     }
     
     // make sure gpio has been exported
-    sprintf(basename, "/sys/class/gpio/gpio%d", pin);
+    sprintf(basename, "/sys/class/gpio/gpio%d", (uint8_t)pin);
     sprintf(event_filename, "%s/edge", basename);
     if (stat(basename, &sb) != 0)
     {
@@ -351,7 +351,7 @@ int gpio_wait_for_low(int pin, int timeout)
     int event_fd;
     int value_fd;
     struct pollfd poll_data;
-    char basename[64];
+    char basename[30];
     char event_filename[64];
     char value_filename[64];
     char buffer[32];
@@ -359,7 +359,7 @@ int gpio_wait_for_low(int pin, int timeout)
     struct stat sb;
     
     // make sure gpio has been exported
-    sprintf(basename, "/sys/class/gpio/gpio%d", pin);
+    sprintf(basename, "/sys/class/gpio/gpio%d", (uint8_t)pin);
     sprintf(event_filename, "%s/edge", basename);
     if (stat(basename, &sb) != 0)
     {

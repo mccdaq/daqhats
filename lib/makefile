@@ -6,10 +6,10 @@ VERSION = $(MAJOR).$(MINOR).$(SUB)
 INSTALL_DIR = /usr/local/lib
 BUILD_DIR = ./build
 
-CC = gcc 
+CC = gcc
 CFLAGS = -I../include -I/opt/vc/include -fPIC -Wall -Wextra -g -O2 -DENABLE_LOCALES=Off
 LDFLAGS = -L/opt/vc/lib -shared -pthread -lm -lbcm_host -Wl,-soname,lib$(NAME).so.$(MAJOR)
-RM = rm -f  
+RM = rm -f
 TARGET_LIB = lib$(NAME).so.$(VERSION)
 
 SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c mcc134.c mcc134_adc.c nist.c mcc172.c
@@ -41,7 +41,7 @@ uninstall:
 	@rm -rf $(INSTALL_DIR)/lib$(NAME).so*
 	@ldconfig
 	@cd ../include; make uninstall; cd ../lib
-	@rm -rf build	
+	@rm -rf build
 
 .PHONY: clean
 

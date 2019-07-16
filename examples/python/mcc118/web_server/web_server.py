@@ -142,7 +142,7 @@ _app.layout = html.Div([
                         {'label': 'Channel 7', 'value': 7},
                     ],
                     labelStyle={'display': 'block'},
-                    values=[0]
+                    value=[0]
                 ),
                 html.Button(
                     children='Configure',
@@ -184,7 +184,7 @@ _app.layout = html.Div([
      State('hatSelector', 'value'),
      State('sampleRate', 'value'),
      State('samplesToDisplay', 'value'),
-     State('channelSelections', 'values')]
+     State('channelSelections', 'value')]
 )   # pylint: disable=too-many-arguments
 def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
                      sample_rate_val, samples_to_display, active_channels):
@@ -252,7 +252,7 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
     [Input('status', 'children'),
      Input('chartData', 'children'),
      Input('chartInfo', 'children')],
-    [State('channelSelections', 'values'),
+    [State('channelSelections', 'value'),
      State('samplesToDisplay', 'value')]
 )
 def update_timer_interval(acq_state, chart_data_json_str, chart_info_json_str,
@@ -390,7 +390,7 @@ def update_start_stop_button_name(acq_state):
      Input('status', 'children')],
     [State('chartData', 'children'),
      State('samplesToDisplay', 'value'),
-     State('channelSelections', 'values')]
+     State('channelSelections', 'value')]
 )
 def update_strip_chart_data(_n_intervals, acq_state, chart_data_json_str,
                             samples_to_display_val, active_channels):
@@ -500,7 +500,7 @@ def add_samples_to_data(samples_to_display, num_chans, chart_data, read_result):
 @_app.callback(
     Output('stripChart', 'figure'),
     [Input('chartData', 'children')],
-    [State('channelSelections', 'values')]
+    [State('channelSelections', 'value')]
 )
 def update_strip_chart(chart_data_json_str, active_channels):
     """
@@ -584,7 +584,7 @@ def update_chart_info(_figure, chart_data_json_str):
     [State('hatSelector', 'value'),
      State('sampleRate', 'value'),
      State('samplesToDisplay', 'value'),
-     State('channelSelections', 'values')]
+     State('channelSelections', 'value')]
 )  # pylint: disable=too-many-arguments
 def update_error_message(chart_data_json_str, acq_state, hat_selection,
                          sample_rate, samples_to_display, active_channels):

@@ -86,6 +86,8 @@ class ControlApp:
    
         master.protocol('WM_DELETE_WINDOW', self.close) # exit cleanup
         
+        icon = PhotoImage(file='/usr/share/mcc/daqhats/icon.png')
+        master.tk.call('wm', 'iconphoto', master._w, icon)
 
         
     # Event handlers

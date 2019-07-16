@@ -37,18 +37,18 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 3. Update your package list:
 
    ```sh
-   sudo apt-get update
+   sudo apt update
    ```
 4. **Optional:** Update your installation packages and reboot:
 
    ```sh
-   sudo apt-get dist-upgrade
+   sudo apt full-upgrade
    sudo reboot
    ```
 5. Install git (if not installed):
 
    ```sh
-   sudo apt-get install git
+   sudo apt install git
    ```
 6. Download the daqhats library to the root of your home folder:
 
