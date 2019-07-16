@@ -710,7 +710,7 @@ static int _parse_factory_data(cJSON* root, struct mcc118FactoryData* data)
                 {
                     // Found the calibration date
                     strncpy(data->cal_date, calchild->valuestring, 
-                        CAL_DATE_SIZE);
+                        CAL_DATE_SIZE-1);
                     got_date = true;
                 }
                 else if (!strcmp(calchild->string, "slopes") &&

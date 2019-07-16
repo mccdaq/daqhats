@@ -89,7 +89,10 @@ class ControlApp:
         self.disableControls()
         
         master.protocol('WM_DELETE_WINDOW', self.close) # exit cleanup
-        
+
+        icon = PhotoImage(file='/usr/share/mcc/daqhats/icon.png')
+        master.tk.call('wm', 'iconphoto', master._w, icon)
+
     def resizeText(self, event):
         new_size = -max(12, int(event.height / 12))
         self.BOLD_FONT.configure(size=new_size)
