@@ -54,7 +54,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 
    ```sh
    cd ~
-   git clone https://nwright-mcc.com/mccdaq/daqhats.git
+   git clone https://github.com/nwright-mcc/daqhats.git
    ```
 7. Build and install the shared library, tools, and optional Python support. The 
    installer will install Python 3 support by default and ask if you want to install
