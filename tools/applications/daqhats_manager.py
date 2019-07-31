@@ -79,10 +79,12 @@ class ControlApp:
         self.mcc118_button = Button(self.device_frame, text="MCC 118 App", command=self.pressed118Button)
         self.mcc134_button = Button(self.device_frame, text="MCC 134 App", command=self.pressed134Button)
         self.mcc152_button = Button(self.device_frame, text="MCC 152 App", command=self.pressed152Button)
+        self.mcc172_button = Button(self.device_frame, text="MCC 172 App", command=self.pressed172Button)
 
         self.mcc118_button.pack(fill=X)
         self.mcc134_button.pack(fill=X)
         self.mcc152_button.pack(fill=X)
+        self.mcc172_button.pack(fill=X)
    
         master.protocol('WM_DELETE_WINDOW', self.close) # exit cleanup
         
@@ -109,6 +111,10 @@ class ControlApp:
         
     def pressed152Button(self):
         result = Popen('/usr/share/mcc/daqhats/mcc152_control_panel.py')
+        self.app_list.append(result)
+
+    def pressed172Button(self):
+        result = Popen('/usr/share/mcc/daqhats/mcc172_control_panel.py')
         self.app_list.append(result)
 
     def close(self):
