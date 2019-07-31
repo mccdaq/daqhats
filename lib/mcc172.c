@@ -122,9 +122,9 @@ struct MCC172DeviceInfo mcc172_device_info =
 
 
 #define SERIAL_SIZE     (8+1)   ///< The maximum size of the serial number
-                                // string, plus NULL.
+                                ///< string, plus NULL.
 #define CAL_DATE_SIZE   (10+1)  ///< The maximum size of the calibration date
-                                // string, plus NULL.
+                                ///< string, plus NULL.
 
 #define MAX_SCAN_BUFFER_SIZE_SAMPLES    (16ul*1024ul*1024ul)    // 16 MS
 
@@ -663,7 +663,7 @@ static int _parse_factory_data(cJSON* root, struct mcc172FactoryData* data)
             child->valuestring)
         {
             // Found the serial number
-            strncpy(data->serial, child->valuestring, SERIAL_SIZE);
+            strncpy(data->serial, child->valuestring, SERIAL_SIZE-1);
             got_serial = true;
         }
         else if (!strcmp(child->string, "calibration") &&
@@ -680,7 +680,7 @@ static int _parse_factory_data(cJSON* root, struct mcc172FactoryData* data)
                 {
                     // Found the calibration date
                     strncpy(data->cal_date, calchild->valuestring,
-                        CAL_DATE_SIZE);
+                        CAL_DATE_SIZE-1);
                     got_date = true;
                 }
                 else if (!strcmp(calchild->string, "slopes") &&
