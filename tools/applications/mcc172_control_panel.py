@@ -12,7 +12,7 @@ import tkinter
 from tkinter import messagebox
 import tkinter.font
 import math
-from daqhats import hat_list, mcc172, HatIDs
+from daqhats import hat_list, mcc172, HatIDs, OptionFlags, HatError
 
 def calc_rms(data, channel, num_channels, num_samples_per_channel):
     """ Calculate RMS of a data buffer """
@@ -27,8 +27,8 @@ class ControlApp:
     """ Control application class """
 
     # pylint: disable=too-many-instance-attributes
-    
-    def __init__(self, master):
+
+    def __init__(self, master): # pylint: disable=too-many-statements
         """ Initialize the class """
         self.master = master
         master.title("MCC 172 Control Panel")
@@ -38,21 +38,26 @@ class ControlApp:
         self.open_address = 0
         self.board = None
         self.scan_run = False
-        self.sample_rate = 0
+        self.sample_rate = 10240
+        self.update_iepe = False
+        self.update_rate_ms = 200
 
         # GUI Setup
 
-        self.BOLD_FONT = tkinter.font.Font(
+        self.bold_font = tkinter.font.Font(
             family=tkinter.font.nametofont("TkDefaultFont")["family"],
             size=tkinter.font.nametofont("TkDefaultFont")["size"],
             weight="bold")
 
         # Create and organize frames
         self.top_frame = tkinter.LabelFrame(master, text="Select Device")
-        self.top_frame.pack(side=tkinter.TOP, expand=False, fill=tkinter.X)
+        self.top_frame.pack(expand=False, fill=tkinter.X)
+
+        self.mid_frame = tkinter.LabelFrame(master, text="IEPE Select")
+        self.mid_frame.pack(expand=False, fill=tkinter.X)
 
         self.bottom_frame = tkinter.LabelFrame(master, text="Analog Inputs")
-        self.bottom_frame.pack(side=tkinter.BOTTOM, expand=True, fill=tkinter.BOTH)
+        self.bottom_frame.pack(expand=True, fill=tkinter.BOTH)
 
         # Create widgets
 
@@ -78,12 +83,21 @@ class ControlApp:
         self.device_lister.grid(row=0, column=1)
         self.open_button.grid(row=0, column=2)
 
+        self.iepe_checkboxes = []
+        self.iepe_check_values = []
         self.checkboxes = []
         self.check_values = []
         self.channel_labels = []
         self.voltages = []
         for index in range(mcc172.info().NUM_AI_CHANNELS):
             # Checkboxes
+            self.iepe_check_values.append(tkinter.IntVar())
+            self.iepe_checkboxes.append(tkinter.Checkbutton(
+                self.mid_frame, text="Channel {} IEPE".format(index),
+                variable=self.iepe_check_values[index],
+                command=lambda index=index: self.pressed_iepe_check(index)))
+            self.iepe_checkboxes[index].grid(row=0, column=index)
+
             self.check_values.append(tkinter.IntVar())
             self.checkboxes.append(tkinter.Checkbutton(
                 self.bottom_frame,
@@ -94,13 +108,13 @@ class ControlApp:
             # Labels
             self.channel_labels.append(tkinter.Label(
                 self.bottom_frame,
-                text="Ch {}".format(index), font=self.BOLD_FONT))
+                text="Ch {}".format(index), font=self.bold_font))
             self.channel_labels[index].grid(row=index, column=1)
             self.channel_labels[index].grid_configure(sticky="W")
             # Voltages
             self.voltages.append(tkinter.Label(
                 self.bottom_frame, text="0.000",
-                font=self.BOLD_FONT))
+                font=self.bold_font))
             self.voltages[index].grid(row=index, column=2)
             self.voltages[index].grid_configure(sticky="E")
 
@@ -117,12 +131,14 @@ class ControlApp:
         master.protocol('WM_DELETE_WINDOW', self.close) # exit cleanup
 
         icon = tkinter.PhotoImage(file='/usr/share/mcc/daqhats/icon.png')
+        # pylint: disable=protected-access
         master.tk.call('wm', 'iconphoto', master._w, icon)
 
-    def resize_text(self, event):
+    def resize_text(self, _):
         """ Text resize event """
-        new_size = -max(12, int(event.height / 12))
-        self.BOLD_FONT.configure(size=new_size)
+        height = self.bottom_frame.winfo_height()
+        new_size = -max(12, int(height / 4))
+        self.bold_font.configure(size=new_size)
 
     def pressed_check(self, index):
         """ Check button pressed event """
@@ -133,11 +149,18 @@ class ControlApp:
             self.channel_labels[index].config(state=tkinter.NORMAL)
             self.voltages[index].config(state=tkinter.NORMAL)
 
+    def pressed_iepe_check(self, _):
+        """ IEPE check button pressed event. Must be handled when a scan
+            is not running. """
+        self.update_iepe = True
+
     def disable_controls(self):
         """ Disable controls when board not opened """
         # Enable the address selector
         self.device_lister.config(state=tkinter.NORMAL)
         # Disable the board controls
+        for child in self.mid_frame.winfo_children():
+            child.config(state=tkinter.DISABLED)
         for child in self.bottom_frame.winfo_children():
             child.config(state=tkinter.DISABLED)
 
@@ -146,8 +169,13 @@ class ControlApp:
         # Disable the address selector
         self.device_lister.config(state=tkinter.DISABLED)
         # Enable the board controls
+        for child in self.mid_frame.winfo_children():
+            child.config(state=tkinter.NORMAL)
         for child in self.bottom_frame.winfo_children():
             child.config(state=tkinter.NORMAL)
+        # Reset the channels to enabled
+        for index in range(mcc172.info().NUM_AI_CHANNELS):
+            self.check_values[index].set(1)
 
     def list_devices(self):
         """ List attached devices """
@@ -160,13 +188,13 @@ class ControlApp:
         try:
             self.board = mcc172(address)
 
-            # Set the sampling clock rate
-            self.sample_rate = 10240
-
-            # Configure IEPE
-
             self.scan_run = False
-        except:
+
+            # Read IEPE states
+            for index in range(mcc172.info().NUM_AI_CHANNELS):
+                enabled = self.board.iepe_config_read(index)
+                self.iepe_check_values[index].set(enabled)
+        except HatError:
             return False
         else:
             return True
@@ -183,22 +211,31 @@ class ControlApp:
             if self.scan_run:
                 num_channels = mcc172.info().NUM_AI_CHANNELS
                 scan_results = self.board.a_in_scan_read(-1, 0)
-
+                self.board.a_in_scan_cleanup()
                 for channel in range(num_channels):
                     if self.check_values[channel].get() == 1:
                         value = calc_rms(scan_results.data,
                                          channel, num_channels,
-                                         len(scan_results.data) / num_channels)
+                                         int(len(scan_results.data) / num_channels))
 
                         self.voltages[channel].config(
                             text="{:.3f}".format(value))
 
+            if self.update_iepe:
+                for index in range(mcc172.info().NUM_AI_CHANNELS):
+                    if self.iepe_check_values[index].get() == 0:
+                        self.board.iepe_config_write(index, 0)
+                    else:
+                        self.board.iepe_config_write(index, 1)
+                self.update_iepe = False
+
             # Start a new scan
-            self.board.a_in_scan_start(3, self.sample_rate * 0.1)
+            self.board.a_in_scan_start(
+                3, int(self.sample_rate * self.update_rate_ms / 2000), OptionFlags.DEFAULT)
             self.scan_run = True
 
-            # schedule another update in 200 ms
-            self.master.after(200, self.update_inputs)
+            # schedule another update
+            self.master.after(self.update_rate_ms, self.update_inputs)
 
     # Event handlers
     def pressed_open_button(self):
@@ -212,10 +249,10 @@ class ControlApp:
 
                 self.enable_controls()
 
+                self.open_button.config(text="Close")
+
                 # Periodically read the inputs and update controls
                 self.update_inputs()
-
-                self.open_button.config(text="Close")
             else:
                 messagebox.showerror("Error", "Could not open device.")
         else:
@@ -232,7 +269,7 @@ class ControlApp:
 def main():
     """ App entry point """
     root = tkinter.Tk()
-    app = ControlApp(root)
+    _app = ControlApp(root)
     root.mainloop()
 
 if __name__ == '__main__':
