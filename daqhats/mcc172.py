@@ -370,7 +370,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if (self._lib.mcc172_iepe_config_read(
                 self._address, channel, byref(mode)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
-        return mode.value()
+        return mode.value
 
     def a_in_clock_config_write(self, clock_source, sample_rate_per_channel):
         """
