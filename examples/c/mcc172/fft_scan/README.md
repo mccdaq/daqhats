@@ -16,7 +16,7 @@ To run the example, open a terminal window and enter the following commands:
 
 This example uses the Kiss FFT library (https://github.com/mborgerding/kissfft), 
 which has the following license information:
-
+```
 Copyright (c) 2003-2010 Mark Borgerding . All rights reserved.
 
 KISS FFT is provided under:
@@ -27,6 +27,7 @@ Being under the terms of the BSD 3-clause "New" or "Revised" License,
 according with:
 
     kiss_fft/LICENSES/BSD-3-Clause
+```
 
 ## Support/Feedback
 Contact technical support through our
