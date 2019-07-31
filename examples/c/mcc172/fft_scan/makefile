@@ -1,19 +1,24 @@
 NAME = fft_scan
 OBJ = $(NAME).o
-LIBS = -ldaqhats -lm -lfftw3
-CFLAGS = -Wall -I/usr/local/include -g
+DEPS = kiss_fft/kiss_fftr.o kiss_fft/kiss_fft.o
+LIBS = -ldaqhats -lm
+CFLAGS = -Wall -I/usr/local/include -Ikiss_fft -g
 CC = gcc
 EXTENSION = .c
 
-all: $(NAME)
+all: kiss_fft $(NAME)
 
-%.o: %$(EXTENSION) $(DEPS)
+kiss_fft:
+	(cd kiss_fft; make all)
+	
+$(NAME).o: $(NAME).c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(NAME): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+$(NAME): $(OBJ) 
+	$(CC) -o $@ $^ $(DEPS) $(CFLAGS) $(LIBS)
 
-.PHONY: clean
+.PHONY: clean kiss_fft
 
 clean:
-	@rm -f *.o *~ core $(NAME) fft_test.csv
+	(cd kiss_fft; make clean)
+	rm -f *.o *~ core $(NAME) fft_test.csv

@@ -18,11 +18,14 @@
         an FFT calculation to determine the frequency content. The highest
         frequency peak is detected and displayed, along with harmonics. The 
         time and frequency data are saved to a CSV file.
+        
+        This example uses the Kiss FFT library from 
+        https://github.com/mborgerding/kissfft.
 
 *****************************************************************************/
 #include "../../daqhats_utils.h"
 #include <math.h>
-#include <fftw3.h>
+#include "kiss_fftr.h"
 
 #define USE_WINDOW
 
@@ -87,16 +90,16 @@ void calculate_real_fft(double* data, int n_samples, double max_v,
 {
     double real_part;
     double imag_part;
-    double* in;
-    fftw_complex* out;
-    fftw_plan p;
     int i;
-
-    // Allocate the FFT buffers and create the plan.
-    in = (double*)fftw_malloc(sizeof(double) * n_samples);
-    out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * (n_samples/2 + 1));
-    p = fftw_plan_dft_r2c_1d(n_samples, in, out, FFTW_ESTIMATE);
-
+    kiss_fftr_cfg cfg;
+    kiss_fft_scalar* in;
+    kiss_fft_cpx* out;
+    
+    // Allocate the FFT buffers and config
+    cfg = kiss_fftr_alloc(n_samples, 0, 0, 0);
+    in = (kiss_fft_scalar*)malloc(sizeof(kiss_fft_scalar) * n_samples);
+    out = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * (n_samples/2 + 1));
+    
     // Apply the window and normalize the time data.
     for (i = 0; i < n_samples; i++)
     {
@@ -104,13 +107,13 @@ void calculate_real_fft(double* data, int n_samples, double max_v,
     }
 
     // Perform the FFT.
-    fftw_execute(p);
+    kiss_fftr(cfg, in, out);
 
     // Convert the complex results to real and convert to dBFS.
-    for (i = 0; i < n_samples/2; i++)
+    for (i = 0; i < n_samples/2 + 1; i++)
     {
-        real_part = out[i][0];
-        imag_part = out[i][1];
+        real_part = out[i].r;
+        imag_part = out[i].i;
 
         if (i == 0)
         {
@@ -127,10 +130,10 @@ void calculate_real_fft(double* data, int n_samples, double max_v,
         }
     }
     
-    // Clean up the plan and buffers.
-    fftw_destroy_plan(p);
-    fftw_free(in);
-    fftw_free(out);
+    // Clean up the config and buffers.
+    free(cfg);
+    free(in);
+    free(out);
 }
 
 int main(void)
@@ -282,7 +285,8 @@ int main(void)
     if (samples_read_per_channel >= samples_per_channel)
     {
         // Calculate and display the FFT.
-        spectrum = (double*)malloc(sizeof(double) * samples_per_channel/2);
+        spectrum = (double*)malloc(sizeof(double) * 
+            (samples_per_channel/2 + 1));
         calculate_real_fft(read_buf, samples_per_channel, 
             mcc172_info()->AI_MAX_RANGE, spectrum);
 
@@ -294,7 +298,7 @@ int main(void)
         peak_index = 0;
         peak_val = -1000.0;
         
-        for (i = 0; i < samples_per_channel/2; i++)
+        for (i = 0; i < (samples_per_channel/2 + 1); i++)
         {
             // Find the peak value and index.
             if (spectrum[i] > peak_val)

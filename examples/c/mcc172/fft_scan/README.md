@@ -1,26 +1,32 @@
-# Finite Scan Example
+# FFT Scan Example
 
 ## About
-This example demonstrates how to perform a finite acquisition on one or more 
-channels.
-
-Analog input data is acquired in blocks for a specified group of channels.
-
-The last sample of data for each channel is displayed for each block of data 
-received from the device. The acquisition is stopped when the specified number 
-of samples is acquired for each channel or the Enter key is pressed.
+This example demonstrates how to perform a finite acquisition from a channel,
+perform an FFT on the data, and find the peak and harmonics.
 
 This example is compiled and ready-to-run, and can be customized to suit 
 your needs.
 
-sudo apt-get install libfftw3-dev
-
 ## Running the example
 To run the example, open a terminal window and enter the following commands:
 ```sh
-   cd ~/daqhats/examples/c/mcc118/finite_scan
-   ./finite_scan
+   cd ~/daqhats/examples/c/mcc172/fft_scan
+   ./fft_scan
 ```
+
+This example uses the Kiss FFT library (https://github.com/mborgerding/kissfft), 
+which has the following license information:
+
+Copyright (c) 2003-2010 Mark Borgerding . All rights reserved.
+
+KISS FFT is provided under:
+
+  SPDX-License-Identifier: BSD-3-Clause
+
+Being under the terms of the BSD 3-clause "New" or "Revised" License,
+according with:
+
+    kiss_fft/LICENSES/BSD-3-Clause
 
 ## Support/Feedback
 Contact technical support through our
