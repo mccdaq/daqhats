@@ -1,6 +1,9 @@
 /*****************************************************************************
 
     MCC 172 Functions Demonstrated:
+        mcc172_iepe_config_write
+        mcc172_a_in_clock_config_read
+        mcc172_a_in_clock_config_write
         mcc172_a_in_scan_start
         mcc172_a_in_scan_read
 
@@ -9,13 +12,31 @@
 
     Description:
         Acquires blocks of analog input data for a user-specified group
-        of channels.  The last sample of data for each channel is
+        of channels.  The RMS voltage for each channel is
         displayed for each block of data received from the device.  The
         acquisition is stopped when the specified number of samples is
         acquired for each channel.
 
 *****************************************************************************/
+#include <math.h>
 #include "../../daqhats_utils.h"
+
+double calc_rms(double* data, uint8_t channel, uint8_t num_channels,
+    uint32_t num_samples_per_channel)
+{
+    double value;
+    uint32_t i;
+    uint32_t index;
+    
+    value = 0.0;
+    for (i = 0; i < num_samples_per_channel; i++)
+    {
+        index = (i * num_channels) + channel;
+        value += (data[index] * data[index]) / num_samples_per_channel;
+    }
+    
+    return sqrt(value);
+}
 
 int main(void)
 {
@@ -114,6 +135,9 @@ int main(void)
 
     printf("\nMCC 172 finite scan example\n");
     printf("    Functions demonstrated:\n");
+    printf("        mcc172_iepe_config_write\n");
+    printf("        mcc172_a_in_clock_config_read\n");
+    printf("        mcc172_a_in_clock_config_write\n");
     printf("        mcc172_a_in_scan_start\n");
     printf("        mcc172_a_in_scan_read\n");
     printf("    IEPE power: %s\n", iepe_enable ? "on" : "off");
@@ -137,7 +161,7 @@ int main(void)
     strcpy(display_header, "Samples Read    Scan Count    ");
     for (i = 0; i < num_channels; i++)
     {
-        sprintf(channel_string, "Channel %d   ", channel_array[i]);
+        sprintf(channel_string, "Ch %d RMS  ", channel_array[i]);
         strcat(display_header, channel_string);
     }
     strcat(display_header, "\n");
@@ -167,20 +191,21 @@ int main(void)
         if (samples_read_per_channel > 0)
         {
             // Display the last sample for each channel.
-            printf("\r%12.0d    %10.0d ", samples_read_per_channel,
+            printf("\r%12.0d    %10.0d  ", samples_read_per_channel,
                 total_samples_read);
 
-            int index = samples_read_per_channel * num_channels - num_channels;
-
+            // Calculate and display RMS voltage of the input data
             for (i = 0; i < num_channels; i++)
             {
-                printf("%10.5f V", read_buf[index + i]);
+                printf("%10.4f",
+                    calc_rms(read_buf, i, num_channels,
+                        samples_read_per_channel));
             }
             fflush(stdout);
 
         }
 
-        usleep(1000);
+        usleep(100000);
     }
     while ((result == RESULT_SUCCESS) &&
            ((read_status & STATUS_RUNNING) == STATUS_RUNNING) &&

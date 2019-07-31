@@ -1,6 +1,6 @@
 NAME = continuous_scan
 OBJ = $(NAME).o
-LIBS = -ldaqhats
+LIBS = -ldaqhats -lm
 CFLAGS = -Wall -I/usr/local/include -g
 CC = gcc
 EXTENSION = .c

@@ -6,7 +6,7 @@ channels.
 
 Analog input data is acquired in blocks for a specified group of channels.
 
-The last sample of data for each channel is displayed for each block of data 
+The RMS voltage for each channel is displayed for each block of data 
 received from the device. The acquisition is stopped when the Enter key is 
 pressed.
 
