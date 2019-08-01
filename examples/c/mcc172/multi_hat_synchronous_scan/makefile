@@ -1,7 +1,7 @@
-NAME = finite_scan
+NAME = multi_hat_synchronous_scan
 OBJ = $(NAME).o
 LIBS = -ldaqhats -lm
-CFLAGS = -Wall -I/usr/local/include -g
+CFLAGS = -Wall -I/usr/local/include -I./ -g
 CC = gcc
 EXTENSION = .c
 

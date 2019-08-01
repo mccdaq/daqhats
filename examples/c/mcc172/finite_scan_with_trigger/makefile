@@ -1,4 +1,4 @@
-NAME = finite_scan
+NAME = finite_scan_with_trigger
 OBJ = $(NAME).o
 LIBS = -ldaqhats -lm
 CFLAGS = -Wall -I/usr/local/include -g

@@ -8,14 +8,15 @@
         mcc172_a_in_scan_read
 
     Purpose:
-        Perform a finite acquisition on 1 or more channels.
+        Perform a finite acquisition on 1 or more channels using the digital
+        trigger to start the acquisition.
 
     Description:
         Acquires blocks of analog input data for a user-specified group
-        of channels.  The RMS voltage for each channel is
-        displayed for each block of data received from the device.  The
-        acquisition is stopped when the specified number of samples is
-        acquired for each channel.
+        of channels when the digital trigger meets the specified condition.
+        The RMS voltage for each channel is displayed for each block of data
+        received from the device.  The acquisition is stopped when the specified
+        number of samples is acquired for each channel.
 
 *****************************************************************************/
 #include <math.h>
@@ -46,6 +47,7 @@ int main(void)
     char options_str[512];
     char c;
     char display_header[512];
+    char trigger_mode_str[512];
     int i;
 
     // Set the channel mask which is used by the library function
@@ -71,7 +73,9 @@ int main(void)
     double scan_rate = 10240.0;
     double actual_scan_rate = 0.0;
 
-    uint32_t options = OPTS_DEFAULT;
+    uint32_t options = OPTS_EXTTRIGGER;
+    uint8_t trigger_mode = TRIG_RISING_EDGE;
+    int cancel_trigger = 0;
 
     uint16_t read_status = 0;
     uint32_t samples_read_per_channel = 0;
@@ -132,12 +136,14 @@ int main(void)
     } while (synced == 0);
 
     convert_options_to_string(options, options_str);
+    convert_trigger_mode_to_string(trigger_mode, trigger_mode_str);
 
     printf("\nMCC 172 finite scan example\n");
     printf("    Functions demonstrated:\n");
     printf("        mcc172_iepe_config_write\n");
     printf("        mcc172_a_in_clock_config_read\n");
     printf("        mcc172_a_in_clock_config_write\n");
+    printf("        mcc172_trigger_config\n");
     printf("        mcc172_a_in_scan_start\n");
     printf("        mcc172_a_in_scan_read\n");
     printf("    IEPE power: %s\n", iepe_enable ? "on" : "off");
@@ -146,16 +152,45 @@ int main(void)
     printf("    Requested scan rate: %-10.2f\n", scan_rate);
     printf("    Actual scan rate: %-10.2f\n", actual_scan_rate);
     printf("    Options: %s\n", options_str);
+    printf("    Trigger mode: %s\n", trigger_mode_str);
 
     printf("\nPress ENTER to continue\n");
     scanf("%c", &c);
 
+    // Configure the trigger.
+    result = mcc172_trigger_config(address, SOURCE_LOCAL, trigger_mode);
+    STOP_ON_ERROR(result);
+    
     // Configure and start the scan.
     result = mcc172_a_in_scan_start(address, channel_mask, samples_per_channel,
         options);
     STOP_ON_ERROR(result);
 
-    printf("Starting scan ... Press ENTER to stop\n\n");
+    printf("Waiting for trigger ... press ENTER to cancel the trigger\n");
+    do
+    {
+        result = mcc172_a_in_scan_status(address, &read_status,
+            &samples_read_per_channel);
+        STOP_ON_ERROR(result);
+
+        cancel_trigger = enter_press();
+        if (!cancel_trigger && 
+            ((read_status & STATUS_TRIGGERED) != STATUS_TRIGGERED))
+        {
+            usleep(1000);
+        }
+    } 
+    while ((result == RESULT_SUCCESS) &&
+           ((read_status & STATUS_TRIGGERED) != STATUS_TRIGGERED) && 
+           !cancel_trigger);
+
+    if (cancel_trigger)
+    {
+        printf("Trigger cancelled by user\n");
+        goto stop;
+    }
+
+    printf("\nStarting scan ... Press ENTER to stop\n\n");
 
     // Create the header containing the column names.
     strcpy(display_header, "Samples Read    Scan Count    ");
@@ -190,6 +225,7 @@ int main(void)
 
         if (samples_read_per_channel > 0)
         {
+            // Display the last sample for each channel.
             printf("\r%12.0d    %10.0d  ", samples_read_per_channel,
                 total_samples_read);
 
