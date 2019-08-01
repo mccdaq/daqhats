@@ -400,8 +400,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     //uint16_t rx_buffer_size = MSG_RX_HEADER_SIZE + rx_data_count + 5;
 
-    tx_count = _create_frame(dev->tx_buffer, command, tx_data_count, tx_data);
-
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
@@ -427,6 +425,8 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             return RESULT_UNDEFINED;
         }
     }
+
+    tx_count = _create_frame(dev->tx_buffer, command, tx_data_count, tx_data);
 
     // Init the spi ioctl structure, using temp_buffer for the intermediate
     // reply.
@@ -1520,7 +1520,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     uint8_t buffer[2];
 
     if (!_check_addr(address) ||
-        (clock_source > 1))
+        (clock_source > SOURCE_SLAVE))
     {
         return RESULT_BAD_PARAMETER;
     }
