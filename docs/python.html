@@ -3304,7 +3304,9 @@ and shared over the Raspberry Pi header with other MCC 172s.</li>
 <li><a class="reference internal" href="#daqhats.SourceType.SLAVE" title="daqhats.SourceType.SLAVE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SourceType.SLAVE</span></code></a>: no clock is generated on this MCC 172,
 it receives its clock from the Raspberry Pi header.</li>
 </ul>
-<p>The sampling rate will not be valid in slave mode if synced is False.</p>
+<p>The sampling rate will not be valid in slave mode if synced is False.
+The device will not detect a loss of the master clock when in slave
+mode; it only monitors the clock when a sync is initiated.</p>
 <dl class="docutils">
 <dt>Returns</dt>
 <dd><p class="first">namedtuple: a namedtuple containing the following field names:</p>

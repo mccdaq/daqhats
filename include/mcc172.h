@@ -220,6 +220,8 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 *     172, it receives its clock from the master MCC 172.
 *
 *   The sampling rate will not be valid in slave mode if synced is equal to 0. 
+*   The device will not detect a loss of the master clock when in slave mode; 
+*   it only monitors the clock when a sync is initiated.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param clock_source Receives the ADC clock source, one of the
@@ -299,6 +301,17 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
 *   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): The trigger terminal on this MCC
 *     172 is not used, it receives its trigger from the master MCC 172.
 *
+*   The trigger mode must be one of:
+*
+*   - [TRIG_RISING_EDGE](@ref TRIG_RISING_EDGE): Start the scan on a rising edge
+*     of TRIG.
+*   - [TRIG_FALLING_EDGE](@ref TRIG_FALLING_EDGE): Start the scan on a falling
+*     edge of TRIG.
+*   - [TRIG_ACTIVE_HIGH](@ref TRIG_ACTIVE_HIGH): Start the scan any time TRIG is
+*     high.
+*   - [TRIG_ACTIVE_LOW](@ref TRIG_ACTIVE_LOW): Start the scan any time TRIG is
+*     low.
+*
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param source   The trigger source, one of the
 *       [source type](@ref SourceType) values.
@@ -331,12 +344,11 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode);
 *       cleaned up by calling mcc172_a_in_scan_cleanup(), so another scan may
 *       not be started.
 *   - \b Running: The scan is active and the device is still acquiring data.
-*       Certain functions like mcc172_a_in_read() will return an error because
-*       the device is busy.
+*       Certain functions will return an error because the device is busy.
 *
 *   The valid options are:
 *       - [OPTS_NOSCALEDATA](@ref OPTS_NOSCALEDATA): Returns ADC code (a value
-*           between 0 and 4095) rather than voltage.
+*           between AI_MIN_CODE and AI_MAX_CODE) rather than voltage.
 *       - [OPTS_NOCALIBRATEDATA](@ref OPTS_NOCALIBRATEDATA): Return data without
 *           the calibration factors applied.
 *       - [OPTS_EXTTRIGGER](@ref OPTS_EXTTRIGGER): Hold off the scan (after

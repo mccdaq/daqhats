@@ -2622,7 +2622,7 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1a6bbbe701eb16b191dfb6e3b3c42c7f9e"><span class="std std-ref">SOURCE_SLAVE</span></a>: No clock is generated on this MCC 172, it receives its clock from the master MCC 172.</li>
 </ul>
 </p>
-<p>The sampling rate will not be valid in slave mode if synced is equal to 0.</p>
+<p>The sampling rate will not be valid in slave mode if synced is equal to 0. The device will not detect a loss of the master clock when in slave mode; it only monitors the clock when a sync is initiated.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful </dd>
@@ -2683,6 +2683,14 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1a6bbbe701eb16b191dfb6e3b3c42c7f9e"><span class="std std-ref">SOURCE_SLAVE</span></a>: The trigger terminal on this MCC 172 is not used, it receives its trigger from the master MCC 172.</li>
 </ul>
 </p>
+<p>The trigger mode must be one of:</p>
+<p><ul class="simple">
+<li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aa1df95eae49cc686aa6b9f91fa13c220b"><span class="std std-ref">TRIG_RISING_EDGE</span></a>: Start the scan on a rising edge of TRIG.</li>
+<li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aaa008e9300e76a51f4c60fd9bf2ae5546"><span class="std std-ref">TRIG_FALLING_EDGE</span></a>: Start the scan on a falling edge of TRIG.</li>
+<li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aa3f701a26940df0c263d230b753f61274"><span class="std std-ref">TRIG_ACTIVE_HIGH</span></a>: Start the scan any time TRIG is high.</li>
+<li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aa95176a26d99fad97d400764990a71c0b"><span class="std std-ref">TRIG_ACTIVE_LOW</span></a>: Start the scan any time TRIG is low.</li>
+</ul>
+</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
@@ -2705,11 +2713,11 @@ type of board.  The library may be used with C and C++.</p>
 <p>The scan cannot be started until the ADCs are synchronized, so this function will not return until that has completed. It is best to wait for sync using <a class="reference internal" href="#mcc172_8h_1a72040179e9edd47cf94addf821a27720"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a> before starting the scan.</p>
 <p>The scan state has defined terminology:<ul class="simple">
 <li><strong>Active:</strong> <a class="reference internal" href="#mcc172_8h_1aef1b8c4747b1c53413ab993db9ca85b5"><span class="std std-ref">mcc172_a_in_scan_start()</span></a> has been called and the device may be acquiring data or finished with the acquisition. The scan has not been cleaned up by calling <a class="reference internal" href="#mcc172_8h_1a3c623caa4d914138eb3b8def0ecece2d"><span class="std std-ref">mcc172_a_in_scan_cleanup()</span></a>, so another scan may not be started.</li>
-<li><strong>Running:</strong> The scan is active and the device is still acquiring data. Certain functions like mcc172_a_in_read() will return an error because the device is busy.</li>
+<li><strong>Running:</strong> The scan is active and the device is still acquiring data. Certain functions will return an error because the device is busy.</li>
 </ul>
 </p>
 <p>The valid options are:<ul class="simple">
-<li><a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a>: Returns ADC code (a value between 0 and 4095) rather than voltage.</li>
+<li><a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a>: Returns ADC code (a value between AI_MIN_CODE and AI_MAX_CODE) rather than voltage.</li>
 <li><a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a>: Return data without the calibration factors applied.</li>
 <li><a class="reference internal" href="#daqhats_8h_1aa2c6cc0f41865f0885ab83c6aa446dc1"><span class="std std-ref">OPTS_EXTTRIGGER</span></a>: Hold off the scan (after calling <a class="reference internal" href="#mcc172_8h_1aef1b8c4747b1c53413ab993db9ca85b5"><span class="std std-ref">mcc172_a_in_scan_start()</span></a>) until the trigger condition is met.</li>
 <li><a class="reference internal" href="#daqhats_8h_1af34e1d3813b5909d7b8bf3012a2d829a"><span class="std std-ref">OPTS_CONTINUOUS</span></a>: Scans continuously until stopped by the user by calling <a class="reference internal" href="#mcc172_8h_1a91b01737a38dfc59846414392f09352f"><span class="std std-ref">mcc172_a_in_scan_stop()</span></a> and writes data to a circular buffer. The data must be read before being overwritten to avoid a buffer overrun error. <strong>samples_per_channel</strong> is only used for buffer sizing.</li>
