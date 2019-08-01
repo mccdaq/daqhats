@@ -451,6 +451,8 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
           it receives its clock from the Raspberry Pi header.
 
         The sampling rate will not be valid in slave mode if synced is False.
+        The device will not detect a loss of the master clock when in slave
+        mode; it only monitors the clock when a sync is initiated.
 
         Returns
             namedtuple: a namedtuple containing the following field names:
@@ -524,7 +526,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
-        result = self._lib.mcc172_trigger_mode(
+        result = self._lib.mcc172_trigger_config(
             self._address, trigger_source, trigger_mode)
         if result == self._RESULT_BUSY:
             raise HatError(
