@@ -26,7 +26,7 @@ KISS FFT is provided under:
 Being under the terms of the BSD 3-clause "New" or "Revised" License,
 according with:
 
-    kiss_fft/LICENSES/BSD-3-Clause
+    LICENSES/BSD-3-Clause
 ```
 
 ## Support/Feedback
