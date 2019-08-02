@@ -341,7 +341,7 @@ int main(void)
         
         free(spectrum);
 
-        printf("Data and FFT saved in fft_test.csv.\n");
+        printf("Data and FFT saved in fft_scan.csv.\n");
     }
     else
     {

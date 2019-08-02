@@ -273,6 +273,7 @@ def read_and_display_data(hat, samples_per_channel, scan_rate):
                 i, order_suffix(i), h_val, h_freq))
         i += 1
 
+    print('Data and FFT saved in fft_scan.csv')
 
 if __name__ == '__main__':
     main()
