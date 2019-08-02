@@ -11,7 +11,11 @@ specified channels until the scan is stopped.
 
 - **fft_scan**: acquires a block of analog data from a single channel, performs
 an FFT on the data, finds the peak frequency and harmonics, and saves the data
-and FFT to a CSV file.
+and FFT to a CSV file.  This example requires the NumPy library; if it is not
+installed you can install it with:
+```sh
+sudo pip install numpy
+```
 
 - **finite_scan**: acquires a block of analog input data from user-specified 
 channels.
