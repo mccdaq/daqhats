@@ -7,26 +7,26 @@ examples are ready-to-run and can be customized to suit your needs.
 
 ## Example Programs
 - **continuous_scan**: continuously acquires blocks of analog input data from 
-specified channels until the scan is stopped. 
+  specified channels until the scan is stopped. 
 
 - **fft_scan**: acquires a block of analog data from a single channel, performs
-an FFT on the data, finds the peak frequency and harmonics, and saves the data
-and FFT to a CSV file.  This example requires the NumPy library; if it is not
-installed you can install it with:
-```sh
-sudo pip install numpy
-```
+  an FFT on the data, finds the peak frequency and harmonics, and saves the data
+  and FFT to a CSV file.  This example requires the NumPy library; if it is not
+  installed you can install it with:
+  ```sh
+  sudo pip install numpy
+  ```
 
 - **finite_scan**: acquires a block of analog input data from user-specified 
-channels.
+  channels.
 
 - **finite_scan_with_trigger**: waits for an external trigger to occur, and 
-then acquires blocks of analog input data for a user-specified group of 
-channels.
+  then acquires blocks of analog input data for a user-specified group of 
+  channels.
 
 - **multi_hat_synchronous_scan**: acquires synchronous data from up to 
-eight MCC 172 HATs using the shared clock and trigger scan.
-One MCC 172 HAT (**master** device) provides the clock for synchronous acquisition.
+  eight MCC 172 HATs using the shared clock and trigger scan.
+  One MCC 172 HAT (**master** device) provides the clock for synchronous acquisition.
 
   Wire the MCC 172 HATs as listed below to synchronously acquire data:
   * Stack the MCC 172 HATs onto the Pi per the documentation.
@@ -42,8 +42,8 @@ One MCC 172 HAT (**master** device) provides the clock for synchronous acquisiti
   will be read by the devices.
 
   > Refer to **a_in_scan_start()**, **a_in_clock_config_write()**, and
-  **trigger_config()** in the documentation for information about shared clock
-  and trigger.
+    **trigger_config()** in the documentation for information about shared clock
+    and trigger.
 
 ## Running an Example
 To run an example, open a terminal window in the folder where the example is 
