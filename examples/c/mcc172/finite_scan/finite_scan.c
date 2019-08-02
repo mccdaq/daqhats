@@ -215,6 +215,14 @@ int main(void)
 stop:
     print_error(mcc172_a_in_scan_stop(address));
     print_error(mcc172_a_in_scan_cleanup(address));
+    
+    // Turn off IEPE supply
+    for (i = 0; i < num_channels; i++)
+    {
+        result = mcc172_iepe_config_write(address, channel_array[i], 0);
+        STOP_ON_ERROR(result);
+    }
+    
     print_error(mcc172_close(address));
 
     return 0;

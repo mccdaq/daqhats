@@ -22,7 +22,7 @@ then acquires blocks of analog input data for a user-specified group of
 channels.
 
 - **multi_hat_synchronous_scan**: acquires synchronous data from up to 
-eight MCC 118 HATs using external clock and trigger options. Refer to the 
+eight MCC 172 HATs using shared clock and trigger options. Refer to the 
 README file in the multi_hat_synchronous_scan example folder for more 
 information.
 
