@@ -291,7 +291,7 @@ int main(void)
             mcc172_info()->AI_MAX_RANGE, spectrum);
 
         // Calculate dBFS and find peak
-        logfile = fopen("fft_test.csv", "wt");
+        logfile = fopen("fft_scan.csv", "wt");
         fprintf(logfile, "Time data (V), Frequency (Hz), Spectrum (dBFS)\n");
         
         f_i = 0.0;

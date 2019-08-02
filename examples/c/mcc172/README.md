@@ -14,6 +14,10 @@ folder where the example is located.
 - **continuous_scan**: continuously acquires blocks of analog input data from 
 specified channels until the scan is stopped.
 
+- **fft_scan**: acquires a block of analog data from a single channel, performs
+an FFT on the data, finds the peak frequency and harmonics, and saves the data
+and FFT to a CSV file.
+
 - **finite_scan**: acquires a block of analog input data from user-specified 
 channels.
 
