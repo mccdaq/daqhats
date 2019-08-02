@@ -6,7 +6,7 @@
         mcc172.a_in_clock_config_write
         mcc172.a_in_clock_config_read
         mcc172.a_in_scan_start
-        mcc172.a_in_scan_read
+        mcc172.a_in_scan_read_numpy
         mcc172.a_in_scan_stop
 
     Purpose:
@@ -18,6 +18,8 @@
         an FFT calculation to determine the frequency content. The highest
         frequency peak is detected and displayed, along with harmonics. The
         time and frequency data are saved to a CSV file.
+
+        This example requires the NumPy library.
 
 """
 from __future__ import print_function
@@ -93,7 +95,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         print('         mcc172.a_in_clock_config_write')
         print('         mcc172.a_in_clock_config_read')
         print('         mcc172.a_in_scan_start')
-        print('         mcc172.a_in_scan_read')
+        print('         mcc172.a_in_scan_read_numpy')
         print('         mcc172.a_in_scan_stop')
         print('         mcc172.a_in_scan_cleanup')
         print('    IEPE power: ', end='')
