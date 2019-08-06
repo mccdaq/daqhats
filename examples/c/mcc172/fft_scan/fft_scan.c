@@ -280,9 +280,6 @@ int main(void)
         goto stop;
     }
 
-    print_error(mcc172_a_in_scan_stop(address));
-    print_error(mcc172_a_in_scan_cleanup(address));
-
     if (samples_read_per_channel >= samples_per_channel)
     {
         // Calculate and display the FFT.
