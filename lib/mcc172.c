@@ -878,6 +878,7 @@ static void* _scan_thread(void* arg)
     //uint16_t largest_read;
     uint8_t rx_buffer[5];
     bool scan_running;
+    int result;
 #ifdef DEBUG
     char str[80];
 #endif
@@ -923,8 +924,8 @@ static void* _scan_thread(void* arg)
     do
     {
         // read the scan status
-        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
-            1*MSEC, 20) == RESULT_SUCCESS)
+        if ((result = _spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
+            1*MSEC, 20)) == RESULT_SUCCESS)
         {
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
             max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
@@ -1047,7 +1048,7 @@ static void* _scan_thread(void* arg)
         }
         else
         {
-            printf(".\n");
+            printf(". %d\n", result);
         }
 
         usleep(sleep_us);
