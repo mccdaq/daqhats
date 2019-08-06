@@ -60,7 +60,7 @@ int main(void)
         CHAN0 | CHAN1,
         CHAN0 | CHAN1
     };
-    uint32_t options = 0; //OPTS_EXTTRIGGER;
+    uint32_t options = OPTS_EXTTRIGGER;
     
     uint32_t samples_per_channel = 10240;
     double sample_rate = 10240; // Samples per second
