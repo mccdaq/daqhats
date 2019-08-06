@@ -1045,11 +1045,6 @@ static void* _scan_thread(void* arg)
                 }
             }
         }
-        // debug
-        else
-        {
-            done = true;
-        }
 
         usleep(sleep_us);
 
