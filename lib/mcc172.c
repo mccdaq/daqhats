@@ -1045,6 +1045,10 @@ static void* _scan_thread(void* arg)
                 }
             }
         }
+        else
+        {
+            printf(".\n");
+        }
 
         usleep(sleep_us);
 
