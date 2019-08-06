@@ -2024,6 +2024,8 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             info->channel_count);
     }
 
+    printf("%d\n", samples_to_read);
+    
     if (samples_to_read)
     {
         // Wait for the all of the data to be read or a timeout
@@ -2103,6 +2105,9 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             (thread_running == false ? buffer_depth > 0 : true) &&
             !timed_out);
 
+        printf("%d %d %d %d %d\n", samples_to_read, error, thread_running,
+            buffer_depth, timed_out);
+            
         if (samples_read_per_channel)
         {
             *samples_read_per_channel = samples_read / info->channel_count;
