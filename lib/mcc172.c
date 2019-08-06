@@ -891,10 +891,10 @@ static void* _scan_thread(void* arg)
         return NULL;
     }
 
-    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    //pthread_mutex_lock(&_devices[address]->scan_mutex);
     info->thread_running = true;
     info->hw_overrun = false;
-    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+    //pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
     status_count = 0;
 
@@ -1065,6 +1065,10 @@ static void* _scan_thread(void* arg)
     if (stop_thread)
     {
         printf("t 4\n");
+    }
+    if (done)
+    {
+        printf("t 5\n");
     }
 
     if (info->scan_running)
