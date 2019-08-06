@@ -268,6 +268,7 @@ int main(void)
     result = mcc172_a_in_scan_read(address, &read_status, samples_per_channel,
         timeout, read_buf, buffer_size, &samples_read_per_channel);
     STOP_ON_ERROR(result);
+
     if (read_status & STATUS_HW_OVERRUN)
     {
         printf("\n\nHardware overrun\n");
@@ -315,11 +316,18 @@ int main(void)
         
         fclose(logfile);
 
-        // Interpolate for a more precise peak frequency.
-        peak_offset = quadratic_interpolate(spectrum[peak_index - 1], 
-            spectrum[peak_index], spectrum[peak_index + 1]);
-        peak_freq = (peak_index + peak_offset) * scan_rate / 
-            samples_per_channel;
+        if ((peak_index > 0) && (peak_index < (samples_per_channel/2)))
+        {
+            // Interpolate for a more precise peak frequency.
+            peak_offset = quadratic_interpolate(spectrum[peak_index - 1], 
+                spectrum[peak_index], spectrum[peak_index + 1]);
+            peak_freq = (peak_index + peak_offset) * scan_rate / 
+                samples_per_channel;
+        }
+        else
+        {
+            peak_freq = peak_index * scan_rate / samples_per_channel;
+        }
         printf("Peak: %.1f dBFS at %.1f Hz\n", peak_val, peak_freq);
         
         // Find and display harmonic levels.
@@ -346,6 +354,12 @@ int main(void)
     else
     {
         printf("Error, %d samples read.\n", samples_read_per_channel);
+        
+        printf("%X %d %f %d\n", 
+            read_status,
+            samples_per_channel,
+            timeout,
+            buffer_size);
     }
  
 
