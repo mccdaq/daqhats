@@ -162,6 +162,7 @@ struct mcc172ScanThreadInfo
     uint16_t options;
     volatile bool hw_overrun;
     volatile bool buffer_overrun;
+    volatile bool thread_started;
     volatile bool thread_running;
     bool stop_thread;
     bool triggered;
@@ -518,23 +519,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             diff = _difftime_us(&start_time, &current_time);
             timeout = (diff > reply_timeout_us);
         } while (!got_reply && !timeout);
-
-#if 0
-        if (!got_reply)
-        {
-            printf("Sent: ");
-            for (temp = 0; temp < tx_count; temp++)
-            {
-                printf("%02X ", dev->tx_buffer[temp]);
-            }
-            printf("\nGot: ");
-            for (temp = 0; temp < read_amount+1; temp++)
-            {
-                printf("%02X ", dev->rx_buffer[temp]);
-            }
-            printf("\n");
-        }
-#endif
     }
 
     if (!got_reply)
@@ -891,10 +875,11 @@ static void* _scan_thread(void* arg)
         return NULL;
     }
 
-    //pthread_mutex_lock(&_devices[address]->scan_mutex);
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    info->thread_started = true;
     info->thread_running = true;
     info->hw_overrun = false;
-    //pthread_mutex_unlock(&_devices[address]->scan_mutex);
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
     status_count = 0;
 
@@ -944,7 +929,6 @@ static void* _scan_thread(void* arg)
                 _syslog("hw overrun");
 #endif
                 done = true;
-                printf("t 1\n");
                 pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->scan_running = false;
                 pthread_mutex_unlock(&_devices[address]->scan_mutex);
@@ -1010,7 +994,6 @@ static void* _scan_thread(void* arg)
                             pthread_mutex_unlock(
                                 &_devices[address]->scan_mutex);
                             done = true;
-                            printf("t 2\n");
                         }
                         info->samples_transferred += read_count;
                     }
@@ -1042,16 +1025,11 @@ static void* _scan_thread(void* arg)
                 if (!scan_running && (available_samples == read_count))
                 {
                     done = true;
-                    printf("t 3 %d\n", available_samples);
                     pthread_mutex_lock(&_devices[address]->scan_mutex);
                     info->scan_running = false;
                     pthread_mutex_unlock(&_devices[address]->scan_mutex);
                 }
             }
-        }
-        else
-        {
-            printf(". %d\n", result);
         }
 
         usleep(sleep_us);
@@ -1062,15 +1040,6 @@ static void* _scan_thread(void* arg)
 
     } while (!stop_thread && !done);
     
-    if (stop_thread)
-    {
-        printf("t 4\n");
-    }
-    if (done)
-    {
-        printf("t 5\n");
-    }
-
     if (info->scan_running)
     {
         // if we are stopped while the device is still running a scan then
@@ -1827,6 +1796,8 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         return result;
     }
 
+    info->thread_started = false;
+    
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
@@ -1846,8 +1817,15 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 
     dev->scan_info->scan_running = true;
 
-    // Short sleep to allow thread to init
-    usleep(1);
+    // Wait for thread to start to avoid race conditions reading thread status
+    bool running;
+    do
+    {
+        usleep(1);
+        pthread_mutex_lock(&_devices[address]->scan_mutex);
+        running = info->thread_started;
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);
+    } while (!running);
 
     return RESULT_SUCCESS;
 }
@@ -2036,8 +2014,6 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             info->channel_count);
     }
 
-    printf("%d\n", samples_to_read);
-    
     if (samples_to_read)
     {
         // Wait for the all of the data to be read or a timeout
@@ -2117,9 +2093,6 @@ int mcc172_a_in_scan_read(uint8_t address, uint16_t* status,
             (thread_running == false ? buffer_depth > 0 : true) &&
             !timed_out);
 
-        printf("%d %d %d %d %d\n", samples_to_read, error, thread_running,
-            buffer_depth, timed_out);
-            
         if (samples_read_per_channel)
         {
             *samples_read_per_channel = samples_read / info->channel_count;
@@ -2511,22 +2484,6 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
-#if 0
-    printf("Sent: ");
-    for (temp = 0; temp < transfer_count; temp++)
-    {
-        printf("%02X ", ((uint8_t*)tx_data)[temp]);
-    }
-    if (rx_data != NULL)
-    {
-        printf("\nGot: ");
-        for (temp = 0; temp < transfer_count; temp++)
-        {
-            printf("%02X ", ((uint8_t*)rx_data)[temp]);
-        }
-    }
-    printf("\n");
-#endif
 
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
