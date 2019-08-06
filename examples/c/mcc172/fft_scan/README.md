@@ -14,8 +14,9 @@ To run the example, open a terminal window and enter the following commands:
    ./fft_scan
 ```
 
-This example uses the Kiss FFT library (https://github.com/mborgerding/kissfft), 
-which has the following license information:
+This example uses the Kiss FFT library (already included, but see 
+https://github.com/mborgerding/kissfft for more information), which has the
+following license information:
 ```
 Copyright (c) 2003-2010 Mark Borgerding . All rights reserved.
 
