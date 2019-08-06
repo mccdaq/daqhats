@@ -944,6 +944,7 @@ static void* _scan_thread(void* arg)
                 _syslog("hw overrun");
 #endif
                 done = true;
+                printf("t 1\n");
                 pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->scan_running = false;
                 pthread_mutex_unlock(&_devices[address]->scan_mutex);
@@ -1009,6 +1010,7 @@ static void* _scan_thread(void* arg)
                             pthread_mutex_unlock(
                                 &_devices[address]->scan_mutex);
                             done = true;
+                            printf("t 2\n");
                         }
                         info->samples_transferred += read_count;
                     }
@@ -1040,6 +1042,7 @@ static void* _scan_thread(void* arg)
                 if (!scan_running && (available_samples == read_count))
                 {
                     done = true;
+                    printf("t 3 %d\n", available_samples);
                     pthread_mutex_lock(&_devices[address]->scan_mutex);
                     info->scan_running = false;
                     pthread_mutex_unlock(&_devices[address]->scan_mutex);
@@ -1058,6 +1061,11 @@ static void* _scan_thread(void* arg)
         pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
     } while (!stop_thread && !done);
+    
+    if (stop_thread)
+    {
+        printf("t 4\n");
+    }
 
     if (info->scan_running)
     {
