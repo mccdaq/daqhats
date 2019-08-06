@@ -351,12 +351,6 @@ int main(void)
     else
     {
         printf("Error, %d samples read.\n", samples_read_per_channel);
-        
-        printf("%X %d %f %d\n", 
-            read_status,
-            samples_per_channel,
-            timeout,
-            buffer_size);
     }
  
 

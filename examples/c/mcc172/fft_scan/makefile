@@ -21,4 +21,4 @@ $(NAME): $(OBJ)
 
 clean:
 	(cd kiss_fft; make clean)
-	rm -f *.o *~ core $(NAME) fft_test.csv
+	rm -f *.o *~ core $(NAME) fft_scan.csv
