@@ -164,6 +164,7 @@ struct mcc118ScanThreadInfo
     uint16_t options;
     bool hw_overrun;
     bool buffer_overrun;
+    volatile bool thread_started;
     bool thread_running;
     bool stop_thread;
     bool triggered;
@@ -897,6 +898,7 @@ static void* _scan_thread(void* arg)
         return NULL;
     }
 
+    info->thread_started = true;
     info->thread_running = true;
     info->hw_overrun = false;
     status_count = 0;
@@ -1716,6 +1718,8 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         return result;
     }
 
+    info->thread_started = false;
+
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
@@ -1732,6 +1736,12 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
 
     pthread_attr_destroy(&attr);
+
+    // Wait for thread to start to avoid race conditions reading thread status
+    do
+    {
+        usleep(1);
+    } while (!info->thread_started);
 
     dev->scan_info->scan_running = true;
 
