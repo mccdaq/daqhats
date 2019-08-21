@@ -24,7 +24,6 @@
 
 // *****************************************************************************
 // Constants
-//#define DEBUG
 
 #define MAX_CODE                (4095)
 #define RANGE_MIN               (-10.0)
@@ -196,10 +195,6 @@ struct mcc118Device
 
 static struct mcc118Device* _devices[MAX_NUMBER_HATS];
 static bool _mcc118_lib_initialized = false;
-
-#ifdef DEBUG
-static bool log_open = false;
-#endif
 
 static const char* const spi_device = SPI_DEVICE_0; // the spidev device
 static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
@@ -875,9 +870,6 @@ static void* _scan_thread(void* arg)
     uint8_t rx_buffer[5];
     bool scan_running;
     bool stop_thread;
-#ifdef DEBUG
-    char str[80];
-#endif
 
     free(arg);
 
@@ -1068,8 +1060,6 @@ int mcc118_open(uint8_t address)
     struct mcc118Device* dev;
     uint16_t id_data[3];
 
-    printf("Development library\n");
-    
     _mcc118_lib_init();
 
     // validate the parameters
@@ -1785,6 +1775,11 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 {
     struct mcc118ScanThreadInfo* info;
     uint16_t stat;
+    uint16_t buffer_depth;
+    bool hw_overrun;
+    bool buffer_overrun;
+    bool triggered;
+    bool scan_running;
 
     if (!_check_addr(address) ||
         (status == NULL))
@@ -1805,24 +1800,33 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
         return RESULT_RESOURCE_UNAVAIL;
     }
 
+    // get thread values
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    buffer_depth = info->buffer_depth;
+    hw_overrun = info->hw_overrun;
+    buffer_overrun = info->buffer_overrun;
+    triggered = info->triggered;
+    scan_running = info->scan_running;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
     if (samples_per_channel)
     {
-        *samples_per_channel = info->buffer_depth / info->channel_count;
+        *samples_per_channel = buffer_depth / info->channel_count;
     }
 
-    if (info->hw_overrun)
+    if (hw_overrun)
     {
         stat |= STATUS_HW_OVERRUN;
     }
-    if (info->buffer_overrun)
+    if (buffer_overrun)
     {
         stat |= STATUS_BUFFER_OVERRUN;
     }
-    if (info->triggered)
+    if (triggered)
     {
         stat |= STATUS_TRIGGERED;
     }
-    if (info->scan_running)
+    if (scan_running)
     {
         stat |= STATUS_RUNNING;
     }
@@ -1859,9 +1863,6 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
     bool triggered;
     bool scan_running;
     bool thread_running;
-#ifdef DEBUG
-    char str[80];
-#endif
 
     if (!_check_addr(address) ||
         (status == NULL) ||
@@ -2150,8 +2151,7 @@ int mcc118_bootmem_read(uint8_t address, uint16_t mem_address, uint16_t count,
 {
     uint8_t temp[4];
 
-    if (!_check_addr(address))// ||
-        //(count > MAX_RX_DATA_SIZE))
+    if (!_check_addr(address))
     {
         return RESULT_BAD_PARAMETER;
     }
