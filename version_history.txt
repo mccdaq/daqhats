@@ -1,3 +1,7 @@
+1.2.0.2:
+    - Fixed MCC 118 scan thread sync issues that could cause occasional hangs
+    when starting a scan.
+
 1.2.0.1:
     - Fixed compile warnings in Raspbian Buster.
     - Fixed Python web server examples for compatibility with Dash 1.0.
