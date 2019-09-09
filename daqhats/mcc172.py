@@ -16,6 +16,14 @@ class SourceType(IntEnum):
     MASTER = 1    #: Use a local source and set it as master.
     SLAVE = 2     #: Use a master source from another MCC 172.
 
+@unique
+class AliasMode(IntEnum):
+    """Anti-aliasing mode options."""
+    NORMAL = 0      #: Normal anti-aliasing mode, the data rate is the same as
+                    #: the ADC sampling rate.
+    ENHANCED = 1    #: Enhanced anti-aliasing mode, the ADC rate is at or near
+                    #: the maximum and the data rate is decreased by decimation.
+
 class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
     """
     The class for an MCC 172 board.
@@ -95,11 +103,12 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         self._lib.mcc172_iepe_config_write.restype = c_int
 
         self._lib.mcc172_a_in_clock_config_read.argtypes = [
-            c_ubyte, POINTER(c_ubyte), POINTER(c_double), POINTER(c_ubyte)]
+            c_ubyte, POINTER(c_ubyte), POINTER(c_ubyte), POINTER(c_double),
+            POINTER(c_ubyte)]
         self._lib.mcc172_a_in_clock_config_read.restype = c_int
 
         self._lib.mcc172_a_in_clock_config_write.argtypes = [
-            c_ubyte, c_ubyte, c_double]
+            c_ubyte, c_ubyte, c_ubyte, c_double]
         self._lib.mcc172_a_in_clock_config_write.restype = c_int
 
         self._lib.mcc172_trigger_config.argtypes = [c_ubyte, c_ubyte, c_ubyte]
@@ -372,13 +381,14 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             raise HatError(self._address, "Incorrect response.")
         return mode.value
 
-    def a_in_clock_config_write(self, clock_source, sample_rate_per_channel):
+    def a_in_clock_config_write(
+            self, clock_source, alias_mode, sample_rate_per_channel):
         """
         Configure the ADC sampling clock.
 
         This method will configure the ADC sampling clock. The default
-        configuration after opening the device is local mode, 51.2 KHz sampling
-        rate. The clock source must be one of:
+        configuration after opening the device is local mode, normal alias
+        rejection, 51.2 KHz sampling rate. The clock source must be one of:
 
         * :py:const:`SourceType.LOCAL`: the clock is generated on this MCC 172
           and not shared with any other devices.
@@ -388,6 +398,16 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
           it receives its clock from the Raspberry Pi header. Another MCC 172
           must be configured for master clock.
+
+        The alias mode must be one of:
+
+        * :py:const:`AliasMode.NORMAL`: The data rate is the same as the clock
+          rate and alias rejection is normal.
+        * :py:const:`AliasMode.ENHANCED`: The clock is operated at a rate of
+          25.6 kHz or higher to prevent signals that are lower than the fixed
+          analog filter but not blocked by the variable digital filter from
+          aliasing into the data. The data rate is achieved by decimating the
+          data in the MCC 172 firmware.
 
         The ADCs will be synchronized so they sample the inputs at the same
         time. This requires 128 clock cycles before the first sample is
@@ -399,6 +419,9 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * Configure the clock on the slave device(s) first, master last. The
           synchronization will occur when the master clock is configured,
           causing the ADCs on all the devices to be in sync.
+        * All synchronized devices must use the same alias rejection mode.
+        * A trigger must be used for the data streams from all devices to start
+          on the same sample.
 
         The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by
         an integer between 1 and 256. The sample_rate_per_channel will be
@@ -421,7 +444,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         result = self._lib.mcc172_a_in_clock_config_write(
-            self._address, clock_source, sample_rate_per_channel)
+            self._address, clock_source, alias_mode, sample_rate_per_channel)
         if result == self._RESULT_BUSY:
             raise HatError(
                 self._address, "Cannot change the clock "
@@ -450,6 +473,16 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
           it receives its clock from the Raspberry Pi header.
 
+        The alias mode will be one of:
+
+        * :py:const:`AliasMode.NORMAL`: The data rate is the same as the clock
+          rate and alias rejection is normal.
+        * :py:const:`AliasMode.ENHANCED`: The clock is operated at a rate of
+          25.6 kHz or higher to prevent signals that are lower than the fixed
+          analog filter but not blocked by the variable digital filter from
+          aliasing into the data. The data rate is achieved by decimating the
+          data in the MCC 172 firmware
+
         The sampling rate will not be valid in slave mode if synced is False.
         The device will not detect a loss of the master clock when in slave
         mode; it only monitors the clock when a sync is initiated.
@@ -458,7 +491,8 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             namedtuple: a namedtuple containing the following field names:
 
             * **clock_source** (:py:class:`SourceType`): The ADC clock source.
-            * **sample_rate_per_channel** (float): The actual sampling rate in
+            * **alias_mode** (:py:class:`AliasMode`): The alias mode.
+            * **sample_rate_per_channel** (float): The sample rate in
               samples per second per channel.
             * **synchronized** (bool): True if the ADCs are synchronized, False
               if a synchronization is in progress.
@@ -470,20 +504,23 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         clock_source = c_ubyte()
+        alias_mode = c_ubyte()
         sample_rate_per_channel = c_double()
         synced = c_ubyte()
         result = self._lib.mcc172_a_in_clock_config_read(
-            self._address, byref(clock_source), byref(sample_rate_per_channel),
-            byref(synced))
+            self._address, byref(clock_source), byref(alias_mode),
+            byref(sample_rate_per_channel), byref(synced))
 
         if result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
 
         clock_config = namedtuple(
             'MCC172ClockConfig',
-            ['clock_source', 'sample_rate_per_channel', 'synchronized'])
+            ['clock_source', 'alias_mode', 'sample_rate_per_channel',
+             'synchronized'])
         return clock_config(
             clock_source=clock_source.value,
+            alias_mode=alias_mode.value,
             sample_rate_per_channel=sample_rate_per_channel.value,
             synchronized=synced.value != 0)
 
@@ -1068,54 +1105,23 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
         return
 
-    def test_clock(self, mode):
+    def test_signals_read(self):
         """
-        Test the sample clock pin (CLK).
+        Read the state of shared signals for testing.
 
-        This function exercises the CLK pin in output mode and returns the value
-        read at the pin for input testing.  Return the mode to input after
-        testing the pin.
-
-        Args:
-            mode (int): The CLK pin mode
-
-                * 0 = input
-                * 1 = output low
-                * 2 = output high
-                * 3 = output 1 kHz square wave
+        This function reads the state of the ADC clock, sync, and trigger
+        signals. Use it in conjunction with :py:func:`a_in_clock_config_write`
+        and :py:func:`trigger_config` to put the signals into slave mode then
+        set values on the signals using the Raspberry Pi GPIO pins. This method
+        will return the values present on those signals.
 
         Returns:
-            int: the value read at the CLK pin after applying the mode (0 or 1).
+            namedtuple: a namedtuple containing the following field names:
 
-        Raises:
-            HatError: the board is not initialized, does not respond, or
-                responds incorrectly.
-            ValueError: the mode is invalid.
-        """
-        if not self._initialized:
-            raise HatError(self._address, "Not initialized.")
-
-        if mode not in range(4):
-            raise ValueError("Invalid mode. Must be 0-3.")
-
-        data_value = c_ubyte()
-        result = self._lib.mcc172_test_clock(self._address, mode,
-                                             byref(data_value))
-        if result == self._RESULT_BUSY:
-            raise HatError(self._address,
-                           "Cannot test the CLK pin while a scan is running.")
-        elif result != self._RESULT_SUCCESS:
-            raise HatError(self._address, "Incorrect response.")
-        return data_value.value
-
-    def test_trigger(self):
-        """
-        Test the external trigger pin (TRIG).
-
-        This value read at the pin for input testing.
-
-        Returns:
-            int: the value read at the TRIG pin (0 or 1).
+            * **clock** (int): The current value of the clock signal (0 or 1).
+            * **sync** (int): The current value of the sync signal (0 or 1).
+            * **trigger** (int): The current value of the trigger signal
+              (0 or 1).
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -1124,8 +1130,51 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        data_value = c_ubyte()
-        result = self._lib.mcc172_test_trigger(self._address, byref(data_value))
+        clock = c_ubyte()
+        sync = c_ubyte()
+        trigger = c_ubyte()
+        result = self._lib.mcc172_test_signals_read(
+            self._address, byref(clock), byref(sync), byref(trigger))
         if result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
-        return data_value.value
+
+        test_status = namedtuple(
+            'MCC172TestRead',
+            ['clock', 'sync', 'trigger'])
+        return test_status(
+            clock=clock.value,
+            sync=sync.value,
+            trigger=trigger.value)
+
+    def test_signals_write(self, mode, clock, sync):
+        """
+        Write values to shared signals for testing.
+
+        This function puts the shared signals into test mode and sets them to
+        the specified state. The signal levels can then be read on the Raspberry
+        Pi GPIO pins to confirm values. Return the device to normal mode when
+        testing is complete.
+
+        ADC conversions will not occur while in test mode. The ADCs require
+        synchronization after exiting test mode, so use
+        :py:func:`a_in_clock_config_write` to perform synchronization.
+
+        Args:
+            mode (int): Set to 1 for test mode or 0 for normal mode.
+            clock (int): The value to write to the clock signal in test mode
+                (0 or 1).
+            sync (int): The value to write to the sync signal in test mode
+                (0 or 1).
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+
+        result = self._lib.mcc172_test_signals_write(
+            self._address, mode, clock, sync)
+        if result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response.")
+        return

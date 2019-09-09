@@ -70,6 +70,8 @@ struct MCC172DeviceInfo mcc172_device_info =
 #define CMD_AINCLOCKCONFIG_W    0x16
 #define CMD_TRIGGERCONFIG_R     0x17
 #define CMD_TRIGGERCONFIG_W     0x18
+#define CMD_DECIMATEFACTOR_R    0x19
+#define CMD_DECIMATEFACTOR_W    0x1A
 
 #define CMD_BLINK               0x40
 #define CMD_ID                  0x41
@@ -182,6 +184,7 @@ struct mcc172Device
     int spi_fd;                 // SPI file descriptor
     uint8_t trigger_source;     // Trigger source
     uint8_t trigger_mode;       // Trigger mode
+    uint16_t decimate_factor;   // Decimation factor
     struct mcc172FactoryData factory_data;  // Factory data
     struct mcc172ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
@@ -901,7 +904,7 @@ static void* _scan_thread(void* arg)
         calibrated = true;
     }
 
-#define MIN_SLEEP_US	200
+#define MIN_SLEEP_US	100
 #define TRIG_SLEEP_US	1000
 
     done = false;
@@ -1068,6 +1071,7 @@ int mcc172_open(uint8_t address)
     uint16_t custom_size;
     struct mcc172Device* dev;
     uint16_t id_data[3];
+    uint8_t buffer;
 
     _mcc172_lib_init();
 
@@ -1149,6 +1153,9 @@ int mcc172_open(uint8_t address)
         // initialize the struct elements
         dev->scan_info = NULL;
         dev->handle_count = 1;
+        dev->decimate_factor = 1;
+
+        pthread_mutex_init(&dev->scan_mutex, NULL);
 
         // open the SPI device handle
         dev->spi_fd = open(spi_device, O_RDWR);
@@ -1232,8 +1239,11 @@ int mcc172_open(uint8_t address)
 
     if (ret == RESULT_SUCCESS)
     {
-        pthread_mutex_init(&dev->scan_mutex, NULL);
-
+        // set the decimation factor to the default
+        buffer = 0;
+        ret = _spi_transfer(address, CMD_DECIMATEFACTOR_W, &buffer, 1, NULL, 0,
+            20*MSEC, 0);
+        
         _syslog("open");
         return RESULT_SUCCESS;
     }
@@ -1494,14 +1504,16 @@ int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config)
   Configure the ADC clock
  *****************************************************************************/
 int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
-    double sample_rate_per_channel)
+    uint8_t alias_mode, double sample_rate_per_channel)
 {
     double divisor;
+    uint16_t decimate_factor;
     int result;
     uint8_t buffer[2];
 
     if (!_check_addr(address) ||
-        (clock_source > SOURCE_SLAVE))
+        (clock_source > SOURCE_SLAVE) ||
+        (alias_mode > ALIAS_ENHANCED))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1512,23 +1524,75 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
         return RESULT_BUSY;
     }
 
-    // set the sample rate to one supported by the device
-    divisor = MAX_SAMPLE_RATE / sample_rate_per_channel + 0.5;
-
-    if (divisor < 1.0)
+    if (sample_rate_per_channel < 200.0)
     {
-        divisor = 1.0;
+        sample_rate_per_channel = 200.0;
     }
-    else if (divisor > 256.0)
+    
+    if (alias_mode == ALIAS_NORMAL)
     {
-        divisor = 256.0;
+        // normal mode - no decimation, use ADC clock to control data rate
+        
+        // set the sample rate to one supported by the device
+        divisor = MAX_SAMPLE_RATE / sample_rate_per_channel + 0.5;
+
+        if (divisor < 1.0)
+        {
+            divisor = 1.0;
+        }
+        else if (divisor > 256.0)
+        {
+            divisor = 256.0;
+        }
+        
+        decimate_factor = 1;
+    }
+    else
+    {
+        // enhanced mode - keep ADC clock high for enhanced alias rejection and
+        // control data rate with decimation factor
+        
+        if (sample_rate_per_channel > 800.0)
+        {
+            divisor = 1;
+        }
+        else if (sample_rate_per_channel > 400.0)
+        {
+            divisor = 2;
+        }
+        else
+        {
+            divisor = 4;
+        }
+        
+        decimate_factor = (MAX_SAMPLE_RATE / divisor) / 
+            sample_rate_per_channel + 0.5;
+
+        if (decimate_factor < 1.0)
+        {
+            decimate_factor = 1.0;
+        }
+        else if (decimate_factor > 256.0)
+        {
+            decimate_factor = 256.0;
+        }
     }
 
-    // write the configuration to the device
+    // write the clock configuration to the device
     buffer[0] = clock_source;
     buffer[1] = (uint8_t)(divisor - 1);
     result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0,
         20*MSEC, 10);
+    if (result != RESULT_SUCCESS)
+    {
+        return result;
+    }
+    
+    // Write the decimate factor
+    buffer[0] = (uint8_t)(decimate_factor-1);
+    _devices[address]->decimate_factor = decimate_factor;
+    result = _spi_transfer(address, CMD_DECIMATEFACTOR_W, buffer, 1, NULL, 0,
+        20*MSEC, 0);
 
     return result;
 }
@@ -1537,20 +1601,23 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
   Read the ADC clock configuration.
  *****************************************************************************/
 int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
-    double* sample_rate, uint8_t* synced)
+    uint8_t* alias_mode, double* sample_rate, uint8_t* synced)
 {
     int result;
+    uint16_t clock_divider;
+    uint16_t decimate_factor;
     uint8_t buffer[2];
 
     if (!_check_addr(address) ||
         (clock_source == NULL) ||
+        (alias_mode == NULL) ||
         (sample_rate == NULL) ||
         (synced == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
 
-    // read the configuration from the device
+    // read the clock configuration
     result = _spi_transfer(address, CMD_AINCLOCKCONFIG_R, NULL, 0, buffer, 2,
         20*MSEC, 10);
     if (result != RESULT_SUCCESS)
@@ -1560,7 +1627,18 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 
     *clock_source = buffer[0] & 0x03;
     *synced = (buffer[0] >> 7) & 0x01;
-    *sample_rate = MAX_SAMPLE_RATE / ((double)buffer[1] + 1);
+    clock_divider = (uint16_t)buffer[1] + 1;
+
+    // read the decimation factor
+    result = _spi_transfer(address, CMD_DECIMATEFACTOR_R, NULL, 0, buffer, 1,
+        20*MSEC, 10);
+    if (result != RESULT_SUCCESS)
+    {
+        return result;
+    }
+    decimate_factor = (uint16_t)buffer[0] + 1;
+    
+    *sample_rate = (MAX_SAMPLE_RATE / clock_divider) / decimate_factor;
 
     return RESULT_SUCCESS;
 }
@@ -1606,6 +1684,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     int result;
     uint8_t num_channels;
     uint8_t channel;
+    uint8_t alias_mode;
     double sample_rate_per_channel;
     struct mcc172Device* dev;
     struct mcc172ScanThreadInfo* info;
@@ -1662,7 +1741,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     do
     {
         result = mcc172_a_in_clock_config_read(address, &clock_source,
-            &sample_rate_per_channel, &synced);
+            &alias_mode, &sample_rate_per_channel, &synced);
         if (result != RESULT_SUCCESS)
         {
             free(info);
@@ -1783,8 +1862,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     buffer[2] = (uint8_t)(scan_count >> 16);
     buffer[3] = (uint8_t)(scan_count >> 24);
     buffer[4] = channel_mask;
+    buffer[5] = 0;
 
-    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 5, NULL, 0,
+    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 6, NULL, 0,
         20*MSEC, 10);
 
     if (result != RESULT_SUCCESS)
@@ -1873,6 +1953,11 @@ int mcc172_a_in_scan_status(uint8_t address, uint16_t* status,
 {
     struct mcc172ScanThreadInfo* info;
     uint16_t stat;
+    uint16_t buffer_depth;
+    bool hw_overrun;
+    bool buffer_overrun;
+    bool triggered;
+    bool scan_running;
 
     if (!_check_addr(address) ||
         (status == NULL))
@@ -1893,24 +1978,33 @@ int mcc172_a_in_scan_status(uint8_t address, uint16_t* status,
         return RESULT_RESOURCE_UNAVAIL;
     }
 
+    // get thread values
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    buffer_depth = info->buffer_depth;
+    hw_overrun = info->hw_overrun;
+    buffer_overrun = info->buffer_overrun;
+    triggered = info->triggered;
+    scan_running = info->scan_running;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
     if (samples_per_channel)
     {
-        *samples_per_channel = info->buffer_depth / info->channel_count;
+        *samples_per_channel = buffer_depth / info->channel_count;
     }
 
-    if (info->hw_overrun)
+    if (hw_overrun)
     {
         stat |= STATUS_HW_OVERRUN;
     }
-    if (info->buffer_overrun)
+    if (buffer_overrun)
     {
         stat |= STATUS_BUFFER_OVERRUN;
     }
-    if (info->triggered)
+    if (triggered)
     {
         stat |= STATUS_TRIGGERED;
     }
-    if (info->scan_running)
+    if (scan_running)
     {
         stat |= STATUS_RUNNING;
     }

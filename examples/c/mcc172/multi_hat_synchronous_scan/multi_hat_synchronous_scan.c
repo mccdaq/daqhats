@@ -97,6 +97,7 @@ int main(void)
     char c;
     uint8_t synced;
     uint8_t clock_source;
+    uint8_t alias_mode;
 
     double actual_sample_rate = 0.0;
 
@@ -130,21 +131,21 @@ int main(void)
         if (device != MASTER)
         {
             result = mcc172_a_in_clock_config_write(address[device], 
-                SOURCE_SLAVE, sample_rate);
+                SOURCE_SLAVE, ALIAS_NORMAL, sample_rate);
             STOP_ON_ERROR(result);
         }
     }
 
     // Configure the master clock last so the clocks are synchronized
     result = mcc172_a_in_clock_config_write(address[MASTER], 
-        SOURCE_MASTER, sample_rate);
+        SOURCE_MASTER, ALIAS_NORMAL, sample_rate);
     STOP_ON_ERROR(result);
 
     // Wait for sync to complete
     do
     {
         result = mcc172_a_in_clock_config_read(address[MASTER], &clock_source,
-            &actual_sample_rate, &synced);
+            &alias_mode, &actual_sample_rate, &synced);
         STOP_ON_ERROR(result);
         usleep(5000);
     } while (synced == 0);

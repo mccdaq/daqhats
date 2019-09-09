@@ -40,6 +40,14 @@ enum SourceType
     SOURCE_SLAVE    = 2
 };
 
+/// Alias rejection mode definitions.
+enum AliasMode
+{
+    /// Use normal alias rejection.
+    ALIAS_NORMAL    = 0,
+    /// Use enhanced alias rejection.
+    ALIAS_ENHANCED  = 1
+};
 
 #ifdef __cplusplus
 extern "C" {
@@ -219,14 +227,26 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 *   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
 *     172, it receives its clock from the master MCC 172.
 *
-*   The sampling rate will not be valid in slave mode if synced is equal to 0. 
+*   The alias_mode will be one of:
+*
+*   - [ALIAS_NORMAL](@ref ALIAS_NORMAL): The data rate is the same as the clock
+*     rate and alias rejection is normal.
+*   - [ALIAS_ENHANCED](@ref ALIAS_ENHANCED): The clock is operated at a rate of
+*     25.6 kHz or higher to prevent signals that are lower than the fixed analog
+*     filter but not blocked by the variable digital filter from aliasing into
+*     the data.  The data rate is achieved by decimating the data in the MCC 172
+*     firmware.
+*
+*   The data rate will not be valid in slave mode if synced is equal to 0. 
 *   The device will not detect a loss of the master clock when in slave mode; 
 *   it only monitors the clock when a sync is initiated.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param clock_source Receives the ADC clock source, one of the
 *       [source type](@ref SourceType) values.
-*   @param sample_rate_per_channel   Receives the sampling rate in samples per
+*   @param alias_mode Receives the alias rejection mode, one of the
+*       [alias mode](@ref AliasMode) values.
+*   @param data_rate_per_channel   Receives the data rate in samples per
 *       second per channel
 *   @param synced   Receives the syncronization status (0: sync in progress,
 *       1: sync complete)
@@ -234,14 +254,14 @@ int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
 */
 int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
-    double* sample_rate_per_channel, uint8_t* synced);
+    uint8_t* alias_mode, double* data_rate_per_channel, uint8_t* synced);
 
 /**
 *   @brief Write the sampling clock configuration.
 *
 *   This function will configure the ADC sampling clock. The default
-*   configuration after opening the device is local mode, 51.2 KHz sampling
-*   rate. 
+*   configuration after opening the device is local mode, normal alias rejection
+*   mode, 51.2 KHz data rate. 
 *
 *   The clock_source must be one of:
 *
@@ -253,36 +273,51 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
 *     172, it receives its clock from the master MCC 172.
 *
+*   The alias_mode must be one of:
+*
+*   - [ALIAS_NORMAL](@ref ALIAS_NORMAL): The data rate is the same as the clock
+*     rate and alias rejection is normal.
+*   - [ALIAS_ENHANCED](@ref ALIAS_ENHANCED): The clock is operated at a rate of
+*     25.6 kHz or higher to prevent signals that are lower than the fixed analog
+*     filter but not blocked by the variable digital filter from aliasing into
+*     the data.  The data rate is achieved by decimating the data in the MCC 172
+*     firmware.
+*
 *   The ADCs will be synchronized so they sample the inputs at the same time.
 *   This requires 128 clock cycles before the first sample is available. When
-*   using a master - slave clock configuration there are additional
-*   considerations:
+*   using a master - slave clock configuration for multiple MCC 172s there are
+*   additional considerations:
 *
 *   - There should be only one master device; otherwise, you will be
 *     connecting multiple outputs together and could damage a device.
 *   - Configure the clock on the slave device(s) first, master last. The
 *     synchronization will occur when the master clock is configured, causing
 *     the ADCs on all the devices to be in sync.
+*   - All synchronized devices must use the same alias rejection mode.
+*   - A trigger must be used for the data streams from all devices to start on
+*     the same sample.
 *
-*   The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by an
-*   integer between 1 and 256. The sample_rate_per_channel will be internally
+*   The MCC 172 can generate an ADC sampling clock equal to 51.2 kHz divided by
+*   an integer between 1 and 256. The data_rate_per_channel will be internally
 *   converted to the nearest valid rate. The actual rate can be read back
 *   using mcc172_a_in_clock_config_read(). When used in slave clock
 *   configuration, the device will measure the frequency of the incoming master
 *   clock after the synchronization period is complete. Calling
-*   mcc172_a_in_clock_config_read() after this will return the measured sample
+*   mcc172_a_in_clock_config_read() after this will return the measured data
 *   rate.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param clock_source The ADC clock source, one of the
 *       [source type](@ref SourceType) values.
-*   @param sample_rate_per_channel   The requested sampling rate in samples per
+*   @param alias_mode The alias rejection mode, one of the
+*       [alias mode](@ref AliasMode) values.
+*   @param data_rate_per_channel   The requested data rate in samples per
 *       second per channel
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful
 */
 int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
-    double sample_rate_per_channel);
+    uint8_t alias_mode, double data_rate_per_channel);
 
 /**
 *   @brief Configure the digital trigger.
@@ -555,7 +590,7 @@ int mcc172_test_signals_read(uint8_t address, uint8_t* clock, uint8_t* sync,
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param mode     Set to 1 for test mode, 0 to return to normal operation.
-*   @param clock    The value to write to the adc clock when in test mode.
+*   @param clock    The value to write to the ADC clock when in test mode.
 *   @param sync     The value to write to sync when in test mode.
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
