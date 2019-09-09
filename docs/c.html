@@ -2612,7 +2612,7 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc172_a_in_clock_config_read">
-<span class="target" id="mcc172_8h_1a72040179e9edd47cf94addf821a27720"></span>int <code class="descname">mcc172_a_in_clock_config_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;clock_source</em>, double *<em>&nbsp;sample_rate_per_channel</em>, uint8_t *<em>&nbsp;synced</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_clock_config_read" title="Permalink to this definition">¶</a></dt>
+<span class="target" id="mcc172_8h_1a8a7584abbd46ac4f839603889d769aac"></span>int <code class="descname">mcc172_a_in_clock_config_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;clock_source</em>, uint8_t *<em>&nbsp;alias_mode</em>, double *<em>&nbsp;data_rate_per_channel</em>, uint8_t *<em>&nbsp;synced</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_clock_config_read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the sampling clock configuration. </p>
 <p>This function will return the sample clock configuration and rate. If the clock is configured for local or master source, then the rate will be the internally adjusted rate set by the user. If the clock is configured for slave source, then the rate will be measured from the master clock after the synchronization period has ended. The synchronization status is also returned.</p>
 <p>The clock source will be one of the following values:</p>
@@ -2622,7 +2622,13 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1a6bbbe701eb16b191dfb6e3b3c42c7f9e"><span class="std std-ref">SOURCE_SLAVE</span></a>: No clock is generated on this MCC 172, it receives its clock from the master MCC 172.</li>
 </ul>
 </p>
-<p>The sampling rate will not be valid in slave mode if synced is equal to 0. The device will not detect a loss of the master clock when in slave mode; it only monitors the clock when a sync is initiated.</p>
+<p>The alias_mode will be one of:</p>
+<p><ul class="simple">
+<li>ALIAS_NORMAL: The data rate is the same as the clock rate and alias rejection is normal.</li>
+<li>ALIAS_ENHANCED: The clock is operated at a rate of 25.6 kHz or higher to prevent signals that are lower than the fixed analog filter but not blocked by the variable digital filter from aliasing into the data. The data rate is achieved by decimating the data in the MCC 172 firmware.</li>
+</ul>
+</p>
+<p>The data rate will not be valid in slave mode if synced is equal to 0. The device will not detect a loss of the master clock when in slave mode; it only monitors the clock when a sync is initiated.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful </dd>
@@ -2630,7 +2636,8 @@ type of board.  The library may be used with C and C++.</p>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
 <li><code class="docutils literal notranslate"><span class="pre">clock_source</span></code>: Receives the ADC clock source, one of the <a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1"><span class="std std-ref">source type</span></a> values. </li>
-<li><code class="docutils literal notranslate"><span class="pre">sample_rate_per_channel</span></code>: Receives the sampling rate in samples per second per channel </li>
+<li><code class="docutils literal notranslate"><span class="pre">alias_mode</span></code>: Receives the alias rejection mode, one of the alias mode values. </li>
+<li><code class="docutils literal notranslate"><span class="pre">data_rate_per_channel</span></code>: Receives the data rate in samples per second per channel </li>
 <li><code class="docutils literal notranslate"><span class="pre">synced</span></code>: Receives the syncronization status (0: sync in progress, 1: sync complete) </li>
 </ul>
 </dd>
@@ -2640,9 +2647,9 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc172_a_in_clock_config_write">
-<span class="target" id="mcc172_8h_1a7bd943e975298f3ee694c2ccea682386"></span>int <code class="descname">mcc172_a_in_clock_config_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;clock_source</em>, double<em>&nbsp;sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_clock_config_write" title="Permalink to this definition">¶</a></dt>
+<span class="target" id="mcc172_8h_1ad0adddcec7958502cf084748fdf7a6c4"></span>int <code class="descname">mcc172_a_in_clock_config_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;clock_source</em>, uint8_t<em>&nbsp;alias_mode</em>, double<em>&nbsp;data_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_clock_config_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the sampling clock configuration. </p>
-<p>This function will configure the ADC sampling clock. The default configuration after opening the device is local mode, 51.2 KHz sampling rate.</p>
+<p>This function will configure the ADC sampling clock. The default configuration after opening the device is local mode, normal alias rejection mode, 51.2 KHz data rate.</p>
 <p>The clock_source must be one of:</p>
 <p><ul class="simple">
 <li><a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1af3e14d0513d3544e7a53e6b391b591d1"><span class="std std-ref">SOURCE_LOCAL</span></a>: The clock is generated on this MCC 172 and not shared with other MCC 172s.</li>
@@ -2650,13 +2657,21 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1a6bbbe701eb16b191dfb6e3b3c42c7f9e"><span class="std std-ref">SOURCE_SLAVE</span></a>: No clock is generated on this MCC 172, it receives its clock from the master MCC 172.</li>
 </ul>
 </p>
-<p>The ADCs will be synchronized so they sample the inputs at the same time. This requires 128 clock cycles before the first sample is available. When using a master - slave clock configuration there are additional considerations:</p>
+<p>The alias_mode must be one of:</p>
+<p><ul class="simple">
+<li>ALIAS_NORMAL: The data rate is the same as the clock rate and alias rejection is normal.</li>
+<li>ALIAS_ENHANCED: The clock is operated at a rate of 25.6 kHz or higher to prevent signals that are lower than the fixed analog filter but not blocked by the variable digital filter from aliasing into the data. The data rate is achieved by decimating the data in the MCC 172 firmware.</li>
+</ul>
+</p>
+<p>The ADCs will be synchronized so they sample the inputs at the same time. This requires 128 clock cycles before the first sample is available. When using a master - slave clock configuration for multiple MCC 172s there are additional considerations:</p>
 <p><ul class="simple">
 <li>There should be only one master device; otherwise, you will be connecting multiple outputs together and could damage a device.</li>
 <li>Configure the clock on the slave device(s) first, master last. The synchronization will occur when the master clock is configured, causing the ADCs on all the devices to be in sync.</li>
+<li>All synchronized devices must use the same alias rejection mode.</li>
+<li>A trigger must be used for the data streams from all devices to start on the same sample.</li>
 </ul>
 </p>
-<p>The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by an integer between 1 and 256. The sample_rate_per_channel will be internally converted to the nearest valid rate. The actual rate can be read back using <a class="reference internal" href="#mcc172_8h_1a72040179e9edd47cf94addf821a27720"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a>. When used in slave clock configuration, the device will measure the frequency of the incoming master clock after the synchronization period is complete. Calling <a class="reference internal" href="#mcc172_8h_1a72040179e9edd47cf94addf821a27720"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a> after this will return the measured sample rate.</p>
+<p>The MCC 172 can generate an ADC sampling clock equal to 51.2 kHz divided by an integer between 1 and 256. The data_rate_per_channel will be internally converted to the nearest valid rate. The actual rate can be read back using <a class="reference internal" href="#mcc172_8h_1a8a7584abbd46ac4f839603889d769aac"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a>. When used in slave clock configuration, the device will measure the frequency of the incoming master clock after the synchronization period is complete. Calling <a class="reference internal" href="#mcc172_8h_1a8a7584abbd46ac4f839603889d769aac"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a> after this will return the measured data rate.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful </dd>
@@ -2664,7 +2679,8 @@ type of board.  The library may be used with C and C++.</p>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
 <li><code class="docutils literal notranslate"><span class="pre">clock_source</span></code>: The ADC clock source, one of the <a class="reference internal" href="#mcc172_8h_1a3ae727773c367ac1041d72ac770a0ab1"><span class="std std-ref">source type</span></a> values. </li>
-<li><code class="docutils literal notranslate"><span class="pre">sample_rate_per_channel</span></code>: The requested sampling rate in samples per second per channel </li>
+<li><code class="docutils literal notranslate"><span class="pre">alias_mode</span></code>: The alias rejection mode, one of the alias mode values. </li>
+<li><code class="docutils literal notranslate"><span class="pre">data_rate_per_channel</span></code>: The requested data rate in samples per second per channel </li>
 </ul>
 </dd>
 </dl>
@@ -2710,7 +2726,7 @@ type of board.  The library may be used with C and C++.</p>
 <span class="target" id="mcc172_8h_1aef1b8c4747b1c53413ab993db9ca85b5"></span>int <code class="descname">mcc172_a_in_scan_start</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel_mask</em>, uint32_t<em>&nbsp;samples_per_channel</em>, uint32_t<em>&nbsp;options</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_scan_start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start capturing analog input data from the specified channels. </p>
 <p>The scan runs as a separate thread from the user’s code. The function will allocate a scan buffer and read data from the device into that buffer. The user reads the data from this buffer and the scan status using the <a class="reference internal" href="#mcc172_8h_1a99e9ef7bac1b4a3b48f0510cf1ef704f"><span class="std std-ref">mcc172_a_in_scan_read()</span></a> function. <a class="reference internal" href="#mcc172_8h_1a91b01737a38dfc59846414392f09352f"><span class="std std-ref">mcc172_a_in_scan_stop()</span></a> is used to stop a continuous scan, or to stop a finite scan before it completes. The user must call <a class="reference internal" href="#mcc172_8h_1a3c623caa4d914138eb3b8def0ecece2d"><span class="std std-ref">mcc172_a_in_scan_cleanup()</span></a> after the scan has finished and all desired data has been read; this frees all resources from the scan and allows additional scans to be performed.</p>
-<p>The scan cannot be started until the ADCs are synchronized, so this function will not return until that has completed. It is best to wait for sync using <a class="reference internal" href="#mcc172_8h_1a72040179e9edd47cf94addf821a27720"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a> before starting the scan.</p>
+<p>The scan cannot be started until the ADCs are synchronized, so this function will not return until that has completed. It is best to wait for sync using <a class="reference internal" href="#mcc172_8h_1a8a7584abbd46ac4f839603889d769aac"><span class="std std-ref">mcc172_a_in_clock_config_read()</span></a> before starting the scan.</p>
 <p>The scan state has defined terminology:<ul class="simple">
 <li><strong>Active:</strong> <a class="reference internal" href="#mcc172_8h_1aef1b8c4747b1c53413ab993db9ca85b5"><span class="std std-ref">mcc172_a_in_scan_start()</span></a> has been called and the device may be acquiring data or finished with the acquisition. The scan has not been cleaned up by calling <a class="reference internal" href="#mcc172_8h_1a3c623caa4d914138eb3b8def0ecece2d"><span class="std std-ref">mcc172_a_in_scan_cleanup()</span></a>, so another scan may not be started.</li>
 <li><strong>Running:</strong> The scan is active and the device is still acquiring data. Certain functions will return an error because the device is busy.</li>

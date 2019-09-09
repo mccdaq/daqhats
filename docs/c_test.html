@@ -219,6 +219,66 @@
 </dd></dl>
 
 </div>
+<div class="section" id="mcc-172-test-functions">
+<h2>MCC 172 test functions<a class="headerlink" href="#mcc-172-test-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="39%" />
+<col width="61%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Function</td>
+<td>Description</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc172_test_signals_read" title="mcc172_test_signals_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_test_signals_read()</span></code></a></td>
+<td>Read the state of the clock, sync, and trigger signals.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc172_test_signals_write" title="mcc172_test_signals_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_test_signals_write()</span></code></a></td>
+<td>Write values to the clock and sync signals.</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="c.mcc172_test_signals_read">
+<span class="target" id="mcc172_8h_1ace025080095f19453c370d573b7a1dc4"></span>int <code class="descname">mcc172_test_signals_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;clock</em>, uint8_t *<em>&nbsp;sync</em>, uint8_t *<em>&nbsp;trigger</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_test_signals_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the state of shared signals for testing. </p>
+<p>This function reads the state of the ADC clock, sync, and trigger signals. Use it in conjunction with <a class="reference internal" href="c.html#mcc172_8h_1ad0adddcec7958502cf084748fdf7a6c4"><span class="std std-ref">mcc172_a_in_clock_config_write()</span></a> and <a class="reference internal" href="c.html#mcc172_8h_1a46ab58e3b3b542c5fee59d9b1454fda2"><span class="std std-ref">mcc172_trigger_config()</span></a> to put the signals into slave mode then set values on the signals using the Pi GPIO pins.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">clock</span></code>: Receives the current logic level of the ADC clock. </li>
+<li><code class="docutils literal notranslate"><span class="pre">sync</span></code>: Receives the current logic level of sync. </li>
+<li><code class="docutils literal notranslate"><span class="pre">trigger</span></code>: Receives the current logic level of trigger. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc172_test_signals_write">
+<span class="target" id="mcc172_8h_1a7b512aeb1cf780d4619d90f70baffb1b"></span>int <code class="descname">mcc172_test_signals_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;clock</em>, uint8_t<em>&nbsp;sync</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_test_signals_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write values to shared signals for testing. </p>
+<p>This function puts the shared signals into test mode and sets them to the specified state. The signal levels can then be read on the Pi GPIO pins to confirm.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="c.html#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: Set to 1 for test mode, 0 to return to normal operation. </li>
+<li><code class="docutils literal notranslate"><span class="pre">clock</span></code>: The value to write to the ADC clock when in test mode. </li>
+<li><code class="docutils literal notranslate"><span class="pre">sync</span></code>: The value to write to sync when in test mode. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
 </div>
 
 

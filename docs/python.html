@@ -3232,11 +3232,11 @@ responds incorrectly.</td>
 
 <dl class="method">
 <dt id="daqhats.mcc172.a_in_clock_config_write">
-<code class="descname">a_in_clock_config_write</code><span class="sig-paren">(</span><em>clock_source</em>, <em>sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_clock_config_write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">a_in_clock_config_write</code><span class="sig-paren">(</span><em>clock_source</em>, <em>alias_mode</em>, <em>sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_clock_config_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure the ADC sampling clock.</p>
 <p>This method will configure the ADC sampling clock. The default
-configuration after opening the device is local mode, 51.2 KHz sampling
-rate. The clock source must be one of:</p>
+configuration after opening the device is local mode, normal alias
+rejection, 51.2 KHz sampling rate. The clock source must be one of:</p>
 <ul class="simple">
 <li><a class="reference internal" href="#daqhats.SourceType.LOCAL" title="daqhats.SourceType.LOCAL"><code class="xref py py-const docutils literal notranslate"><span class="pre">SourceType.LOCAL</span></code></a>: the clock is generated on this MCC 172
 and not shared with any other devices.</li>
@@ -3246,6 +3246,16 @@ MCC 172s must be configured for local or slave clock.</li>
 <li><a class="reference internal" href="#daqhats.SourceType.SLAVE" title="daqhats.SourceType.SLAVE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SourceType.SLAVE</span></code></a>: no clock is generated on this MCC 172,
 it receives its clock from the Raspberry Pi header. Another MCC 172
 must be configured for master clock.</li>
+</ul>
+<p>The alias mode must be one of:</p>
+<ul class="simple">
+<li><code class="xref py py-const docutils literal notranslate"><span class="pre">AliasMode.NORMAL</span></code>: The data rate is the same as the clock
+rate and alias rejection is normal.</li>
+<li><code class="xref py py-const docutils literal notranslate"><span class="pre">AliasMode.ENHANCED</span></code>: The clock is operated at a rate of
+25.6 kHz or higher to prevent signals that are lower than the fixed
+analog filter but not blocked by the variable digital filter from
+aliasing into the data. The data rate is achieved by decimating the
+data in the MCC 172 firmware.</li>
 </ul>
 <p>The ADCs will be synchronized so they sample the inputs at the same
 time. This requires 128 clock cycles before the first sample is
@@ -3257,6 +3267,9 @@ connecting multiple outputs together and could damage a device.</li>
 <li>Configure the clock on the slave device(s) first, master last. The
 synchronization will occur when the master clock is configured,
 causing the ADCs on all the devices to be in sync.</li>
+<li>All synchronized devices must use the same alias rejection mode.</li>
+<li>A trigger must be used for the data streams from all devices to start
+on the same sample.</li>
 </ul>
 <p>The MCC 172 can generate a sampling clock equal to 51.2 KHz divided by
 an integer between 1 and 256. The sample_rate_per_channel will be
@@ -3304,6 +3317,16 @@ and shared over the Raspberry Pi header with other MCC 172s.</li>
 <li><a class="reference internal" href="#daqhats.SourceType.SLAVE" title="daqhats.SourceType.SLAVE"><code class="xref py py-const docutils literal notranslate"><span class="pre">SourceType.SLAVE</span></code></a>: no clock is generated on this MCC 172,
 it receives its clock from the Raspberry Pi header.</li>
 </ul>
+<p>The alias mode will be one of:</p>
+<ul class="simple">
+<li><code class="xref py py-const docutils literal notranslate"><span class="pre">AliasMode.NORMAL</span></code>: The data rate is the same as the clock
+rate and alias rejection is normal.</li>
+<li><code class="xref py py-const docutils literal notranslate"><span class="pre">AliasMode.ENHANCED</span></code>: The clock is operated at a rate of
+25.6 kHz or higher to prevent signals that are lower than the fixed
+analog filter but not blocked by the variable digital filter from
+aliasing into the data. The data rate is achieved by decimating the
+data in the MCC 172 firmware</li>
+</ul>
 <p>The sampling rate will not be valid in slave mode if synced is False.
 The device will not detect a loss of the master clock when in slave
 mode; it only monitors the clock when a sync is initiated.</p>
@@ -3312,7 +3335,8 @@ mode; it only monitors the clock when a sync is initiated.</p>
 <dd><p class="first">namedtuple: a namedtuple containing the following field names:</p>
 <ul class="last simple">
 <li><strong>clock_source</strong> (<a class="reference internal" href="#daqhats.SourceType" title="daqhats.SourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">SourceType</span></code></a>): The ADC clock source.</li>
-<li><strong>sample_rate_per_channel</strong> (float): The actual sampling rate in
+<li><strong>alias_mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">AliasMode</span></code>): The alias mode.</li>
+<li><strong>sample_rate_per_channel</strong> (float): The sample rate in
 samples per second per channel.</li>
 <li><strong>synchronized</strong> (bool): True if the ADCs are synchronized, False
 if a synchronization is in progress.</li>

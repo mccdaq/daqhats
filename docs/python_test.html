@@ -233,6 +233,87 @@ responds incorrectly.</td>
 </dd></dl>
 
 </div>
+<div class="section" id="mcc-172-test-methods">
+<h2>MCC 172 test methods<a class="headerlink" href="#mcc-172-test-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc172</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span></dt>
+<dd><p>The class for an MCC 172 board.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="descname">test_signals_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Read the state of shared signals for testing.</p>
+<p>This function reads the state of the ADC clock, sync, and trigger
+signals. Use it in conjunction with <a class="reference internal" href="python.html#daqhats.mcc172.a_in_clock_config_write" title="daqhats.mcc172.a_in_clock_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_clock_config_write()</span></code></a>
+and <a class="reference internal" href="python.html#daqhats.mcc172.trigger_config" title="daqhats.mcc172.trigger_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">trigger_config()</span></code></a> to put the signals into slave mode then
+set values on the signals using the Raspberry Pi GPIO pins. This method
+will return the values present on those signals.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names:<ul class="simple">
+<li><strong>clock</strong> (int): The current value of the clock signal (0 or 1).</li>
+<li><strong>sync</strong> (int): The current value of the sync signal (0 or 1).</li>
+<li><strong>trigger</strong> (int): The current value of the trigger signal
+(0 or 1).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">test_signals_write</code><span class="sig-paren">(</span><em>mode</em>, <em>clock</em>, <em>sync</em><span class="sig-paren">)</span></dt>
+<dd><p>Write values to shared signals for testing.</p>
+<p>This function puts the shared signals into test mode and sets them to
+the specified state. The signal levels can then be read on the Raspberry
+Pi GPIO pins to confirm values. Return the device to normal mode when
+testing is complete.</p>
+<p>ADC conversions will not occur while in test mode. The ADCs require
+synchronization after exiting test mode, so use
+<a class="reference internal" href="python.html#daqhats.mcc172.a_in_clock_config_write" title="daqhats.mcc172.a_in_clock_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_clock_config_write()</span></code></a> to perform synchronization.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mode</strong> (<em>int</em>) – Set to 1 for test mode or 0 for normal mode.</li>
+<li><strong>clock</strong> (<em>int</em>) – The value to write to the clock signal in test mode
+(0 or 1).</li>
+<li><strong>sync</strong> (<em>int</em>) – The value to write to the sync signal in test mode
+(0 or 1).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 

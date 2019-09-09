@@ -9,7 +9,7 @@ Methods
 .. autoclass:: mcc172
     :inherited-members:
     :members:
-    :exclude-members: test_clock, test_trigger
+    :exclude-members: test_signals_write, test_signals_read
 
     .. tabularcolumns:: |p{230pt}|p{190pt}|
 
