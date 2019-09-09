@@ -15,7 +15,6 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <errno.h>
-#include <syslog.h>
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
 #include "daqhats.h"
@@ -25,7 +24,6 @@
 
 // *****************************************************************************
 // Constants
-//#define DEBUG
 
 #define MAX_CODE                (4095)
 #define RANGE_MIN               (-10.0)
@@ -164,6 +162,7 @@ struct mcc118ScanThreadInfo
     uint16_t options;
     bool hw_overrun;
     bool buffer_overrun;
+    bool thread_started;
     bool thread_running;
     bool stop_thread;
     bool triggered;
@@ -186,6 +185,7 @@ struct mcc118Device
     uint8_t trigger_mode;       // Trigger mode
     struct mcc118FactoryData factory_data;   // Factory data
     struct mcc118ScanThreadInfo* scan_info; // Scan info
+    pthread_mutex_t scan_mutex;
 };
 
 /// \endcond
@@ -195,10 +195,6 @@ struct mcc118Device
 
 static struct mcc118Device* _devices[MAX_NUMBER_HATS];
 static bool _mcc118_lib_initialized = false;
-
-#ifdef DEBUG
-static bool log_open = false;
-#endif
 
 static const char* const spi_device = SPI_DEVICE_0; // the spidev device
 static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
@@ -211,17 +207,6 @@ static const uint16_t spi_delay = 0;                // delay in us before
 
 // *****************************************************************************
 // Local Functions
-static void _syslog(__attribute__((unused)) char* str)
-{
-#ifdef DEBUG
-    if (!log_open)
-    {
-        openlog("mcc118", LOG_PID|LOG_CONS, LOG_USER);
-        log_open = true;
-    }
-    syslog(LOG_INFO, str);
-#endif
-}
 
 /******************************************************************************
   Validate parameters for an address
@@ -882,12 +867,9 @@ static void* _scan_thread(void* arg)
     struct mcc118ScanThreadInfo* info = _devices[address]->scan_info;
     bool calibrated;
     bool scaled;
-    //uint16_t largest_read;
     uint8_t rx_buffer[5];
     bool scan_running;
-#ifdef DEBUG
-    char str[80];
-#endif
+    bool stop_thread;
 
     free(arg);
 
@@ -897,8 +879,12 @@ static void* _scan_thread(void* arg)
         return NULL;
     }
 
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    info->thread_started = true;
     info->thread_running = true;
     info->hw_overrun = false;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
     status_count = 0;
 
     if (info->options & OPTS_NOSCALEDATA)
@@ -924,7 +910,7 @@ static void* _scan_thread(void* arg)
 
     done = false;
     sleep_us = MIN_SLEEP_US;
-    while (!info->stop_thread && !done)
+    do
     {
         // read the scan status
         if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5, 
@@ -933,18 +919,20 @@ static void* _scan_thread(void* arg)
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
             max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
             scan_running = (rx_buffer[0] & 0x01) == 0x01;
+
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
             info->hw_overrun = (rx_buffer[0] & 0x02) == 0x02;
             info->triggered = (rx_buffer[0] & 0x04) == 0x04;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
             status_count++;
 
             if (info->hw_overrun)
             {
-#ifdef DEBUG
-                _syslog("hw overrun");
-#endif
                 done = true;
+                pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->scan_running = false;
+                pthread_mutex_unlock(&_devices[address]->scan_mutex);
             }
             else if (info->triggered == 0)
             {
@@ -986,36 +974,26 @@ static void* _scan_thread(void* arg)
                         &info->scan_buffer[info->write_index])) == 
                         RESULT_SUCCESS)
                     {
-#ifdef DEBUG
-                        sprintf(str, "scan_thread_read %d %d %d", 
-                            info->write_index, read_count, info->buffer_depth);
-                        _syslog(str);
-#endif
                         info->write_index += read_count;
                         if (info->write_index >= info->buffer_size)
                         {
                             info->write_index = 0;
                         }
 
+                        pthread_mutex_lock(&_devices[address]->scan_mutex);
                         info->buffer_depth += read_count;
+                        pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
                         if (info->buffer_depth > info->buffer_size)
                         {
-#ifdef DEBUG
-                            _syslog("buffer overrun");
-#endif
+                            pthread_mutex_lock(&_devices[address]->scan_mutex);
                             info->buffer_overrun = true;
                             info->scan_running = false;
+                            pthread_mutex_unlock(
+                                &_devices[address]->scan_mutex);
                             done = true;
                         }
                         info->samples_transferred += read_count;
-                    }
-                    else
-                    {
-#ifdef DEBUG
-                        sprintf(str, "error %d", error);
-                        _syslog(str);
-#endif
                     }
 
                     // adaptive sleep time to minimize processor usage
@@ -1038,13 +1016,20 @@ static void* _scan_thread(void* arg)
                 if (!scan_running && (available_samples == read_count))
                 {
                     done = true;
+                    pthread_mutex_lock(&_devices[address]->scan_mutex);
                     info->scan_running = false;
+                    pthread_mutex_unlock(&_devices[address]->scan_mutex);
                 }
             }
         }
 
         usleep(sleep_us);
+
+        pthread_mutex_lock(&_devices[address]->scan_mutex);
+        stop_thread = info->stop_thread;
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);
     }
+    while (!stop_thread && !done);
 
     if (info->scan_running)
     {
@@ -1053,7 +1038,9 @@ static void* _scan_thread(void* arg)
         mcc118_a_in_scan_stop(address);
     }
 
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
     info->thread_running = false;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
     return NULL;
 }
 
@@ -1117,10 +1104,13 @@ int mcc118_open(uint8_t address)
         dev->scan_info = NULL;
         dev->handle_count = 1;
 
+        pthread_mutex_init(&dev->scan_mutex, NULL);
+
         // open the SPI device handle
         dev->spi_fd = open(spi_device, O_RDWR);
         if (dev->spi_fd < 0)
         {
+            pthread_mutex_destroy(&dev->scan_mutex);
             free(custom_data);
             free(dev);
             _devices[address] = NULL;
@@ -1192,7 +1182,7 @@ int mcc118_open(uint8_t address)
             }
             else
             {
-                //mcc118_close(address);
+                pthread_mutex_destroy(&dev->scan_mutex);
                 free(dev);
                 _devices[address] = NULL;
                 return RESULT_INVALID_DEVICE;
@@ -1202,7 +1192,6 @@ int mcc118_open(uint8_t address)
         attempts++;
     } while ((ret != RESULT_SUCCESS) && (attempts < 2));
 
-    _syslog("open");
     return RESULT_SUCCESS;
 }
 
@@ -1237,18 +1226,11 @@ int mcc118_close(uint8_t address)
     _devices[address]->handle_count--;
     if (_devices[address]->handle_count == 0)
     {
+        pthread_mutex_destroy(&_devices[address]->scan_mutex);
         close(_devices[address]->spi_fd);
         free(_devices[address]);
         _devices[address] = NULL;
     }
-
-#ifdef DEBUG
-    if (log_open)
-    {
-        _syslog("close");
-        closelog();
-    }
-#endif
 
     return RESULT_SUCCESS;
 }
@@ -1716,6 +1698,8 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         return result;
     }
 
+    info->thread_started = false;
+
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
@@ -1732,6 +1716,16 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
 
     pthread_attr_destroy(&attr);
+
+    // Wait for thread to start to avoid race conditions reading thread status
+    bool running;
+    do
+    {
+        usleep(1);
+        pthread_mutex_lock(&dev->scan_mutex);
+        running = info->thread_started;
+        pthread_mutex_unlock(&dev->scan_mutex);
+    } while (!running);
 
     dev->scan_info->scan_running = true;
 
@@ -1781,6 +1775,11 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 {
     struct mcc118ScanThreadInfo* info;
     uint16_t stat;
+    uint16_t buffer_depth;
+    bool hw_overrun;
+    bool buffer_overrun;
+    bool triggered;
+    bool scan_running;
 
     if (!_check_addr(address) ||
         (status == NULL))
@@ -1801,24 +1800,33 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
         return RESULT_RESOURCE_UNAVAIL;
     }
 
+    // get thread values
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    buffer_depth = info->buffer_depth;
+    hw_overrun = info->hw_overrun;
+    buffer_overrun = info->buffer_overrun;
+    triggered = info->triggered;
+    scan_running = info->scan_running;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
     if (samples_per_channel)
     {
-        *samples_per_channel = info->buffer_depth / info->channel_count;
+        *samples_per_channel = buffer_depth / info->channel_count;
     }
 
-    if (info->hw_overrun)
+    if (hw_overrun)
     {
         stat |= STATUS_HW_OVERRUN;
     }
-    if (info->buffer_overrun)
+    if (buffer_overrun)
     {
         stat |= STATUS_BUFFER_OVERRUN;
     }
-    if (info->triggered)
+    if (triggered)
     {
         stat |= STATUS_TRIGGERED;
     }
-    if (info->scan_running)
+    if (scan_running)
     {
         stat |= STATUS_RUNNING;
     }
@@ -1849,9 +1857,12 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
     struct timespec start_time;
     struct timespec current_time;
     uint16_t stat;
-#ifdef DEBUG
-    char str[80];
-#endif
+    uint16_t buffer_depth;
+    bool hw_overrun;
+    bool buffer_overrun;
+    bool triggered;
+    bool scan_running;
+    bool thread_running;
 
     if (!_check_addr(address) ||
         (status == NULL) ||
@@ -1888,11 +1899,21 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
         return RESULT_RESOURCE_UNAVAIL;
     }
 
+    // get thread values
+    pthread_mutex_lock(&_devices[address]->scan_mutex);
+    buffer_depth = info->buffer_depth;
+    hw_overrun = info->hw_overrun;
+    buffer_overrun = info->buffer_overrun;
+    triggered = info->triggered;
+    scan_running = info->scan_running;
+    thread_running = info->thread_running;
+    pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
     // Determine how many samples to read
     if (samples_per_channel == -1)
     {
         // return all available, ignore timeout
-        samples_to_read = info->buffer_depth;
+        samples_to_read = buffer_depth;
     }
     else
     {
@@ -1915,10 +1936,20 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
         timed_out = false;
         do
         {
-            if (info->buffer_depth >= info->channel_count)
+            // update thread values
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
+            buffer_depth = info->buffer_depth;
+            hw_overrun = info->hw_overrun;
+            buffer_overrun = info->buffer_overrun;
+            triggered = info->triggered;
+            scan_running = info->scan_running;
+            thread_running = info->thread_running;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
+
+            if (buffer_depth >= info->channel_count)
             {
                 // read in increments of the number of channels in the scan
-                current_read = MIN(info->buffer_depth, samples_to_read);
+                current_read = MIN(buffer_depth, samples_to_read);
                 current_read = COUNT_NORMALIZE(current_read, 
                     info->channel_count);
 
@@ -1950,12 +1981,12 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
                         info->read_index = 0;
                     }
                 }
-#ifdef DEBUG
-                sprintf(str, "a_in_scan_read %d", current_read);
-                _syslog(str);
-#endif
+
                 samples_to_read -= current_read;
+                buffer_depth -= current_read;
+                pthread_mutex_lock(&_devices[address]->scan_mutex);
                 info->buffer_depth -= current_read;
+                pthread_mutex_unlock(&_devices[address]->scan_mutex);
             }
             usleep(100);
 
@@ -1966,18 +1997,18 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
                     timeout_us);
             }
 
-            if (info->hw_overrun)
+            if (hw_overrun)
             {
                 stat |= STATUS_HW_OVERRUN;
                 error = true;
             }
-            if (info->buffer_overrun)
+            if (buffer_overrun)
             {
                 stat |= STATUS_BUFFER_OVERRUN;
                 error = true;
             }
         } while ((samples_to_read > 0) && !error &&
-            (info->thread_running == false ? info->buffer_depth > 0 : true) &&
+            (thread_running == false ? buffer_depth > 0 : true) &&
             !timed_out);
 
         if (samples_read_per_channel)
@@ -1988,11 +2019,11 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
     else
     {
         // just update status
-        if (info->hw_overrun)
+        if (hw_overrun)
         {
             stat |= STATUS_HW_OVERRUN;
         }
-        if (info->buffer_overrun)
+        if (buffer_overrun)
         {
             stat |= STATUS_BUFFER_OVERRUN;
         }
@@ -2003,11 +2034,11 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
         }
     }
 
-    if (info->triggered)
+    if (triggered)
     {
         stat |= STATUS_TRIGGERED;
     }
-    if (info->scan_running)
+    if (scan_running)
     {
         stat |= STATUS_RUNNING;
     }
@@ -2058,7 +2089,9 @@ int mcc118_a_in_scan_cleanup(uint8_t address)
         {
             // If the thread is running then tell it to stop and wait for it. 
             // It will send the a_in_stop_scan command.
+            pthread_mutex_lock(&_devices[address]->scan_mutex);
             _devices[address]->scan_info->stop_thread = true;
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
             pthread_join(_devices[address]->scan_info->handle, NULL);
             _devices[address]->scan_info->handle = 0;
@@ -2067,6 +2100,8 @@ int mcc118_a_in_scan_cleanup(uint8_t address)
         free(_devices[address]->scan_info->scan_buffer);
         free(_devices[address]->scan_info);
         _devices[address]->scan_info = NULL;
+        
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);        
     }
 
     return RESULT_SUCCESS;
@@ -2116,8 +2151,7 @@ int mcc118_bootmem_read(uint8_t address, uint16_t mem_address, uint16_t count,
 {
     uint8_t temp[4];
 
-    if (!_check_addr(address))// ||
-        //(count > MAX_RX_DATA_SIZE))
+    if (!_check_addr(address))
     {
         return RESULT_BAD_PARAMETER;
     }

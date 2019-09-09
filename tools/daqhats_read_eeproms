@@ -56,14 +56,14 @@ do
 
    if [ "$rc" -eq 0 ]; then
       # successs, read the entire eeprom
-      printf "Found HAT at address %d\n" $index
-      #if [ "$index" != "0" ]; then
+      printf "Found EEPROM at address %d\n" $index
+      if [ "$index" != "0" ]; then
          if [ ! -e "/etc/mcc/hats" ]; then
             mkdir -p "/etc/mcc/hats"
          fi
          dd if=$devname/eeprom of=/etc/mcc/hats/eeprom_$index.bin status=none
          sync
-      #fi
+      fi
    fi
 
    # remove the device
