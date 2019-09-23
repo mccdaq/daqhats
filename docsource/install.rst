@@ -55,6 +55,10 @@ You can use the DAQ HAT Manager or the command::
 
     sudo daqhats_read_eeproms
     
+To display the installed daqhats version use::
+
+    daqhats_version
+    
 To uninstall the package use::
 
     cd ~/daqhats

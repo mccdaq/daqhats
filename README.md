@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.2.0.2</td></tr>
+    <tr><td>Library Version<td>1.2.0.3</td></tr>
 </table>
 
 ## About
@@ -91,6 +91,9 @@ command:
 ```sh
 sudo daqhats_read_eeproms
 ```
+
+#### Display the installed daqhats version
+The command **daqhats_version** may be used to display the installed version number.
 
 #### Uninstall the daqhats library
 If you want to uninstall the the daqhats library, use the following commands:
