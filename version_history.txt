@@ -2,6 +2,7 @@
     - Fixed bug in MCC 118 scan data read functions where a 16-bit variable was used instead of 
       32 bits, so more than 64K samples per channel in the scan buffer would not be read at a 
       time.
+    - Fixed issue reading daqhat EEPROMs in newer versions of Raspbian Buster.
     - Added information on MCC 118 OEM.
     - Added daqhats_version command.
 
