@@ -1028,7 +1028,6 @@ int mcc172_open(uint8_t address)
     uint16_t custom_size;
     struct mcc172Device* dev;
     uint16_t id_data[3];
-    uint8_t buffer;
 
     _mcc172_lib_init();
 

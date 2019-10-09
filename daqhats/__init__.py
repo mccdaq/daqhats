@@ -7,4 +7,4 @@ from daqhats.hats import HatError, hat_list, HatIDs, TriggerModes, \
 from daqhats.mcc118 import mcc118
 from daqhats.mcc152 import mcc152, DIOConfigItem
 from daqhats.mcc134 import mcc134, TcTypes
-from daqhats.mcc172 import mcc172, SourceType, AliasMode
+from daqhats.mcc172 import mcc172, SourceType
