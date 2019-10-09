@@ -16,14 +16,6 @@ class SourceType(IntEnum):
     MASTER = 1    #: Use a local source and set it as master.
     SLAVE = 2     #: Use a master source from another MCC 172.
 
-@unique
-class AliasMode(IntEnum):
-    """Anti-aliasing mode options."""
-    NORMAL = 0      #: Normal anti-aliasing mode, the data rate is the same as
-                    #: the ADC sampling rate.
-    ENHANCED = 1    #: Enhanced anti-aliasing mode, the ADC rate is at or near
-                    #: the maximum and the data rate is decreased by decimation.
-
 class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
     """
     The class for an MCC 172 board.
@@ -103,12 +95,12 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         self._lib.mcc172_iepe_config_write.restype = c_int
 
         self._lib.mcc172_a_in_clock_config_read.argtypes = [
-            c_ubyte, POINTER(c_ubyte), POINTER(c_ubyte), POINTER(c_double),
+            c_ubyte, POINTER(c_ubyte), POINTER(c_double),
             POINTER(c_ubyte)]
         self._lib.mcc172_a_in_clock_config_read.restype = c_int
 
         self._lib.mcc172_a_in_clock_config_write.argtypes = [
-            c_ubyte, c_ubyte, c_ubyte, c_double]
+            c_ubyte, c_ubyte, c_double]
         self._lib.mcc172_a_in_clock_config_write.restype = c_int
 
         self._lib.mcc172_trigger_config.argtypes = [c_ubyte, c_ubyte, c_ubyte]
@@ -382,13 +374,13 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         return mode.value
 
     def a_in_clock_config_write(
-            self, clock_source, alias_mode, sample_rate_per_channel):
+            self, clock_source, sample_rate_per_channel):
         """
         Configure the ADC sampling clock.
 
         This method will configure the ADC sampling clock. The default
-        configuration after opening the device is local mode, normal alias
-        rejection, 51.2 KHz sampling rate. The clock source must be one of:
+        configuration after opening the device is local mode, 51.2 KHz sampling
+        rate. The clock source must be one of:
 
         * :py:const:`SourceType.LOCAL`: the clock is generated on this MCC 172
           and not shared with any other devices.
@@ -398,16 +390,6 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
           it receives its clock from the Raspberry Pi header. Another MCC 172
           must be configured for master clock.
-
-        The alias mode must be one of:
-
-        * :py:const:`AliasMode.NORMAL`: The data rate is the same as the clock
-          rate and alias rejection is normal.
-        * :py:const:`AliasMode.ENHANCED`: The clock is operated at a rate of
-          25.6 kHz or higher to prevent signals that are lower than the fixed
-          analog filter but not blocked by the variable digital filter from
-          aliasing into the data. The data rate is achieved by decimating the
-          data in the MCC 172 firmware.
 
         The ADCs will be synchronized so they sample the inputs at the same
         time. This requires 128 clock cycles before the first sample is
@@ -419,7 +401,6 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * Configure the clock on the slave device(s) first, master last. The
           synchronization will occur when the master clock is configured,
           causing the ADCs on all the devices to be in sync.
-        * All synchronized devices must use the same alias rejection mode.
         * A trigger must be used for the data streams from all devices to start
           on the same sample.
 
@@ -444,7 +425,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         result = self._lib.mcc172_a_in_clock_config_write(
-            self._address, clock_source, alias_mode, sample_rate_per_channel)
+            self._address, clock_source, sample_rate_per_channel)
         if result == self._RESULT_BUSY:
             raise HatError(
                 self._address, "Cannot change the clock "
@@ -473,16 +454,6 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`SourceType.SLAVE`: no clock is generated on this MCC 172,
           it receives its clock from the Raspberry Pi header.
 
-        The alias mode will be one of:
-
-        * :py:const:`AliasMode.NORMAL`: The data rate is the same as the clock
-          rate and alias rejection is normal.
-        * :py:const:`AliasMode.ENHANCED`: The clock is operated at a rate of
-          25.6 kHz or higher to prevent signals that are lower than the fixed
-          analog filter but not blocked by the variable digital filter from
-          aliasing into the data. The data rate is achieved by decimating the
-          data in the MCC 172 firmware
-
         The sampling rate will not be valid in slave mode if synced is False.
         The device will not detect a loss of the master clock when in slave
         mode; it only monitors the clock when a sync is initiated.
@@ -491,7 +462,6 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             namedtuple: a namedtuple containing the following field names:
 
             * **clock_source** (:py:class:`SourceType`): The ADC clock source.
-            * **alias_mode** (:py:class:`AliasMode`): The alias mode.
             * **sample_rate_per_channel** (float): The sample rate in
               samples per second per channel.
             * **synchronized** (bool): True if the ADCs are synchronized, False
@@ -504,11 +474,10 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         clock_source = c_ubyte()
-        alias_mode = c_ubyte()
         sample_rate_per_channel = c_double()
         synced = c_ubyte()
         result = self._lib.mcc172_a_in_clock_config_read(
-            self._address, byref(clock_source), byref(alias_mode),
+            self._address, byref(clock_source),
             byref(sample_rate_per_channel), byref(synced))
 
         if result != self._RESULT_SUCCESS:
@@ -516,11 +485,10 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
         clock_config = namedtuple(
             'MCC172ClockConfig',
-            ['clock_source', 'alias_mode', 'sample_rate_per_channel',
+            ['clock_source', 'sample_rate_per_channel',
              'synchronized'])
         return clock_config(
             clock_source=clock_source.value,
-            alias_mode=alias_mode.value,
             sample_rate_per_channel=sample_rate_per_channel.value,
             synchronized=synced.value != 0)
 

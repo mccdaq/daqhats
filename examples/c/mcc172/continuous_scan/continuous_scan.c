@@ -72,7 +72,6 @@ int main(void)
     uint32_t samples_read_per_channel = 0;
     uint8_t synced;
     uint8_t clock_source;
-    uint8_t alias_mode;
     uint32_t user_buffer_size = 2 * scan_rate * num_channels;
     uint32_t samples_per_channel = 2 * scan_rate;
     double read_buf[user_buffer_size];
@@ -121,15 +120,14 @@ int main(void)
     }
     
     // Set the ADC clock to the desired rate.
-    result = mcc172_a_in_clock_config_write(address, SOURCE_LOCAL, ALIAS_NORMAL,
-        scan_rate);
+    result = mcc172_a_in_clock_config_write(address, SOURCE_LOCAL, scan_rate);
     STOP_ON_ERROR(result);
     
     // Wait for the ADCs to synchronize.
     do
     {
         result = mcc172_a_in_clock_config_read(address, &clock_source,
-            &alias_mode, &actual_scan_rate, &synced);
+            &actual_scan_rate, &synced);
         STOP_ON_ERROR(result);
         usleep(5000);
     } while (synced == 0);
