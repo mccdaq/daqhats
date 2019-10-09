@@ -1,0 +1,11 @@
+#!/bin/sh
+
+libname=$(readlink /usr/local/lib/libdaqhats.so)
+if [ "$?" -eq 1 ]; then
+    echo "daqhats is not installed"
+    exit 1
+fi
+
+version=$(echo "${libname##libdaqhats.so.}")
+echo "daqhats version $version is installed"
+exit 0

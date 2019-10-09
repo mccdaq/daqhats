@@ -1775,7 +1775,7 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 {
     struct mcc118ScanThreadInfo* info;
     uint16_t stat;
-    uint16_t buffer_depth;
+    uint32_t buffer_depth;
     bool hw_overrun;
     bool buffer_overrun;
     bool triggered;
@@ -1857,7 +1857,7 @@ int mcc118_a_in_scan_read(uint8_t address, uint16_t* status,
     struct timespec start_time;
     struct timespec current_time;
     uint16_t stat;
-    uint16_t buffer_depth;
+    uint32_t buffer_depth;
     bool hw_overrun;
     bool buffer_overrun;
     bool triggered;

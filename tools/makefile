@@ -29,6 +29,7 @@ install:
 	@install -D mcc118_firmware_update $(INSTALL_DIR)
 	@install -D daqhats_read_eeproms $(INSTALL_DIR)
 	@install -D daqhats_list_boards $(INSTALL_DIR)
+	@install -D daqhats_version $(INSTALL_DIR)
 	@install -d $(APPS_DIR)
 	@install -D applications/*.py $(APPS_DIR)
 	@install -D -m 0644 applications/*.png $(APPS_DIR)
@@ -39,6 +40,7 @@ uninstall:
 	@rm -f $(INSTALL_DIR)/mcc118_firmware_update
 	@rm -f $(INSTALL_DIR)/daqhats_read_eeproms
 	@rm -f $(INSTALL_DIR)/daqhats_list_boards
+	@rm -f $(INSTALL_DIR)/daqhats_version
 	@rm -rf $(APPS_DIR)
 	@rm -f $(SHORTCUT_DIR)/mcc*_control_panel.desktop
 
@@ -46,5 +48,3 @@ uninstall:
 
 clean:
 	@rm -f *.o *~ core mcc118_firmware_update mcc172_firmware_update
-
-
