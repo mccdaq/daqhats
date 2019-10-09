@@ -19,15 +19,17 @@ Hardware supported by this version of the MCC DAQ HAT Library:
 #### Hardware Compatibility
 The MCC DAQ HATs are generally not compatible with any other brand of Raspberry
 Pi HAT or add-on board that attaches to the GPIO header, or devices that use the
-Raspberry Pi SPI interface. The specific pins used by each DAQ HAT are documented
-in the electrical specifications for that device.
+Raspberry Pi SPI interface. 
 
 In particular, LCD displays that use the GPIO header (not HDMI) usually use the
 SPI interface and will prevent the DAQ HATs from working. Even if the display is
 removed, the driver is probably still loaded by /boot/config.txt and will cause
 issues with the DAQ HATs. If you have a problem with your device and have used a
-display with your Raspberry Pi then consult your display hardware documentation
-for how to remove the driver.
+GPIO header display with your Raspberry Pi then consult your display hardware
+documentation for how to remove the driver.
+
+The specific pins used by each DAQ HAT are documented in the electrical
+specifications for that device.
 
 ## Prerequisites
 - Raspbian or Raspbian Lite image (may work with other Raspberry Pi operating systems)
