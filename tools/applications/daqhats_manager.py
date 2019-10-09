@@ -92,7 +92,11 @@ class ControlApp:
         
     # Event handlers
     def pressedReadButton(self):
-        result = check_output(['gksudo', 'daqhats_read_eeproms'])
+        try:
+            result = check_output(['pkexec', 'daqhats_read_eeproms'])
+        except FileNotFoundError:
+            result = check_output(['gksudo', 'daqhats_read_eeproms'])
+            
         d = MessageDialog(self.master, 'Read EEPROMs', result)
         
     def pressedListButton(self):

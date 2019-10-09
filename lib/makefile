@@ -1,6 +1,6 @@
 MAJOR = 1
 MINOR = 2
-SUB   = 0.2
+SUB   = 0.3
 NAME = daqhats
 VERSION = $(MAJOR).$(MINOR).$(SUB)
 INSTALL_DIR = /usr/local/lib

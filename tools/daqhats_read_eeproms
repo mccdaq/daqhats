@@ -5,14 +5,14 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-
+overlay_loaded=0
 modprobe i2c_dev
 if [ -e "/dev/i2c-0" ]; then
    BUS=0
 elif [ -e "/dev/i2c-3" ]; then
    BUS=3
 else
-   dtoverlay i2c-gpio i2c_gpio_sda=0 i2c_gpio_scl=1
+   dtoverlay i2c-gpio i2c_gpio_sda=0 i2c_gpio_scl=1 bus=3
    rc=$?
    if [ $rc != 0 ]; then
       echo "Loading of i2c-gpio dtoverlay failed. Do an rpi-update (and maybe apt update; apt upgrade)."
@@ -20,17 +20,19 @@ else
    fi
    if [ -e "/dev/i2c-3" ]; then
       BUS=3
+      overlay_loaded=1
    else
       echo "Expected I2C bus (i2c-3) not found."
+      exit 1
    fi
 fi
-
-#dtparam i2c_vc=on
-#BUS=0
 
 modprobe at24
 rc=$?
 if [ "$rc" != 0 ]; then
+   if [ "$overlay_loaded" -eq 1 ]; then
+      dtoverlay -R i2c-gpio
+   fi
    echo "Modprobe of at24 failed. Do an rpi-update."
    exit $rc
 fi
@@ -71,5 +73,9 @@ do
 
    index=$(($index + 1))
 done
+
+if [ "$overlay_loaded" -eq 1 ]; then
+   dtoverlay -R i2c-gpio
+fi
 
 echo "Done"
