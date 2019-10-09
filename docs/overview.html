@@ -88,6 +88,7 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Hardware Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-compatibility">Hardware Compatibility</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#mcc-118">MCC 118</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#board-components">Board components</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#screw-terminals">Screw terminals</a></li>
@@ -217,6 +218,17 @@ to the Raspberry Pi HAT specification, but also extend it to allow stacking up t
 8 MCC boards on a single Raspberry Pi.</p>
 <p>C and Python libraries, documentation, and examples are provided to allow you to
 develop your own applications.</p>
+<div class="section" id="hardware-compatibility">
+<h2>Hardware Compatibility<a class="headerlink" href="#hardware-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>The MCC DAQ HATs are generally not compatible with any other brand of Raspberry
+Pi HAT or add-on board that attaches to the GPIO header, or devices that use the
+Raspberry Pi SPI interface. In particular, LCD displays that use the GPIO header
+usually use SPI and will prevent the DAQ HATs from working. Even if the display
+is removed, the driver is probably still loaded by /boot/config.txt and will
+prevent the DAQ HATs from working. If you have a problem with your device and
+have used a display with your Raspberry Pi then check /boot/config.txt for display
+drivers, remove them, and reboot.</p>
+</div>
 <div class="section" id="mcc-118">
 <h2>MCC 118<a class="headerlink" href="#mcc-118" title="Permalink to this headline">¶</a></h2>
 <p>The MCC 118 is an 8-channel analog voltage input board with the following features:</p>
