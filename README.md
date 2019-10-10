@@ -119,6 +119,9 @@ sudo ./uninstall.sh
 ```
 
 ## Firmware Updates
+The library firmware version for applicable devices can be found in
+[tools/README.md](./tools/README.md).
+
 #### MCC 118
 Use the firmware update tool to update the firmware on your MCC 118 board(s).
 The "0" in the example below is the board address. Repeat the command for each
