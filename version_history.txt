@@ -11,6 +11,7 @@
     - Fixed issue reading daqhat EEPROMs in newer versions of Raspbian Buster.
     - Added information on MCC 118 OEM.
     - Added daqhats_version command.
+    - Added firmware version history to tools README file.
 
 1.2.0.2:
     - Fixed MCC 118 scan thread sync issues that could cause occasional hangs
