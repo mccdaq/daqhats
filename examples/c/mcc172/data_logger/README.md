@@ -1,7 +1,7 @@
 # DataLogger Example
 
 ## About
-The **DataLogger** example shows how to acquire data from the **MCC 118 HAT**, display the data on 
+The **DataLogger** example shows how to acquire data from the **MCC 172 HAT**, display the data on 
 a strip chart, and log the data to a CSV file. 
 This example can be run from a terminal window, or accessed with an IDE such as **Geany** or **CodeBlocks**. 
 
@@ -40,7 +40,7 @@ Install **GTKDatabox**:
 ## Running the example from a terminal
 To run the example from a terminal window, enter the following commands:
   ```sh
-    cd ~/daqhats/examples/c/mcc118/data_logger/logger
+    cd ~/daqhats/examples/c/mcc172/data_logger/logger
     make
     ./logger
   ```

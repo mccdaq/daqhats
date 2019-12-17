@@ -3,7 +3,7 @@
 
 
 // Get the error message for the specified error code.
-const char* get_mcc118_error_message(int error_code)
+const char* get_mcc172_error_message(int error_code)
 {
     const char* msg;
 
@@ -18,7 +18,7 @@ const char* get_mcc118_error_message(int error_code)
         switch (error_code)
         {
             case NO_HAT_DEVICES_FOUND:
-                msg = (const char*)"No MCC 118 Hat devices were found.";
+                msg = (const char*)"No MCC 172 Hat devices were found.";
                 break;
 
             case HW_OVERRUN:
@@ -74,21 +74,21 @@ gboolean show_error(const char* errmsg)
 // dialog box.
 //
 // This function is called from a background thread using the function
-// g_main_context_invoke(), which causes the function to execute in the main
+// g_main_context_invoke(), which causes the funthreadhction to execute in the main
 // thread.
-void show_mcc118_error_main_thread(gpointer error_code_ptr)
+void show_mcc172_error_main_thread(gpointer error_code_ptr)
 {
     int error_code = *(int*)error_code_ptr;
-    show_mcc118_error(error_code);
+    show_mcc172_error(error_code);
 }
 
 
 // Get the error message for the specified error code, and display it in a
 // dialog box.
-void show_mcc118_error(int error_code)
+void show_mcc172_error(int error_code)
 {
     // Get the error message.
-    const char* errmsg = get_mcc118_error_message(error_code);
+    const char* errmsg = get_mcc172_error_message(error_code);
 
  	// display the rror message in a a dialog box.
    show_error(errmsg);

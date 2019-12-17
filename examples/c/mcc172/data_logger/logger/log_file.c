@@ -123,10 +123,10 @@ int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask)
 		// exit if an error occurred.
 		return write_status;
 	}
-	
-    for (i = 0; i < MAX_118_CHANNELS; i++)
+
+    for (i = 0; i < MAX_172_CHANNELS; i++)
     {
-        // If this channel is in the scan, 
+        // If this channel is in the scan,
         // print the channel number
         if (chanMask & 1)
         {
@@ -147,7 +147,8 @@ int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask)
     write_status = fprintf(log_file_ptr, "\n");
     return write_status;
 }
-    
+
+
 // Convert the numeric data to ASCII values, seperated by commas (CSV), and
 // write the data using the specified file pointer.
 int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
@@ -155,7 +156,7 @@ int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
 {
     int i = 0;
     int j = 0;
-    int write_status = 1;
+    int write_status = 0;
 
     char str[1000];
     char buf[256];

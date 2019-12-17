@@ -17,35 +17,42 @@
 #include <glib.h>
 
 #include "daqhats/daqhats.h"
+#include "kiss_fft/kiss_fftr.h"
 
-#define MAX_118_CHANNELS 8
+#define MAX_172_CHANNELS 2
 
 
 typedef struct graph_channel_info
 {
     GtkDataboxGraph*    graph;
+    GtkDataboxGraph*    fft_graph;
     GdkRGBA*            color;
     uint                channelNumber;
     uint                readBufStartIndex;
     gfloat*             X;
     gfloat*             Y;
+    gfloat*             fft_X;
+    gfloat*             fft_Y;
 } GraphChannelInfo;
 
 EXTERN GtkWidget *window;
 
-EXTERN GtkWidget *box;
-EXTERN GtkWidget *table;
+EXTERN GtkWidget *dataBox;
+EXTERN GtkWidget *fftBox;
+EXTERN GtkWidget *dataTable;
+EXTERN GtkWidget *fftTable;
 
 EXTERN GtkWidget *rbContinuous, *rbFinite;
 EXTERN GtkWidget *spinRate;
 EXTERN GtkWidget *spinNumSamples;
 EXTERN GtkWidget *btnSelectLogFile;
 EXTERN GtkWidget *btnQuit;
-EXTERN GtkWidget *chkChan[MAX_118_CHANNELS];
+EXTERN GtkWidget *chkChan[MAX_172_CHANNELS];
+EXTERN GtkWidget *chkIepe[MAX_172_CHANNELS];
 EXTERN GtkWidget *btnStart_Stop;
 
-EXTERN GraphChannelInfo graphChannelInfo[MAX_118_CHANNELS];
-EXTERN GdkRGBA legendColor[MAX_118_CHANNELS];
+EXTERN GraphChannelInfo graphChannelInfo[MAX_172_CHANNELS];
+EXTERN GdkRGBA legendColor[MAX_172_CHANNELS];
 
 EXTERN uint8_t address;
 EXTERN uint8_t channel_mask;
@@ -65,7 +72,17 @@ EXTERN char csv_filename[512];
 EXTERN GMutex data_mutex;
 EXTERN GMainContext *context;
 
+EXTERN int error_code;
 EXTERN char error_message[256];
-EXTERN GMainContext *error_context;
+////////EXTERN GMainContext *error_context;
+
+////////EXTERN  kiss_fftr_cfg cfg;
+////////EXTERN  kiss_fft_scalar* in;
+////////EXTERN  kiss_fft_cpx* out;
+
+
+EXTERN char dbg_string[1000];
+EXTERN char dbg_string0[1000];
+EXTERN char dbg_string1[1000];
 
 #endif // GLOBALS_H_INCLUDED

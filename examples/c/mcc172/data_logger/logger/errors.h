@@ -12,10 +12,10 @@
 #define HW_OVERRUN                  -200
 #define BUFFER_OVERRUN              -201
 
-extern const char* get_mcc118_error_message(int error_code);
+extern const char* get_mcc172_error_message(int error_code);
 extern gboolean show_error(const char* errmsg);
-extern void show_mcc118_error_main_thread(gpointer error_code);
-extern void show_mcc118_error(int error_code);
+extern void show_mcc172_error_main_thread(gpointer error_code);
+extern void show_mcc172_error(int error_code);
 
 #endif // ERRORS_H_INCLUDED
 

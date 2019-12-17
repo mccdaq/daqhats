@@ -44,10 +44,16 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="logger/errors.h" />
+		<Unit filename="logger/fft.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="logger/fft.h" />
 		<Unit filename="logger/globals.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="logger/globals.h" />
+		<Unit filename="logger/kiss_fft/kiss_fft.o" />
+		<Unit filename="logger/kiss_fft/kiss_fftr.o" />
 		<Unit filename="logger/log_file.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -56,8 +62,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="logger/logger.h" />
-		<Unit filename="logger/makefile" />
-		<Unit filename="logger/theme.css" />
 		<Extensions>
 			<code_completion />
 			<debugger />

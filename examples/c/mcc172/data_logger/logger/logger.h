@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "log_file.h"
 #include "errors.h"
+#include "fft.h"
 
 GtkWidget *labelFile;
 
@@ -23,7 +24,7 @@ int allocate_channel_xy_arrays(uint8_t current_channel_mask,
 int create_selected_channel_mask();
 void set_enable_state_for_controls(gboolean state);
 
-gboolean refresh_graph(GtkWidget *box);
+gboolean refresh_graph();
 void copy_data_to_xy_arrays(double* hat_read_buf, int read_buf_start_index,
     int channel, int stride, int buffer_size_samples, gboolean first_block);
 
