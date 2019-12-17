@@ -24,8 +24,6 @@
 
 // *****************************************************************************
 // Constants
-#define RESET_ACTIVE_LOW
-
 #define MAX_CODE                (8388607L)
 #define MIN_CODE                (-8388608L)
 #define RANGE_MIN               (-5.0)
@@ -178,6 +176,7 @@ struct mcc172Device
     uint16_t handle_count;      // the number of handles open to this device
     uint16_t fw_version;        // firmware version
     int spi_fd;                 // SPI file descriptor
+    uint8_t reset_polarity;     // Reset signal polarity
     uint8_t trigger_source;     // Trigger source
     uint8_t trigger_mode;       // Trigger mode
     struct mcc172FactoryData factory_data;  // Factory data
@@ -1064,43 +1063,6 @@ int mcc172_open(uint8_t address)
             custom_data = NULL;
         }
 
-        // ensure GPIO signals are initialized
-        gpio_dir(IRQ_GPIO, 1);
-
-#ifdef RESET_ACTIVE_LOW
-        // Signal defaults to low, so micro would be held in reset if library
-        // has not been opened since boot.  In that case, add extra delay for
-        // micro to start.
-        if (gpio_status(RESET_GPIO) == 0)
-        {
-            gpio_write(RESET_GPIO, 1);
-            gpio_dir(RESET_GPIO, 0);
-
-            int lock_fd;
-
-            // Obtain a spi lock
-            if ((lock_fd = _obtain_lock()) < 0)
-            {
-                // could not get a lock within 5 seconds, report as a timeout
-                return RESULT_LOCK_TIMEOUT;
-            }
-
-            _set_address(address);
-            _release_lock(lock_fd);
-
-            sleep(2);
-        }
-        else
-        {
-            gpio_write(RESET_GPIO, 1);
-            gpio_dir(RESET_GPIO, 0);
-        }
-#else
-        gpio_write(RESET_GPIO, 0);
-        gpio_dir(RESET_GPIO, 0);
-#endif
-
-
         // create a struct to hold device instance data
         _devices[address] = (struct mcc172Device*)calloc(
             1, sizeof(struct mcc172Device));
@@ -1109,21 +1071,17 @@ int mcc172_open(uint8_t address)
         // initialize the struct elements
         dev->scan_info = NULL;
         dev->handle_count = 1;
-
-        pthread_mutex_init(&dev->scan_mutex, NULL);
-
-        // open the SPI device handle
-        dev->spi_fd = open(spi_device, O_RDWR);
-        if (dev->spi_fd < 0)
-        {
-            free(custom_data);
-            free(dev);
-            _devices[address] = NULL;
-            return RESULT_RESOURCE_UNAVAIL;
-        }
+        dev->reset_polarity = 1;
 
         if (custom_size > 0)
         {
+            // if the EEPROM is initialized then use the version to determine
+            // which reset polarity was used on the hardware
+            if (info.version == 1)
+            {
+                dev->reset_polarity = 0;
+            }
+
             // convert the JSON custom data to parameters
             cJSON* root = cJSON_Parse(custom_data);
             if (root == NULL)
@@ -1155,6 +1113,58 @@ int mcc172_open(uint8_t address)
                 "values\n", address);
         }
 
+        // ensure GPIO signals are initialized
+        gpio_dir(IRQ_GPIO, 1);
+
+        if (dev->reset_polarity == 0)
+        {
+            // Initial prototypes had active low reset, and the GPIO signal 
+            // defaults to low. This causes the micro to be held in reset if 
+            // the library has not been opened since booting. In that case, add 
+            // an extra delay for the micro to start.
+            if (gpio_status(RESET_GPIO) == 0)
+            {
+                gpio_write(RESET_GPIO, 1);
+                gpio_dir(RESET_GPIO, 0);
+
+                int lock_fd;
+
+                // Obtain a spi lock
+                if ((lock_fd = _obtain_lock()) < 0)
+                {
+                    // could not get a lock within 5 seconds, report as a timeout
+                    return RESULT_LOCK_TIMEOUT;
+                }
+
+                _set_address(address);
+                _release_lock(lock_fd);
+
+                sleep(2);
+            }
+            else
+            {
+                gpio_write(RESET_GPIO, 1);
+                gpio_dir(RESET_GPIO, 0);
+            }
+        }
+        else
+        {
+            // normal reset polarity
+            gpio_write(RESET_GPIO, 0);
+            gpio_dir(RESET_GPIO, 0);
+        }
+
+        pthread_mutex_init(&dev->scan_mutex, NULL);
+
+        // open the SPI device handle
+        dev->spi_fd = open(spi_device, O_RDWR);
+        if (dev->spi_fd < 0)
+        {
+            free(custom_data);
+            free(dev);
+            _devices[address] = NULL;
+            return RESULT_RESOURCE_UNAVAIL;
+        }
     }
     else
     {
@@ -2279,16 +2289,6 @@ int mcc172_open_for_update(uint8_t address)
             custom_data = NULL;
         }
 
-        // ensure GPIO signals are initialized
-#ifdef RESET_ACTIVE_LOW
-        gpio_write(RESET_GPIO, 1);
-#else
-        gpio_write(RESET_GPIO, 0);
-#endif
-        gpio_dir(RESET_GPIO, 0);
-
-        gpio_dir(IRQ_GPIO, 1);
-
         // create a struct to hold device instance data
         _devices[address] = (struct mcc172Device*)calloc(
             1, sizeof(struct mcc172Device));
@@ -2297,19 +2297,17 @@ int mcc172_open_for_update(uint8_t address)
         // initialize the struct elements
         dev->scan_info = NULL;
         dev->handle_count = 1;
-
-        // open the SPI device handle
-        dev->spi_fd = open(spi_device, O_RDWR);
-        if (dev->spi_fd < 0)
-        {
-            free(custom_data);
-            free(dev);
-            _devices[address] = NULL;
-            return RESULT_RESOURCE_UNAVAIL;
-        }
+        dev->reset_polarity = 1;
 
         if (custom_size > 0)
         {
+            // if the EEPROM is initialized then use the version to determine
+            // which reset polarity was used on the hardware
+            if (info.version == 1)
+            {
+                dev->reset_polarity = 0;
+            }
+
             // convert the JSON custom data to parameters
             cJSON* root = cJSON_Parse(custom_data);
             if (!_parse_factory_data(root, &dev->factory_data))
@@ -2327,6 +2325,29 @@ int mcc172_open_for_update(uint8_t address)
             _set_defaults(&dev->factory_data);
         }
 
+        
+        // ensure GPIO signals are initialized
+        if (dev->reset_polarity == 0)
+        {
+            gpio_write(RESET_GPIO, 1);
+        }
+        else
+        {
+            gpio_write(RESET_GPIO, 0);
+        }
+        gpio_dir(RESET_GPIO, 0);
+
+        gpio_dir(IRQ_GPIO, 1);
+
+        // open the SPI device handle
+        dev->spi_fd = open(spi_device, O_RDWR);
+        if (dev->spi_fd < 0)
+        {
+            free(custom_data);
+            free(dev);
+            _devices[address] = NULL;
+            return RESULT_RESOURCE_UNAVAIL;
+        }
     }
     else
     {
@@ -2343,12 +2364,15 @@ int mcc172_enter_bootloader(uint8_t address)
 {
     int lock_fd;
     int count;
+    struct mcc172Device* dev;
 
     if (!_check_addr(address))                  // check address failed
     {
         return RESULT_BAD_PARAMETER;
     }
 
+    dev = _devices[address];
+    
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
@@ -2362,15 +2386,18 @@ int mcc172_enter_bootloader(uint8_t address)
     count = 0;
     while (gpio_status(IRQ_GPIO) && (count < 20))
     {
-#ifdef RESET_ACTIVE_LOW
-        gpio_write(RESET_GPIO, 0);
-        usleep(2*1000ul);
-        gpio_write(RESET_GPIO, 1);
-#else
-        gpio_write(RESET_GPIO, 1);
-        usleep(2*1000ul);
-        gpio_write(RESET_GPIO, 0);
-#endif
+        if (dev->reset_polarity == 0)
+        {
+            gpio_write(RESET_GPIO, 0);
+            usleep(2*1000ul);
+            gpio_write(RESET_GPIO, 1);
+        }
+        else
+        {
+            gpio_write(RESET_GPIO, 1);
+            usleep(2*1000ul);
+            gpio_write(RESET_GPIO, 0);
+        }
         usleep(55*1000ul);
         count++;
     }

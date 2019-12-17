@@ -14,13 +14,6 @@
 #include "daqhats.h"
 #include "mcc172_update.h"
 
-//#define SPI_DEVICE              "/dev/spidev0.0"
-// SPI stuff
-//#define SPI_RATE    1000000
-//#define SPI_MODE    1
-//#define SPI_DELAY   2
-//#define SPI_BITS    8
-
 // allocated at run time to contain the entire file
 uint8_t* frame_file_buffer;
 uint32_t frame_file_size;
