@@ -26,7 +26,7 @@ The MCC 172 is a 2-channel analog voltage input board with the following feature
 Board components
 ----------------
 10-32 coaxial connectors
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
 - **CH0** and **CH1** (CHx): Analog input connectors (do not connect an input source
   to the 10-32 connectors and screw terminals at the same time).
 
