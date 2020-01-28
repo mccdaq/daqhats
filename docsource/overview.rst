@@ -11,7 +11,7 @@ develop your own applications.
 
 Hardware Compatibility
 ======================
-he MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
+The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
 GPIO header (not the original Pi 1 A or B with the 26-pin header.) They are
 generally not compatible with any other brand of Raspberry Pi HAT or add-on board
 that attaches to the GPIO header, or devices that use the Raspberry Pi SPI interface. 
