@@ -19,7 +19,7 @@ Installing a single board
         .. image:: images/standoff.jpg
     
 3. Attach the 4 standoffs to the Raspberry Pi by inserting the male threaded portion through the 4 corner holes on the Raspberry Pi from the top and securing them with the included nuts from the bottom.
-4. Install the 2x20 receptacle with extended leads onto the Raspberry Pi GPIO header by pressing the female portion of the receptacle onto the header pins, being careful not to bend the leads of the receptacle.  The 2x20 receptacle looks like:
+4. Install the 2x20 receptacle with extended leads (MCC provides a Samtec SSQ-120-03-T-D or equivalent) onto the Raspberry Pi GPIO header by pressing the female portion of the receptacle onto the header pins, being careful not to bend the leads of the receptacle.  The 2x20 receptacle looks like:
 
     .. only:: html
 
