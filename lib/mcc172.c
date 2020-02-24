@@ -1586,6 +1586,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     if (!_check_addr(address) ||
         (channel_mask == 0) ||
         (channel_mask >= (1 << NUM_CHANNELS)) ||
+        (options & OPTS_EXTCLOCK) ||
         ((samples_per_channel == 0) && ((options & OPTS_CONTINUOUS) == 0)))
     {
         return RESULT_BAD_PARAMETER;
