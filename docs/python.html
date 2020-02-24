@@ -3257,6 +3257,13 @@ connecting multiple outputs together and could damage a device.</li>
 <li>Configure the clock on the slave device(s) first, master last. The
 synchronization will occur when the master clock is configured,
 causing the ADCs on all the devices to be in sync.</li>
+<li>If you change the clock configuration on one device after configuring
+the master, then the data will no longer be in sync. The devices
+cannot detect this and will still report that they are synchronized.
+Always write the clock configuration to all devices when modifying the
+configuration.</li>
+<li>Slave devices must have a master clock source or scans will never
+complete.</li>
 <li>A trigger must be used for the data streams from all devices to start
 on the same sample.</li>
 </ul>
@@ -3360,6 +3367,11 @@ trigger is high.</li>
 <li><a class="reference internal" href="#daqhats.TriggerModes.ACTIVE_LOW" title="daqhats.TriggerModes.ACTIVE_LOW"><code class="xref py py-const docutils literal notranslate"><span class="pre">TriggerModes.ACTIVE_LOW</span></code></a>: Start saving data when the
 trigger is low.</li>
 </ul>
+<p>Care must be taken when using master / slave triggering; the input
+trigger signal on the master will be passed through to the slave(s), but
+the mode is set independently on each device. For example, it is
+possible for the master to trigger on the rising edge of the signal and
+the slave to trigger on the falling edge.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -3449,6 +3461,8 @@ write data to a circular buffer. The data must be read before being
 overwritten to avoid a buffer overrun error. <strong>samples_per_channel</strong>
 is only used for buffer sizing.</li>
 </ul>
+<p>The <a class="reference internal" href="#daqhats.OptionFlags.EXTCLOCK" title="daqhats.OptionFlags.EXTCLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.EXTCLOCK</span></code></a> option is not supported for this
+device and will raise a ValueError.</p>
 <p>The scan buffer size will be allocated as follows:</p>
 <p><strong>Finite mode:</strong> Total number of samples in the scan.</p>
 <p><strong>Continuous mode:</strong> Either <strong>samples_per_channel</strong> or the value in the
