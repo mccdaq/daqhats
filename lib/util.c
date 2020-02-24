@@ -115,6 +115,9 @@ static const char* const HAT_SETTINGS_DIR = "/etc/mcc/hats";
 static const char* const SYS_HAT_DIR = "/proc/device-tree/hat";
 static const char* const VENDOR_NAME = "Measurement Computing Corp.";
 
+static const char* UNDEFINED_ERROR_MESSAGE = 
+    "An unknown error occurred.";
+
 static const char* HAT_ERROR_MESSAGES[] =
 {
     "Success.",
@@ -124,8 +127,7 @@ static const char* HAT_ERROR_MESSAGES[] =
     "There was a timeout while obtaining a resource lock.",
     "The device at the specified address is not the correct type.",
     "A needed resource was not available.",
-    "Could not communicate with the device.",
-    "An unknown error occurred."
+    "Could not communicate with the device."
 };
 
 // *****************************************************************************
@@ -861,9 +863,11 @@ const char* hat_error_message(int result)
         return HAT_ERROR_MESSAGES[5];
     case RESULT_RESOURCE_UNAVAIL:
         return HAT_ERROR_MESSAGES[6];
+    case RESULT_COMMS_FAILURE:
+        return HAT_ERROR_MESSAGES[7];
     case RESULT_UNDEFINED:
     default:
-        return HAT_ERROR_MESSAGES[7];
+        return UNDEFINED_ERROR_MESSAGE;
     }
 }
 
