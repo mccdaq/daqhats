@@ -143,7 +143,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#mcc-172">MCC 172</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#id17">Board components</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#connectors">10-32 connectors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#coaxial-connectors">10-32 coaxial connectors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id18">Screw terminals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id19">Address jumpers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id20">Status LED</a></li>
@@ -154,6 +154,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#id23">Functional details</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#adc-clock">ADC clock</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id24">Trigger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alias-rejection">Alias Rejection</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#id25">Firmware updates</a></li>
@@ -239,7 +240,7 @@ to the Raspberry Pi HAT specification, but also extend it to allow stacking up t
 develop your own applications.</p>
 <div class="section" id="hardware-compatibility">
 <h2>Hardware Compatibility<a class="headerlink" href="#hardware-compatibility" title="Permalink to this headline">¶</a></h2>
-<p>he MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
+<p>The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
 GPIO header (not the original Pi 1 A or B with the 26-pin header.) They are
 generally not compatible with any other brand of Raspberry Pi HAT or add-on board
 that attaches to the GPIO header, or devices that use the Raspberry Pi SPI interface.</p>
@@ -506,18 +507,18 @@ using a series resistor of 700 ohms or larger.</p>
 <img alt="MCC 172 circuit board" class="align-center" src="_images/mcc172-web.jpg" />
 <div class="section" id="id17">
 <h3>Board components<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="connectors">
-<h4>10-32 connectors<a class="headerlink" href="#connectors" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="coaxial-connectors">
+<h4>10-32 coaxial connectors<a class="headerlink" href="#coaxial-connectors" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>Ch 0</strong> and <strong>Ch 1</strong>: Analog input connectors (do not use both 10-32 and
-screw terminals at the same time for an input channel).</li>
+<li><strong>CH0</strong> and <strong>CH1</strong> (CHx): Analog input connectors (do not connect an input source
+to the 10-32 connectors and screw terminals at the same time).</li>
 </ul>
 </div>
 <div class="section" id="id18">
 <h4>Screw terminals<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>Ch 0</strong> and <strong>Ch 1</strong>: Analog input terminals  (do not use both 10-32 and
-screw terminals at the same time for an input channel).</li>
+<li><strong>CH0+/CH0-</strong> and <strong>CH1+/CH1-</strong> (CHx+/CHx-): Analog input terminals (do not connect
+an input source to the 10-32 connectors and screw terminals at the same time).</li>
 <li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode
 is software configurable for edge or level sensitive, rising or falling edge,
 high or low level.</li>
@@ -569,6 +570,15 @@ may be rising edge, falling edge, high level, or low level.  The trigger may
 also be shared across the Raspberry Pi GPIO header to synchronize multiple
 MCC 172s.</p>
 </div>
+<div class="section" id="alias-rejection">
+<h4>Alias Rejection<a class="headerlink" href="#alias-rejection" title="Permalink to this headline">¶</a></h4>
+<p>At low sampling rates, certain high frequency signals (at multiples of 128 * the
+sampling rate) can fall below the cutoff frequency of the fixed analog
+anti-aliasing filter and create aliasing in the data.  Using transducers with
+a bandwidth lower than 100 kHz should not affect measurement results.
+Sampling at 10.24 kHz or higher will also ensure that the anti-aliasing filter
+suppresses all signals that could alias into the data.</p>
+</div>
 </div>
 <div class="section" id="id25">
 <h3>Firmware updates<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
@@ -582,7 +592,7 @@ firmware on the MCC 172 that is installed at address 0:</p>
 </div>
 <div class="section" id="id26">
 <h3>Specifications<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="_static/esmcc118.pdf">MCC 172 Electrical Specifications</a></p>
+<p><a class="reference external" href="_static/esmcc172.pdf">MCC 172 Electrical Specifications</a></p>
 </div>
 </div>
 </div>
