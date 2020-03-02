@@ -2654,6 +2654,8 @@ type of board.  The library may be used with C and C++.</p>
 <p><ul class="simple">
 <li>There should be only one master device; otherwise, you will be connecting multiple outputs together and could damage a device.</li>
 <li>Configure the clock on the slave device(s) first, master last. The synchronization will occur when the master clock is configured, causing the ADCs on all the devices to be in sync.</li>
+<li>If you change the clock configuration on one device after configuring the master, then the data will no longer be in sync. The devices cannot detect this and will still report that they are synchronized. Always write the clock configuration to all devices when modifying the configuration.</li>
+<li>Slave devices must have a master clock source or scans will never complete.</li>
 <li>A trigger must be used for the data streams from all devices to start on the same sample.</li>
 </ul>
 </p>
@@ -2692,6 +2694,7 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aa95176a26d99fad97d400764990a71c0b"><span class="std std-ref">TRIG_ACTIVE_LOW</span></a>: Start the scan any time TRIG is low.</li>
 </ul>
 </p>
+<p>Care must be taken when using master / slave triggering; the input trigger signal on the master will be passed through to the slave(s), but the mode is set independently on each device. For example, it is possible for the master to trigger on the rising edge of the signal and the slave to trigger on the falling edge.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
@@ -2724,6 +2727,7 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#daqhats_8h_1af34e1d3813b5909d7b8bf3012a2d829a"><span class="std std-ref">OPTS_CONTINUOUS</span></a>: Scans continuously until stopped by the user by calling <a class="reference internal" href="#mcc172_8h_1a91b01737a38dfc59846414392f09352f"><span class="std std-ref">mcc172_a_in_scan_stop()</span></a> and writes data to a circular buffer. The data must be read before being overwritten to avoid a buffer overrun error. <strong>samples_per_channel</strong> is only used for buffer sizing.</li>
 </ul>
 </p>
+<p>The <a class="reference internal" href="#daqhats_8h_1a385c1e54c5caa4ddaab2bbed18a974a8"><span class="std std-ref">OPTS_EXTCLOCK</span></a> option is not supported for this device and will return an error.</p>
 <p>The options parameter is set to 0 or <a class="reference internal" href="#daqhats_8h_1ac3262ea2b2658ce9d272e6b1246edd35"><span class="std std-ref">OPTS_DEFAULT</span></a> for default operation, which is scaled and calibrated data, no trigger, and finite operation.</p>
 <p>Multiple options may be specified by ORing the flags. For instance, specifying <a class="reference internal" href="#daqhats_8h_1aca7ce40604d112dff98e0ce6f1194cbd"><span class="std std-ref">OPTS_NOSCALEDATA</span></a> | <a class="reference internal" href="#daqhats_8h_1af25a40101f44bd0ea3a5e77d525832e0"><span class="std std-ref">OPTS_NOCALIBRATEDATA</span></a> will return the values read from the ADC without calibration or converting to voltage.</p>
 <p>The buffer size will be allocated as follows:</p>

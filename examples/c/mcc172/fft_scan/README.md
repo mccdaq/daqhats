@@ -1,8 +1,8 @@
 # FFT Scan Example
 
 ## About
-This example demonstrates how to perform a finite acquisition from a channel,
-perform an FFT on the data, and find the peak and harmonics.
+This example demonstrates how to perform finite acquisitions from both channels,
+perform FFTs on the data, and find the peaks and harmonics.
 
 This example is compiled and ready-to-run, and can be customized to suit 
 your needs.

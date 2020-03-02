@@ -261,6 +261,13 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *   - Configure the clock on the slave device(s) first, master last. The
 *     synchronization will occur when the master clock is configured, causing
 *     the ADCs on all the devices to be in sync.
+*   - If you change the clock configuration on one device after configuring
+*     the master, then the data will no longer be in sync.  The devices cannot
+*     detect this and will still report that they are synchronized.  Always
+*     write the clock configuration to all devices when modifying the
+*     configuration.
+*   - Slave devices must have a master clock source or scans will never
+*     complete.
 *   - A trigger must be used for the data streams from all devices to start on
 *     the same sample.
 *
@@ -312,6 +319,12 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
 *   - [TRIG_ACTIVE_LOW](@ref TRIG_ACTIVE_LOW): Start the scan any time TRIG is
 *     low.
 *
+*   Care must be taken when using master / slave triggering; the input trigger
+*   signal on the master will be passed through to the slave(s), but the mode
+*   is set independently on each device.  For example, it is possible for the
+*   master to trigger on the rising edge of the signal and the slave to trigger
+*   on the falling edge.
+*
 *   @param address  The board address (0 - 7). Board must already be opened.
 *   @param source   The trigger source, one of the
 *       [source type](@ref SourceType) values.
@@ -359,6 +372,9 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode);
 *           data to a circular buffer. The data must be read before being
 *           overwritten to avoid a buffer overrun error. \b samples_per_channel
 *           is only used for buffer sizing.
+*
+*   The [OPTS_EXTCLOCK](@ref OPTS_EXTCLOCK) option is not supported for this
+*   device and will return an error.
 *
 *   The options parameter is set to 0 or [OPTS_DEFAULT](@ref OPTS_DEFAULT) for
 *   default operation, which is scaled and calibrated data, no trigger, and

@@ -10,14 +10,14 @@
         mcc172.a_in_scan_stop
 
     Purpose:
-        Perform a finite acquisition on a channel, calculate the FFT, and
+        Perform finite acquisitions on both channels, calculate the FFTs, and
         display peak information.
 
     Description:
-        Acquires blocks of analog input data for a single channel then performs
-        an FFT calculation to determine the frequency content. The highest
+        Acquires blocks of analog input data for both channels then performs
+        FFT calculations to determine the frequency content. The highest
         frequency peak is detected and displayed, along with harmonics. The
-        time and frequency data are saved to a CSV file.
+        time and frequency data are saved to CSV files.
 
         This example requires the NumPy library.
 
@@ -61,8 +61,8 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
     This function is executed automatically when the module is run directly.
     """
 
-    channel = 0       # This example only supports a single channel.
-    channel_mask = chan_list_to_mask([channel])
+    channels = [0, 1]
+    channel_mask = chan_list_to_mask(channels)
 
     samples_per_channel = 12800
     scan_rate = 51200.0
@@ -78,7 +78,8 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         # Turn on IEPE supply?
         iepe_enable = get_iepe()
 
-        hat.iepe_config_write(channel, iepe_enable)
+        for channel in channels:
+            hat.iepe_config_write(channel, iepe_enable)
 
         # Configure the clock and wait for sync to complete.
         hat.a_in_clock_config_write(SourceType.LOCAL, scan_rate)
@@ -89,7 +90,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
             if not synced:
                 sleep(0.005)
 
-        print('\nMCC 172 FFT example')
+        print('\nMCC 172 Multi channel FFT example')
         print('    Functions demonstrated:')
         print('         mcc172.iepe_config_write')
         print('         mcc172.a_in_clock_config_write')
@@ -103,7 +104,8 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
             print('on')
         else:
             print('off')
-        print('    Channel: ', str(channel))
+        print('    Channels: ', end='')
+        print(', '.join([str(chan) for chan in channels]))
         print('    Requested scan rate: ', scan_rate)
         print('    Actual scan rate: ', actual_scan_rate)
         print('    Samples per channel', samples_per_channel)
@@ -120,7 +122,8 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         print('Starting scan ... Press Ctrl-C to stop\n')
 
         try:
-            read_and_display_data(hat, samples_per_channel, actual_scan_rate)
+            read_and_display_data(hat, channels, samples_per_channel, 
+                actual_scan_rate)
 
         except KeyboardInterrupt:
             # Clear the '^C' from the display.
@@ -199,7 +202,7 @@ def order_suffix(index):
 
     return "th"
 
-def read_and_display_data(hat, samples_per_channel, scan_rate):
+def read_and_display_data(hat, channels, samples_per_channel, scan_rate):
     """
     Wait for all of the scan data, perform an FFT, find the peak frequency,
     and display the frequency information.  Only supports 1 channel in the data.
@@ -226,54 +229,61 @@ def read_and_display_data(hat, samples_per_channel, scan_rate):
         print('\n\nBuffer overrun\n')
         return
 
-    # Calculate the FFT.
-    spectrum = calculate_real_fft(read_result.data)
+    # Separate the data by channel
+    read_data = read_result.data.reshape((len(channels), -1), order='F')
+    
+    for channel in channels:
+        print('===== Channel {}:\n'.format(channel))
 
-    # Calculate dBFS and find peak.
-    f_i = 0.0
-    peak_index = 0
-    peak_val = -1000.0
+        # Calculate the FFT.
+        spectrum = calculate_real_fft(read_data[channels.index(channel)])
 
-    # Save data to CSV file
-    logfile = open("fft_scan.csv", "w")
-    logfile.write("Time data (V), Frequency (Hz), Spectrum (dBFS)\n")
+        # Calculate dBFS and find peak.
+        f_i = 0.0
+        peak_index = 0
+        peak_val = -1000.0
 
-    for i, spec_val in enumerate(spectrum):
-        # Find the peak value and index.
-        if spec_val > peak_val:
-            peak_val = spec_val
-            peak_index = i
+        # Save data to CSV file
+        logname = "fft_scan_{}.csv".format(channel)
+        logfile = open(logname, "w")
+        logfile.write("Time data (V), Frequency (Hz), Spectrum (dBFS)\n")
 
-        # Save to the CSV file.
-        logfile.write("{0:.6f},{1:.3f},{2:.6f}\n".format(
-            read_result.data[i], f_i, spec_val))
+        for i, spec_val in enumerate(spectrum):
+            # Find the peak value and index.
+            if spec_val > peak_val:
+                peak_val = spec_val
+                peak_index = i
 
-        f_i += scan_rate / samples_per_channel
+            # Save to the CSV file.
+            logfile.write("{0:.6f},{1:.3f},{2:.6f}\n".format(
+                read_result.data[i], f_i, spec_val))
 
-    logfile.close()
+            f_i += scan_rate / samples_per_channel
 
-    # Interpolate for a more precise peak frequency.
-    peak_offset = quadratic_interpolate(
-        spectrum[peak_index - 1], spectrum[peak_index], spectrum[peak_index + 1])
-    peak_freq = ((peak_index + peak_offset) * scan_rate /
-                 samples_per_channel)
-    print("Peak: {0:.1f} dBFS at {1:.1f} Hz".format(peak_val, peak_freq))
+        logfile.close()
 
-    # Find and display harmonic levels.
-    i = 2
-    h_freq = 0
-    nyquist = scan_rate / 2.0
-    while (i < 8) and (h_freq <= nyquist):
-        # Stop when frequency exceeds Nyquist rate or at the 8th harmonic.
-        h_freq = peak_freq * i
-        if h_freq <= nyquist:
-            h_index = int(h_freq * samples_per_channel / scan_rate + 0.5)
-            h_val = spectrum[h_index]
-            print("{0:d}{1:s} harmonic: {2:.1f} dBFS at {3:.1f} Hz".format(
-                i, order_suffix(i), h_val, h_freq))
-        i += 1
+        # Interpolate for a more precise peak frequency.
+        peak_offset = quadratic_interpolate(
+            spectrum[peak_index - 1], spectrum[peak_index], spectrum[peak_index + 1])
+        peak_freq = ((peak_index + peak_offset) * scan_rate /
+                     samples_per_channel)
+        print("Peak: {0:.1f} dBFS at {1:.1f} Hz".format(peak_val, peak_freq))
 
-    print('Data and FFT saved in fft_scan.csv')
+        # Find and display harmonic levels.
+        i = 2
+        h_freq = 0
+        nyquist = scan_rate / 2.0
+        while (i < 8) and (h_freq <= nyquist):
+            # Stop when frequency exceeds Nyquist rate or at the 8th harmonic.
+            h_freq = peak_freq * i
+            if h_freq <= nyquist:
+                h_index = int(h_freq * samples_per_channel / scan_rate + 0.5)
+                h_val = spectrum[h_index]
+                print("{0:d}{1:s} harmonic: {2:.1f} dBFS at {3:.1f} Hz".format(
+                    i, order_suffix(i), h_val, h_freq))
+            i += 1
+
+        print('Data and FFT saved in {}\n'.format(logname))
 
 if __name__ == '__main__':
     main()

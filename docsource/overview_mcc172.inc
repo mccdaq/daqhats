@@ -25,15 +25,15 @@ The MCC 172 is a 2-channel analog voltage input board with the following feature
 
 Board components
 ----------------
-10-32 connectors
-^^^^^^^^^^^^^^^^
-- **Ch 0** and **Ch 1**: Analog input connectors (do not use both 10-32 and
-  screw terminals at the same time for an input channel).
+10-32 coaxial connectors
+^^^^^^^^^^^^^^^^^^^^^^^^
+- **CH0** and **CH1** (CHx): Analog input connectors (do not connect an input source
+  to the 10-32 connectors and screw terminals at the same time).
 
 Screw terminals
 ^^^^^^^^^^^^^^^
-- **Ch 0** and **Ch 1**: Analog input terminals  (do not use both 10-32 and
-  screw terminals at the same time for an input channel).
+- **CH0+/CH0-** and **CH1+/CH1-** (CHx+/CHx-): Analog input terminals (do not connect
+  an input source to the 10-32 connectors and screw terminals at the same time).
 - **Trigger** (TRIG): External digital trigger input terminal. The trigger mode 
   is software configurable for edge or level sensitive, rising or falling edge, 
   high or low level.
@@ -95,6 +95,16 @@ may be rising edge, falling edge, high level, or low level.  The trigger may
 also be shared across the Raspberry Pi GPIO header to synchronize multiple 
 MCC 172s.
 
+Alias Rejection
+^^^^^^^^^^^^^^^
+
+At low sampling rates, certain high frequency signals (at multiples of 128 * the
+sampling rate) can fall below the cutoff frequency of the fixed analog
+anti-aliasing filter and create aliasing in the data.  Using transducers with
+a bandwidth lower than 100 kHz should not affect measurement results.
+Sampling at 10.24 kHz or higher will also ensure that the anti-aliasing filter
+suppresses all signals that could alias into the data.
+
 Firmware updates
 ----------------
 
@@ -111,8 +121,8 @@ Specifications
 
 .. only:: html
 
-    `MCC 172 Electrical Specifications <_static/esmcc118.pdf>`_
+    `MCC 172 Electrical Specifications <_static/esmcc172.pdf>`_
 
 .. raw:: latex
 
-    \includepdf[pages=-]{../../specs/esmcc118.pdf}
+    \includepdf[pages=-]{../../specs/esmcc172.pdf}

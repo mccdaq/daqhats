@@ -1586,6 +1586,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     if (!_check_addr(address) ||
         (channel_mask == 0) ||
         (channel_mask >= (1 << NUM_CHANNELS)) ||
+        (options & OPTS_EXTCLOCK) ||
         ((samples_per_channel == 0) && ((options & OPTS_CONTINUOUS) == 0)))
     {
         return RESULT_BAD_PARAMETER;
@@ -2474,7 +2475,7 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         .rx_buf = (uintptr_t)rx_data,
         .len = transfer_count,
         .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
+        .speed_hz = 4000000, // spi_speed,
         .bits_per_word = spi_bits,
     };
 
