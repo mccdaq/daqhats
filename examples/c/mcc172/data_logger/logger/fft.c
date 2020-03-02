@@ -29,7 +29,7 @@ double window_compensation(void)
 
 /* Calculate a real to real FFT, returning in units of dBFS. */
 void calculate_real_fft(double* data, int n_samples, int stride,
-     int channel, double max_v, double* spectrum, gboolean first_time)
+     int chan_idx, double max_v, gfloat* spectrum)
 {
     double real_part;
     double imag_part;
@@ -44,9 +44,9 @@ void calculate_real_fft(double* data, int n_samples, int stride,
     out = (kiss_fft_cpx*)malloc(sizeof(kiss_fft_cpx) * (n_samples/2 + 1));
 
     // Apply the window and normalize the time data.
-    for (i = channel; i < n_samples; i++)
+    for (i = chan_idx; i < n_samples; i++)
     {
-        in[i] = hann_window(i, n_samples) * data[(i*stride)+channel] / max_v;
+        in[i] = hann_window(i, n_samples) * data[(i*stride)+chan_idx] / max_v;
     }
 
     // Perform the FFT.

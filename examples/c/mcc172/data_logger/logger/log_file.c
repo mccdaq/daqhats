@@ -192,7 +192,7 @@ int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
         scan_start_index += numberOfChannels;
     }
 
-    // Flush the file to insure all data is written.
+    // Flush the file to ensure all data is written.
     fflush(log_file_ptr);
 
     // Return the error code.

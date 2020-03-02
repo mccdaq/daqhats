@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdlib.h>
 
 #include "../../../daqhats_utils.h"
 #include "logger.h"
@@ -16,7 +17,21 @@ int main(void)
     getcwd(csv_filename, sizeof(csv_filename));
     strcat(csv_filename, "/LogFiles/csv_test.csv");
 
-    initialize_graph_channel_info();
+    // Channel 0
+    legendColor[0].red = 221.0/255;
+    legendColor[0].green = 50.0/255;
+    legendColor[0].blue = 34.0/255;
+    legendColor[0].alpha = 1;
+    graphChannelInfo[0].color = &legendColor[0];
+    graphChannelInfo[0].channelNumber = 0;
+
+    // Channel 1
+    legendColor[1].red = 52.0/255;
+    legendColor[1].green = 130.0/255;
+    legendColor[1].blue = 203.0/255;
+    legendColor[1].alpha = 1;
+    graphChannelInfo[1].color = &legendColor[1];
+    graphChannelInfo[1].channelNumber = 1;
 
     // Create the application structure and set
     // an event handler for the activate event.
@@ -50,51 +65,62 @@ int main(void)
 
 // Allocate arrays for the indices and data for each channel in the scan.
 int allocate_channel_xy_arrays(uint8_t current_channel_mask,
-    uint32_t numSamplesPerChannel)
+    uint32_t fft_size)
 {
-    int i = 0;
-    int chanMask = 0;
-    int channel = 0;
+    int chan = 0;
+    int chanMask = current_channel_mask;
     int num_channels = 0;
+    int fft_buffer_size = fft_size / 2 + 1;
+    gfloat frequency_interval = iRatePerChannel / fft_size;
+    gfloat freq_val = 0.0;
 
     // Delete the previous arrays for each of the channels (if they exist)
-    for (i = 0; i < MAX_172_CHANNELS; i++)
+    for (chan = 0; chan < MAX_172_CHANNELS; chan++)
     {
-        if (graphChannelInfo[i].graph != NULL)
+        if (graphChannelInfo[chan].graph != NULL)
         {
             gtk_databox_graph_remove (GTK_DATABOX(dataBox),
-                graphChannelInfo[i].graph);
-            graphChannelInfo[i].graph= NULL;
+                GTK_DATABOX_GRAPH(graphChannelInfo[chan].graph));
+            graphChannelInfo[chan].graph= NULL;
         }
 
-        if (graphChannelInfo[i].fft_graph != NULL)
+        if (graphChannelInfo[chan].fft_graph != NULL)
         {
             gtk_databox_graph_remove (GTK_DATABOX(fftBox),
-                graphChannelInfo[i].fft_graph);
-            graphChannelInfo[i].fft_graph= NULL;
+                GTK_DATABOX_GRAPH(graphChannelInfo[chan].fft_graph));
+            graphChannelInfo[chan].fft_graph= NULL;
         }
-    }
 
-    // Create the new arrays for the current channels in the scan
-    chanMask = current_channel_mask;
-    channel = 0;
-    for (i = 0; i < MAX_172_CHANNELS; i++)
-    {
-        // If this channel is in the scan, then allocate the arrays for the
-        // indices (X) and data (Y)
+        // Free any existing data arrays
+        g_free(graphChannelInfo[chan].X);
+        g_free(graphChannelInfo[chan].Y);
+        g_free(graphChannelInfo[chan].fft_X);
+        g_free(graphChannelInfo[chan].fft_Y);
+
+        // If this channel is in the scan, allocate new arrays
         if (chanMask & 1)
         {
-            graphChannelInfo[channel].X = g_new0 (gfloat, numSamplesPerChannel);
-            graphChannelInfo[channel].Y = g_new0 (gfloat, numSamplesPerChannel);
+            // Allocate arrays for data (Y) values and initialized to zero
+            graphChannelInfo[chan].Y = g_new0(gfloat, fft_size);
+            graphChannelInfo[chan].fft_Y = g_new0(gfloat, fft_buffer_size);
 
-            graphChannelInfo[channel].fft_X = g_new0 (gfloat, numSamplesPerChannel/2);
-            graphChannelInfo[channel].fft_Y = g_new0 (gfloat, numSamplesPerChannel/2);
+            // Allocate arrays for sample/frequency (X) values and initialize
+            graphChannelInfo[chan].X = g_new(gfloat, fft_size);
+            graphChannelInfo[chan].fft_X = g_new(gfloat, fft_buffer_size);
+
+            freq_val = 0.0;
+            for (int i = 0; i < fft_size; i++)
+            {
+                graphChannelInfo[chan].X[i] = i;
+                if(i < fft_buffer_size) {
+                    graphChannelInfo[chan].fft_X[i] = freq_val;
+                    freq_val += frequency_interval;
+                }
+            }
 
             num_channels++;
         }
 
-        // Check next channel.
-        channel++;
         chanMask >>= 1;
     }
 
@@ -106,19 +132,18 @@ int allocate_channel_xy_arrays(uint8_t current_channel_mask,
 // Add each checked channel to the channel mask
 int create_selected_channel_mask()
 {
-    gboolean checked_status = FALSE;
+    gboolean checked = FALSE;
     int selected_channel_mask = 0;
 
     for (int i = 0; i < MAX_172_CHANNELS; i++)
     {
         // Is the channel checked?
-        checked_status = gtk_toggle_button_get_active(
-            GTK_TOGGLE_BUTTON(chkChan[i]));
+        checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chkChan[i]));
 
         // If checked, add the channel to the mask
-        if (checked_status == TRUE)
+        if (checked == TRUE)
         {
-            selected_channel_mask += (int)pow(2,i);
+            selected_channel_mask |= 1<<i;
         }
     }
 
@@ -130,21 +155,14 @@ int create_selected_channel_mask()
 // Set te IEPE power configuration
 void set_iepe_configuration()
 {
-    gboolean checked_status = FALSE;
+    gboolean checked = FALSE;
 
     for (int i = 0; i < MAX_172_CHANNELS; i++)
     {
-        // Is the channel checked?
-        checked_status = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chkIepe[i]));
-
-        // If checked, add the channel to the mask
-        if (checked_status == TRUE)
-        {
-            mcc172_iepe_config_write(address, i, checked_status);
-        }
+        // Is the channel IEPE checked?
+        checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chkIepe[i]));
+        mcc172_iepe_config_write(address, i, checked);
     }
-
-    // return the channel mask
     return;
 }
 
@@ -163,7 +181,7 @@ void set_enable_state_for_controls(gboolean state)
 
     // Set the state of the text boxes
     gtk_widget_set_sensitive (spinRate, state);
-    gtk_widget_set_sensitive (spinNumSamples, state);
+    gtk_widget_set_sensitive (comboBoxFftSize, state);
 
     // Set the state of the radio buttons
     gtk_widget_set_sensitive (rbFinite, state);
@@ -176,27 +194,43 @@ void set_enable_state_for_controls(gboolean state)
 }
 
 
-int copy_hat_data_to_display_buffer(double* hat_read_buf, int samples_per_channel,
-                                    double* display_buf,  int samples_per_channel_in_display_buf,
-                                    int display_buf_size_in_samples, int num_channels)
+int copy_hat_data_to_display_buffer(double* hat_read_buf,
+                                    int samples_per_channel,
+                                    double* display_buf,
+                                    int samples_per_channel_in_display_buf,
+                                    int display_buf_size_in_samples,
+                                    int num_channels)
 {
-    if (samples_per_channel_in_display_buf < display_buf_size_in_samples)
-    {
-        memcpy(&display_buf[samples_per_channel_in_display_buf* num_channels], hat_read_buf, samples_per_channel*sizeof(double) * num_channels);
-        samples_per_channel_in_display_buf += samples_per_channel;
-    }
-    else if (samples_per_channel > samples_per_channel_in_display_buf)
-    {
-        memcpy(display_buf, &hat_read_buf[samples_per_channel*num_channels], (display_buf_size_in_samples - samples_per_channel)*sizeof(double) * num_channels);
-    }
-    else
-    {
-        memcpy(display_buf, &display_buf[samples_per_channel*num_channels], (display_buf_size_in_samples - samples_per_channel)*sizeof(double) * num_channels);
-        memcpy(&display_buf[(display_buf_size_in_samples - samples_per_channel)*num_channels], hat_read_buf, samples_per_channel*sizeof(double) * num_channels);
-    }
+    size_t copy_size = 0;
+    int samples_to_keep = 0;
 
-    if (samples_per_channel_in_display_buf > display_buf_size_in_samples)
-        samples_per_channel_in_display_buf = display_buf_size_in_samples;
+    if (samples_per_channel > 0) {
+        // There are samples to be copied
+        if((samples_per_channel_in_display_buf + samples_per_channel) <= display_buf_size_in_samples) {
+            // All of the samples read will fit in the display buffer so copy all of the samples
+            copy_size = samples_per_channel * num_channels * sizeof(double);
+            memcpy(&display_buf[samples_per_channel_in_display_buf * num_channels], hat_read_buf, copy_size);
+            samples_per_channel_in_display_buf += samples_per_channel;
+        }
+        else if (samples_per_channel > display_buf_size_in_samples) {
+            // The number of samples read is larger than the size of the display buffer, so overwrite the entire display buffer with the last samples read
+            copy_size = display_buf_size_in_samples * num_channels * sizeof(double);
+            memcpy(display_buf, &hat_read_buf[(samples_per_channel - display_buf_size_in_samples) * num_channels], copy_size);
+            samples_per_channel_in_display_buf = display_buf_size_in_samples;
+        }
+        else {
+            // The number of samples read is larger than the remaining space in the display buffer, but less than the display buffer size.
+            // Therefore, the display buffer values must first be shifted.
+            samples_to_keep = display_buf_size_in_samples - samples_per_channel;
+            copy_size = samples_to_keep * num_channels * sizeof(double);
+            memcpy(display_buf, &display_buf[(samples_per_channel_in_display_buf - samples_to_keep) * num_channels], copy_size);
+            samples_per_channel_in_display_buf = samples_to_keep;
+
+            copy_size = samples_per_channel * num_channels * sizeof(double);
+            memcpy(&display_buf[samples_per_channel_in_display_buf * num_channels], hat_read_buf, copy_size);
+            samples_per_channel_in_display_buf += samples_per_channel;
+        }
+    }
 
     return samples_per_channel_in_display_buf;
 }
@@ -204,86 +238,32 @@ int copy_hat_data_to_display_buffer(double* hat_read_buf, int samples_per_channe
 
 // Copy the data for the specified channel from the interleaved
 // HAT buffer to the array for the specified channel.
-void copy_data_to_xy_arrays(double* hat_read_buf, int read_buf_start_index,
-    int channel, int stride, int buffer_size_samples, gboolean first_block)
+void copy_data_to_xy_arrays(double* display_buf, int read_buf_start_index,
+    int channel, int stride, int buffer_size_samples, uint32_t start_sample)
 {
-    // Get the arrays for this channel
-    gfloat* X = graphChannelInfo[channel].X;
-    gfloat* Y = graphChannelInfo[channel].Y;
-
-    int ii = 0;
-
-    // For the first block, set the indices and data.
-    // For all other blocks, just set the data
-    if (first_block)
+    uint32_t sample = start_sample;
+    uint32_t data_array_idx = 0;
+    // Set indices and data
+    for (int i = read_buf_start_index; i < buffer_size_samples; i+=stride)
     {
-        // Set indices and data
-        for (int i = read_buf_start_index; i < buffer_size_samples; i+=stride)
-        {
-            X[ii] = (gfloat)ii;
-            Y[ii] = (gfloat)hat_read_buf[i];
-
-            ii++;
-        }
-    }
-    else
-    {
-		// Set data only
-		for (int i = read_buf_start_index; i < buffer_size_samples; i+=stride)
-        {
-            Y[ii] = (gfloat)hat_read_buf[i];
-
-            ii++;
-        }
-    }
-}
-
-
-// Copy the data for the specified channel from the interleaved
-// HAT buffer to the array for the specified channel.
-void copy_fft_data_to_xy_arrays(double* spectrum, double rate_per_channel,
-    int channel, int samples_per_channel, gboolean first_block)
-{
-    // Get the arrays for this channel
-    gfloat* fft_X = graphChannelInfo[channel].fft_X;
-    gfloat* fft_Y = graphChannelInfo[channel].fft_Y;
-
-    int ii = 0;
-    double f_i = 0;
-
-    // For the first block, set the indices and data.
-    // For all other blocks, just set the data
-    if (first_block)
-    {
-        // Set indices and data
-         for (int i = 0; i < samples_per_channel/2; i++)
-        {
-            fft_X[ii] = (gfloat)f_i;
-            fft_Y[ii] = (gfloat)spectrum[i];
-
-            f_i += rate_per_channel / samples_per_channel;
-
-            ii++;
-        }
-    }
-    else
-    {
-		// Set data onlyi
-		for (int i = 0; i < samples_per_channel/2; i++)
-        {
-            fft_Y[ii] = (gfloat)spectrum[i];
-
-            ii++;
-        }
+        graphChannelInfo[channel].X[data_array_idx] = (gfloat)sample;
+        graphChannelInfo[channel].Y[data_array_idx] = (gfloat)display_buf[i];
+        data_array_idx++;
+        sample++;
     }
 }
 
 
 // Refresh the graph with the new data.
-gboolean refresh_graph()
+gboolean refresh_graph(int* start_sample_ptr)
 {
-    // set a mutex to prevent the data from changing while it is being plotted
+    int start_sample = *start_sample_ptr;
+
     g_mutex_lock (&data_mutex);
+
+    // Update the limits for the time domain graph
+    gtk_databox_set_total_limits(GTK_DATABOX (dataBox), (gfloat)start_sample,
+        (gfloat)(start_sample + iFftSize), 6.0, -6.0);
 
     // Tell the graph to update
     gtk_widget_queue_draw(dataBox);
@@ -296,215 +276,95 @@ gboolean refresh_graph()
 }
 
 
-// Wait for the scan to complete, read the data,
-// write it to a CSV file, and plot it in the graph.
-void analog_in_finite ()
-{
-    int chan_mask = 0;
+// Initialize the time domain plot and the FFT plot based on the selected
+// settings prior to starting an acquisition
+gboolean initialize_graphs() {
+    uint8_t chanMask = channel_mask;
     int channel = 0;
- 	uint32_t samples_read_per_channel = 0;
-    uint32_t buffer_size_samples = 0;
-    int retval = 0;
-    uint16_t read_status = 0;
+    int start_sample = 0;
 
-    // Allocate arrays for the indices and data
-    // for each channel in the scan.
-    int num_channels = allocate_channel_xy_arrays(channel_mask,
-        iNumSamplesPerChannel);
+    pthread_mutex_lock(&graph_init_mutex);
 
-    // Set the timeout
-    double scan_timeout = num_channels *
-		iNumSamplesPerChannel / iRatePerChannel * 10;
+    // Allocate memory for the data arrays
+    allocate_channel_xy_arrays(channel_mask, iFftSize);
 
-    // Setup the sample buffer.
-    double hat_read_buf[iNumSamplesPerChannel*num_channels];
-    buffer_size_samples = iNumSamplesPerChannel*num_channels;
-
-    // Write channel numbers to file header
-	retval = init_log_file(log_file_ptr, channel_mask);
-	if (retval < 0)
-	{
-		switch (retval)
-		{
-		case -1:
-			error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-			break;
-
-		default:
-			error_code = UNKNOWN_ERROR;
-			break;
-		}
-
-		// Error dialog must be displayed on the main thread.
-		g_main_context_invoke(context,
-			(GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
-
-		// Call the Start/Stop event handler to reset the UI
-		start_stop_event_handler(btnStart_Stop, NULL);
-
-		return;
-	}
-
-    // Wait for the scan to start running.
-    do
+    while (chanMask > 0)
     {
-        retval = mcc172_a_in_scan_status(address, &read_status,
-            &samples_read_per_channel);
-    }
-    while ((retval == RESULT_SUCCESS) &&
-           ((read_status & STATUS_RUNNING) != STATUS_RUNNING));
-
-    if (retval == RESULT_SUCCESS)
-
-    {
-        // Read all the samples requested
-        retval = mcc172_a_in_scan_read(address, &read_status,
-            iNumSamplesPerChannel, scan_timeout, hat_read_buf,
-            buffer_size_samples, &samples_read_per_channel);
-        if (retval != RESULT_SUCCESS)
+        // Create graph object for each channel and add it to the graph
+        if (chanMask & 1)
         {
-            show_mcc172_error(retval);
-        }
-        else if (read_status & STATUS_HW_OVERRUN)
-        {
-            show_mcc172_error(HW_OVERRUN);
-        }
-        else if (read_status & STATUS_BUFFER_OVERRUN)
-        {
-            show_mcc172_error(BUFFER_OVERRUN);
-        }
-    }
-
-    double* spectrum = (double*)malloc(sizeof(double) * (iNumSamplesPerChannel/2 + 1));
-
-    if (retval == RESULT_SUCCESS)
-    {
-        // Write the data to the CSV file.
-        retval = write_log_file(log_file_ptr, hat_read_buf,
-            iNumSamplesPerChannel, num_channels);
-        if (retval < 0)
-        {
-            switch (retval)
-            {
-            case -1:
-                show_mcc172_error(MAXIMUM_FILE_SIZE_EXCEEDED);
-                break;
-
-            default:
-                show_mcc172_error(UNKNOWN_ERROR);
-                break;
-            }
-        }
-    }
-
-    // Parse the data and display it on the graph.
-    // Convert the 1D interleaved data into a 2D array
-    chan_mask = channel_mask;
-    channel = 0;
-    int read_buf_index = 0;
-    int index = 0;
-
-    // Display the data for each channel.
-    while (chan_mask > 0)
-    {
-        // Is this channel part of the scan?
-        if (chan_mask & 1)
-        {
-            // Get the data for this channel                // Calculate and display the FFT.
-            calculate_real_fft(hat_read_buf, iNumSamplesPerChannel, num_channels, index++,
-                mcc172_info()->AI_MAX_RANGE, spectrum, TRUE);
-
-
-            copy_data_to_xy_arrays(hat_read_buf, read_buf_index, channel,
-                num_channels, buffer_size_samples, TRUE);
-
-            // Graph the data
-            gfloat* X = graphChannelInfo[channel].X;
-            gfloat* Y = graphChannelInfo[channel].Y;
-
-            graphChannelInfo[channel].graph =
-                gtk_databox_lines_new ((guint)iNumSamplesPerChannel, X, Y,
-                graphChannelInfo[channel].color, 2);
-
+            graphChannelInfo[channel].graph = gtk_databox_lines_new
+                ((guint)iFftSize, graphChannelInfo[channel].X,
+                graphChannelInfo[channel].Y,
+                graphChannelInfo[channel].color, 1);
             gtk_databox_graph_add(GTK_DATABOX (dataBox),
                 GTK_DATABOX_GRAPH(graphChannelInfo[channel].graph));
 
-            gtk_databox_set_total_limits(GTK_DATABOX (dataBox), 0.0,
-                (gfloat)iNumSamplesPerChannel, 10.0, -10.0);
-
-            copy_fft_data_to_xy_arrays(spectrum, iRatePerChannel,
-                channel, iNumSamplesPerChannel, TRUE);
-
-            gfloat* fft_X = graphChannelInfo[channel].fft_X;
-            gfloat* fft_Y = graphChannelInfo[channel].fft_Y;
-
             graphChannelInfo[channel].fft_graph = gtk_databox_lines_new
-                ((guint)iNumSamplesPerChannel/2, fft_X, fft_Y,
-                graphChannelInfo[channel].color, 2);
-
+                ((guint)iFftSize/2 + 1, graphChannelInfo[channel].fft_X,
+                graphChannelInfo[channel].fft_Y,
+                graphChannelInfo[channel].color, 1);
             gtk_databox_graph_add(GTK_DATABOX (fftBox),
                 GTK_DATABOX_GRAPH(graphChannelInfo[channel].fft_graph));
-
-            gtk_databox_set_total_limits(GTK_DATABOX (fftBox), 0.0,
-                (gfloat)iNumSamplesPerChannel/2, 0.0, -150.0);
-
-            read_buf_index++;
         }
-
-        // Next channel in the mask
         channel++;
-        chan_mask >>= 1;
-     }
-
-    // Re-enable all of the controls in the min window.
-    set_enable_state_for_controls(TRUE);
-
-    // Stop the scan completes
-    retval = mcc172_a_in_scan_stop(address);
-    if (retval != RESULT_SUCCESS)
-    {
-        show_mcc172_error(retval);
+        chanMask >>= 1;
     }
 
-    // Clean up after the scan completes
-    retval = mcc172_a_in_scan_cleanup(address);
-    if (retval != RESULT_SUCCESS)
-    {
-        show_mcc172_error(retval);
-    }
+    // Set the limits for each graph
+    gtk_databox_set_total_limits(GTK_DATABOX (fftBox), 0.0,
+        (gfloat)iRatePerChannel/2, 10.0, -150.0);
 
-    gtk_button_set_label(GTK_BUTTON(btnStart_Stop), "Start");
+    refresh_graph(&start_sample);
+
+    pthread_cond_signal(&graph_init_cond);
+    pthread_mutex_unlock(&graph_init_mutex);
+
+    return FALSE;
 }
+
 
 // While the scan is running, read the data, write it to a
 // CSV file, and plot it in the graph.
 // This function runs as a background thread
 // for the duration of the scan.
-static void * analog_in_continuous ()
+static void * read_and_display_data ()
 {
 	////////int error_code;
-    int chanMask = 0;
+    int chanMask = channel_mask;
     int channel = 0;
     uint32_t samples_read_per_channel = 0;
-    uint32_t buffer_size_samples = 0;
     int retval = 0;
     uint16_t read_status;
+    uint32_t sample_count = 0;
+    int start_sample = 0;
 
-    // Allocate arrays for the indices and data
-    // for each channel in the scan.
-    int num_channels = allocate_channel_xy_arrays(channel_mask,
-        iNumSamplesPerChannel);
+    int num_channels = 0;
+    while (chanMask > 0)
+    {
+        if (chanMask & 1)
+        {
+            num_channels++;
+        }
+        chanMask >>= 1;
+    }
 
-    // Set the timeout
-    double scan_timeout = num_channels *
-		iNumSamplesPerChannel / iRatePerChannel * 10;
+    // Setup the buffers
+    uint32_t display_buf_size_samples = iFftSize * num_channels;
+    uint32_t read_buf_size_samples = iRatePerChannel * num_channels * 5;
 
-    // Setup the sample buffer.
-    buffer_size_samples = iNumSamplesPerChannel*num_channels;
-    double hat_read_buf[2*(int)iRatePerChannel*num_channels];
+    double hat_read_buf[read_buf_size_samples];
+    memset(hat_read_buf, 0, read_buf_size_samples * sizeof(double));
 
-    double display_buf[buffer_size_samples];
+    double display_buf[display_buf_size_samples];
+    memset(display_buf, 0, display_buf_size_samples * sizeof(double));
     int samples_in_display_buf = 0;
+
+    // Initialize the graphs
+    pthread_mutex_lock(&graph_init_mutex);
+    g_main_context_invoke(context, (GSourceFunc)initialize_graphs, NULL);
+    pthread_cond_wait(&graph_init_cond, &graph_init_mutex);
+    pthread_mutex_unlock(&graph_init_mutex);
 
     // Write channel numbers to file header
 	retval = init_log_file(log_file_ptr, channel_mask);
@@ -512,13 +372,13 @@ static void * analog_in_continuous ()
 	{
 		switch (retval)
 		{
-		case -1:
-			error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-			break;
+            case -1:
+                error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
+                break;
 
-		default:
-			error_code = UNKNOWN_ERROR;
-			break;
+            default:
+                error_code = UNKNOWN_ERROR;
+                break;
 		}
 
 		// Error dialog must be displayed on the main thread.
@@ -566,28 +426,28 @@ static void * analog_in_continuous ()
                     (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
             }
 
-            done = TRUE;
-            pthread_join (threadh, NULL);
-
-            gtk_button_set_label (GTK_BUTTON(btnStart_Stop), "Start");
+            g_main_context_invoke(context, (GSourceFunc)stop_acquisition, NULL);
             return NULL;
         }
     } while ((retval == RESULT_SUCCESS) &&
              ((read_status & STATUS_RUNNING) != STATUS_RUNNING));
 
-    double* spectrum = (double*)malloc(sizeof(double) * (iNumSamplesPerChannel/2 + 1));
-
     // Loop to read data continuously
-    gboolean first_block = TRUE;
-    while  (done == FALSE)
+    while (done != TRUE)
     {
         // Read the data from the device
         samples_read_per_channel = 0;
 
-        retval = mcc172_a_in_scan_read(address, &read_status,
-            READ_ALL_AVAILABLE, scan_timeout, hat_read_buf,
-            buffer_size_samples, &samples_read_per_channel);
+        uint32_t samples_to_read = read_buf_size_samples;
+        if(!continuous) {
+            samples_to_read = (iFftSize - sample_count) * num_channels;
+        }
 
+        retval = mcc172_a_in_scan_read(address, &read_status,
+            READ_ALL_AVAILABLE, 0, hat_read_buf,
+            samples_to_read, &samples_read_per_channel);
+
+        sample_count += samples_read_per_channel;
 
         if (retval != RESULT_SUCCESS)
         {
@@ -621,122 +481,70 @@ static void * analog_in_continuous ()
         {
             switch (retval)
             {
-            case -1:
-                error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-                break;
+                case -1:
+                    error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
+                    break;
 
-            default:
-                error_code = UNKNOWN_ERROR;
-                break;
+                default:
+                    error_code = UNKNOWN_ERROR;
+                    break;
             }
 
             // Error dialog must be displayed on the main thread.
             g_main_context_invoke(context,
                 (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
 
-            // Call the Start?Stop event handler to reset the UI
+            // Call the Start/Stop event handler to reset the UI
             start_stop_event_handler(btnStart_Stop, NULL);
-
-            done = TRUE;
-
-            break;
         }
 
         samples_in_display_buf = copy_hat_data_to_display_buffer(hat_read_buf, samples_read_per_channel,
                                         display_buf, samples_in_display_buf,
-                                        iNumSamplesPerChannel, num_channels);
+                                        iFftSize, num_channels);
+        // Set a mutex to prevent the data from changing while we plot it
+        g_mutex_lock (&data_mutex);
 
-        if (samples_in_display_buf >= iNumSamplesPerChannel)
+        chanMask = channel_mask;
+        channel = 0;
+        int read_buf_index = 0;
+        int chan_index = 0;
+
+        start_sample = sample_count >= iFftSize ? (sample_count - iFftSize) : 0;
+        // While there are channels to plot.
+        while (chanMask > 0)
         {
-            // Set a mutex to prevent the data from changing while we plot it
-            g_mutex_lock (&data_mutex);
-
-            chanMask = channel_mask;
-            channel = 0;
-            int read_buf_index = 0;
-            int index = 0;
-
-            // While there are channels to plot.
-            while (chanMask > 0)
+            // If this channel is included in the acquisition, plot its data.
+            if (chanMask & 1)
             {
-                // If this channel is included in the acquisition, plot its data.
-                if (chanMask & 1)
+                copy_data_to_xy_arrays(display_buf, read_buf_index++,
+                    channel, num_channels, display_buf_size_samples, start_sample);
+
+                if (samples_in_display_buf >= iFftSize)
                 {
                     // Calculate and display the FFT.
-                    calculate_real_fft(display_buf, iNumSamplesPerChannel, num_channels, index++,
-                        mcc172_info()->AI_MAX_RANGE, spectrum, first_block);
-
-                    if (first_block)
-                    {
-                        // If this is the first block we need to set the indices and
-                        // the data.
-                        copy_data_to_xy_arrays(display_buf, read_buf_index,
-                            channel, num_channels, buffer_size_samples, first_block);
-
-                        gfloat* X = graphChannelInfo[channel].X;
-                        gfloat* Y = graphChannelInfo[channel].Y;
-
-                        graphChannelInfo[channel].graph = gtk_databox_lines_new
-                            ((guint)iNumSamplesPerChannel, X, Y,
-                            graphChannelInfo[channel].color, 2);
-
-                        gtk_databox_graph_add(GTK_DATABOX (dataBox),
-                            GTK_DATABOX_GRAPH(graphChannelInfo[channel].graph));
-
-                        gtk_databox_set_total_limits(GTK_DATABOX (dataBox), 0.0,
-                            (gfloat)iNumSamplesPerChannel, 10.0, -10.0);
-
-                        copy_fft_data_to_xy_arrays(spectrum, iRatePerChannel,
-                            channel, iNumSamplesPerChannel, first_block);
-
-                        gfloat* fft_X = graphChannelInfo[channel].fft_X;
-                        gfloat* fft_Y = graphChannelInfo[channel].fft_Y;
-
-                        graphChannelInfo[channel].fft_graph = gtk_databox_lines_new
-                            ((guint)iNumSamplesPerChannel/2, fft_X, fft_Y,
-                            graphChannelInfo[channel].color, 2);
-
-                        gtk_databox_graph_add(GTK_DATABOX (fftBox),
-                            GTK_DATABOX_GRAPH(graphChannelInfo[channel].fft_graph));
-
-                        gtk_databox_set_total_limits(GTK_DATABOX (fftBox), 0.0,
-                            (gfloat)iNumSamplesPerChannel/2, 0.0, -150.0);
-                    }
-                    else
-                    {
-
-                        // If this is not the first block, just update the data.
-                        copy_data_to_xy_arrays(display_buf, read_buf_index,
-                            channel, num_channels, buffer_size_samples, first_block);
-
-                        copy_fft_data_to_xy_arrays(spectrum, iRatePerChannel,
-                            channel, iNumSamplesPerChannel, first_block);
-                    }
-                    // Set the index to start at the first
-                    // sample of the next channel.
-                    read_buf_index++;
+                    calculate_real_fft(display_buf, iFftSize, num_channels, chan_index++,
+                        mcc172_info()->AI_MAX_RANGE, graphChannelInfo[channel].fft_Y);
                 }
-                channel++;
-                chanMask >>= 1;
             }
-
-            samples_in_display_buf = 0;
-
-            // Done with the data so fill the buffer with zeros.
-            memset(hat_read_buf, 0, buffer_size_samples * sizeof(double));
-
-            first_block = FALSE;
-
-            // Set the condition to cause the display
-            // update function to update the display.
-            g_main_context_invoke(context, (GSourceFunc)refresh_graph, NULL);
-
-            // Release the mutex
-            g_mutex_unlock(&data_mutex);
-
-            // Allow idle time for the display to update
-            usleep(1);
+            channel++;
+            chanMask >>= 1;
         }
+
+        // Done with the data so fill the buffer with zeros.
+        memset(hat_read_buf, 0, read_buf_size_samples * sizeof(double));
+
+        // Update the display.
+        g_main_context_invoke(context, (GSourceFunc)refresh_graph, &start_sample);
+
+        // Release the mutex
+        g_mutex_unlock(&data_mutex);
+
+        if(!continuous && sample_count == iFftSize) {
+            g_main_context_invoke(context, (GSourceFunc)stop_acquisition, NULL);
+        }
+
+        // Allow 200 msec idle time between each read
+        usleep(200000);
     }
 
     // Stop the scan.
@@ -755,6 +563,18 @@ static void * analog_in_continuous ()
 
     return NULL;
 }
+
+
+// A function to stop the acquisisiont that can be invoked
+// from the worker thread
+gboolean stop_acquisition()
+{
+    // Simulate a stop button press
+    start_stop_event_handler(btnStart_Stop, NULL);
+
+    return FALSE;
+}
+
 
 // Event handler for the Start/Stop button.
 //
@@ -793,11 +613,10 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
         // Set variables based on the UI settings.
         channel_mask = create_selected_channel_mask();
 
-        iNumSamplesPerChannel = gtk_spin_button_get_value_as_int(
-            GTK_SPIN_BUTTON(spinNumSamples));
+        gchar *fftText = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(comboBoxFftSize));
+        iFftSize = atoi(fftText);
 
-        iRatePerChannel =  gtk_spin_button_get_value_as_int(
-            GTK_SPIN_BUTTON(spinRate));
+        iRatePerChannel =  gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spinRate));
 
         set_iepe_configuration();
 
@@ -806,9 +625,8 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), actual_rate_per_channel);
 
         // Set the continuous option based on the UI setting.
-        gboolean bContinuous =  gtk_toggle_button_get_active(
-            GTK_TOGGLE_BUTTON(rbContinuous));
-        if (bContinuous == TRUE)
+        continuous =  gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rbContinuous));
+        if (continuous == TRUE)
         {
             options |= OPTS_CONTINUOUS;
         }
@@ -825,20 +643,10 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
             return;
         }
 
-        if ((options & OPTS_CONTINUOUS) == OPTS_CONTINUOUS)
+        // Start a thread to read the data from the device
+        if (pthread_create(&threadh, NULL, &read_and_display_data, &tinfo) != 0)
         {
-            // If continuous scan, start a thread
-            // to read the data from the device
-            if (pthread_create(&threadh, NULL, &analog_in_continuous, &tinfo) != 0)
-            {
-                printf("error creating thread..\n");
-            }
-        }
-        else
-        {
-            // Its a finite scan, so call function to wait for all of the
-            // samples to be acquired
-            analog_in_finite();
+            printf("error creating thread..\n");
         }
     }
     else
@@ -881,46 +689,15 @@ void select_log_file_event_handler(GtkWidget* widget, gpointer user_data)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-//   Assign a legend color and channel number for each channel on the device.
-void initialize_graph_channel_info (void)
-{
-    for (int i = 0; i < MAX_172_CHANNELS; i++)
-    {
-        switch(i)
-        {
-        // channel 0
-        case 0:
-        default:
-            legendColor[i].red = 1;
-            legendColor[i].green = 0;
-            legendColor[i].blue = 0;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-            break;
-        // channel 1
-        case 1:
-            legendColor[i].red = 0;
-            legendColor[i].green = 1;
-            legendColor[i].blue = 0;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-           break;
-        }
-    }
-}
-
-
 // Event handler that is called when the application is launched to create
 // the main window and its controls.
 void activate_event_handler(GtkApplication *app, gpointer user_data)
 {
     GtkCssProvider* cssProvider = gtk_css_provider_new();
-    gtk_css_provider_load_from_path(cssProvider, "theme.css", NULL);
+    gtk_css_provider_load_from_data (GTK_CSS_PROVIDER (cssProvider),
+         "label#Chan0 {background-color: rgba(221, 50, 34, 1);}\n"
+         "label#Chan1 {background-color: rgba(52, 130, 203, 1);}\n",
+         -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);
@@ -928,7 +705,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     GtkWidget *hboxMain, *vboxMain;
     GtkWidget *hboxFile;
     GtkWidget *vboxConfig, *vboxSampleRateConfig, *vboxAcquireMode, *vboxButtons, *vboxGraph, *label;
-    GtkWidget *hboxChannel, *hboxIepe, *hboxNumSamples, *hboxRate;
+    GtkWidget *hboxChannel, *hboxIepe, *hboxFftSize, *hboxRate;
     GtkWidget *vboxChannel, *vboxIepe, *vboxLegend;
     GtkDataboxGraph *dataGraph, *fftGraph;
     int i = 0;
@@ -972,11 +749,11 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     vboxSampleRateConfig = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(vboxConfig), vboxSampleRateConfig);
 
-    hboxNumSamples = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(vboxSampleRateConfig), hboxNumSamples);
+    hboxFftSize = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxSampleRateConfig), hboxFftSize);
 
-    label = gtk_label_new("Num Samples: ");
-    gtk_box_pack_start(GTK_BOX(hboxNumSamples), label, 0, 0, 0);
+    label = gtk_label_new("          FFT Size: ");
+    gtk_box_pack_start(GTK_BOX(hboxFftSize), label, 0, 0, 0);
 
     hboxRate = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxSampleRateConfig), hboxRate);
@@ -1021,9 +798,17 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(chkChan[0]), TRUE);
 
-    spinNumSamples = gtk_spin_button_new_with_range (10, 100000, 10);
-    gtk_box_pack_start(GTK_BOX(hboxNumSamples), spinNumSamples, 0, 0, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinNumSamples), 500.);
+    comboBoxFftSize = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "256");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "512");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "1024");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "2048");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "4096");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "8192");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "16384");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(comboBoxFftSize), 3);
+    gtk_box_pack_start(GTK_BOX(hboxFftSize), comboBoxFftSize, 0, 0, 0);
+
 
     // FILE indicator
     hboxFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -1033,7 +818,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     spinRate = gtk_spin_button_new_with_range (10, 100000, 10);
     gtk_box_pack_start(GTK_BOX(hboxRate), spinRate, 0, 0, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), 1000.);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), 2048.);
 
     GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
     gtk_container_add(GTK_CONTAINER(hboxMain), separator);
@@ -1050,11 +835,11 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
 
     GtkDataboxRuler* rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
-    gchar* formatX = "%%6.0lf";
+    gchar* formatX = "%%g";
     gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
     gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
-    gtk_databox_ruler_set_range(rulerY, 10.0, -10.0, 0.0);
+    gtk_databox_ruler_set_range(rulerY, 6.0, -6.0, 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 500.0, 0.0);
 
     GdkRGBA grid_color;
@@ -1062,7 +847,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     grid_color.green = 0;
     grid_color.blue = 0;
     grid_color.alpha = 0.3;
-    dataGraph = (GtkDataboxGraph*)gtk_databox_grid_new(7, 9, &grid_color, 1);
+    dataGraph = (GtkDataboxGraph*)gtk_databox_grid_new(11, 9, &grid_color, 1);
     gtk_databox_graph_add(GTK_DATABOX (dataBox), GTK_DATABOX_GRAPH(dataGraph));
 
     // add the FFT graph
@@ -1074,18 +859,17 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
 
     rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(fftBox));
-    formatX = "%%6.0lf";
     gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
     gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
-    gtk_databox_ruler_set_range(rulerY, 10.0, -10.0, 0.0);
+    gtk_databox_ruler_set_range(rulerY, 10.0, -150.0, 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 500.0, 0.0);
 
     grid_color.red = 0;
     grid_color.green = 0;
     grid_color.blue = 0;
     grid_color.alpha = 0.3;
-    fftGraph = (GtkDataboxGraph*)gtk_databox_grid_new(7, 9, &grid_color, 1);
+    fftGraph = (GtkDataboxGraph*)gtk_databox_grid_new(15, 9, &grid_color, 1);
     gtk_databox_graph_add(GTK_DATABOX (fftBox), GTK_DATABOX_GRAPH(fftGraph));
 
     vboxAcquireMode= gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
