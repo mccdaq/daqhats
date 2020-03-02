@@ -2475,7 +2475,7 @@ int mcc172_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         .rx_buf = (uintptr_t)rx_data,
         .len = transfer_count,
         .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
+        .speed_hz = 4000000; // spi_speed,
         .bits_per_word = spi_bits,
     };
 
