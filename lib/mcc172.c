@@ -2390,16 +2390,16 @@ int mcc172_enter_bootloader(uint8_t address)
         if (dev->reset_polarity == 0)
         {
             gpio_write(RESET_GPIO, 0);
-            usleep(2*1000ul);
+            usleep(1*1000ul);
             gpio_write(RESET_GPIO, 1);
         }
         else
         {
             gpio_write(RESET_GPIO, 1);
-            usleep(2*1000ul);
+            usleep(1*1000ul);
             gpio_write(RESET_GPIO, 0);
         }
-        usleep(55*1000ul);
+        usleep(40*1000ul);
         count++;
     }
 
