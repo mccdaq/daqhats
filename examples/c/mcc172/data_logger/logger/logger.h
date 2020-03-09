@@ -32,5 +32,5 @@ static void * read_and_display_data ();
 void activate_event_handler(GtkApplication *app, gpointer user_data);
 void select_log_file_event_handler(GtkWidget* widget, gpointer user_data);
 void start_stop_event_handler(GtkWidget *widget, gpointer data);
-gboolean stop_acquisition();
+gboolean stop_acquisition(void);
 

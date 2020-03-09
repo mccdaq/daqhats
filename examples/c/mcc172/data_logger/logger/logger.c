@@ -17,7 +17,7 @@ int main(void)
     getcwd(csv_filename, sizeof(csv_filename));
     strcat(csv_filename, "/LogFiles/csv_test.csv");
 
-    // Channel 0
+    // Channel 0 - Red
     legendColor[0].red = 221.0/255;
     legendColor[0].green = 50.0/255;
     legendColor[0].blue = 34.0/255;
@@ -25,7 +25,7 @@ int main(void)
     graphChannelInfo[0].color = &legendColor[0];
     graphChannelInfo[0].channelNumber = 0;
 
-    // Channel 1
+    // Channel 1 - Blue
     legendColor[1].red = 52.0/255;
     legendColor[1].green = 130.0/255;
     legendColor[1].blue = 203.0/255;
@@ -109,9 +109,9 @@ int allocate_channel_xy_arrays(uint8_t current_channel_mask,
             graphChannelInfo[chan].fft_X = g_new(gfloat, fft_buffer_size);
 
             freq_val = 0.0;
-            for (int i = 0; i < fft_size; i++)
+            for (gint i = 0; i < fft_size; i++)
             {
-                graphChannelInfo[chan].X[i] = i;
+                graphChannelInfo[chan].X[i] = (gfloat)i;
                 if(i < fft_buffer_size) {
                     graphChannelInfo[chan].fft_X[i] = freq_val;
                     freq_val += frequency_interval;
@@ -168,8 +168,8 @@ void set_iepe_configuration()
 
 
 // Enable/disable the controls in the main window.
-// Controls are disabled when the application is running
-// and re-enabled when the application is stopped.
+// Controls are disabled when the acquisition is running
+// and re-enabled when the acquisition is stopped.
 void set_enable_state_for_controls(gboolean state)
 {
     // Set the state of the check boxes
@@ -193,46 +193,59 @@ void set_enable_state_for_controls(gboolean state)
 
 }
 
-
+// Copy data from the hat read buffer to the display buffer
 int copy_hat_data_to_display_buffer(double* hat_read_buf,
-                                    int samples_per_channel,
+                                    int samples_per_chan_read,
                                     double* display_buf,
-                                    int samples_per_channel_in_display_buf,
-                                    int display_buf_size_in_samples,
-                                    int num_channels)
+                                    int samples_per_chan_displayed,
+                                    int display_buf_size_samples,
+                                    int num_chans)
 {
     size_t copy_size = 0;
     int samples_to_keep = 0;
+    int start_idx = 0;
 
-    if (samples_per_channel > 0) {
+    if (samples_per_chan_read > 0) {
         // There are samples to be copied
-        if((samples_per_channel_in_display_buf + samples_per_channel) <= display_buf_size_in_samples) {
-            // All of the samples read will fit in the display buffer so copy all of the samples
-            copy_size = samples_per_channel * num_channels * sizeof(double);
-            memcpy(&display_buf[samples_per_channel_in_display_buf * num_channels], hat_read_buf, copy_size);
-            samples_per_channel_in_display_buf += samples_per_channel;
+        if((samples_per_chan_displayed + samples_per_chan_read)
+            <= display_buf_size_samples)
+        {
+            // All of the samples read will fit in the display buffer
+            // so copy all of the samples
+            copy_size = samples_per_chan_read * num_chans * sizeof(double);
+            memcpy(&display_buf[samples_per_chan_displayed * num_chans],
+                   hat_read_buf, copy_size);
+            samples_per_chan_displayed += samples_per_chan_read;
         }
-        else if (samples_per_channel > display_buf_size_in_samples) {
-            // The number of samples read is larger than the size of the display buffer, so overwrite the entire display buffer with the last samples read
-            copy_size = display_buf_size_in_samples * num_channels * sizeof(double);
-            memcpy(display_buf, &hat_read_buf[(samples_per_channel - display_buf_size_in_samples) * num_channels], copy_size);
-            samples_per_channel_in_display_buf = display_buf_size_in_samples;
+        else if (samples_per_chan_read > display_buf_size_samples) {
+            // The number of samples read is larger than the size of the
+            // display buffer, so overwrite the entire display buffer with the
+            // last samples read
+            copy_size = display_buf_size_samples * num_chans * sizeof(double);
+            start_idx = ((samples_per_chan_read - display_buf_size_samples)
+                         * num_chans);
+            memcpy(display_buf, &hat_read_buf[start_idx], copy_size);
+            samples_per_chan_displayed = display_buf_size_samples;
         }
         else {
-            // The number of samples read is larger than the remaining space in the display buffer, but less than the display buffer size.
+            // The number of samples read is larger than the remaining space in
+            // the display buffer, but less than the display buffer size.
             // Therefore, the display buffer values must first be shifted.
-            samples_to_keep = display_buf_size_in_samples - samples_per_channel;
-            copy_size = samples_to_keep * num_channels * sizeof(double);
-            memcpy(display_buf, &display_buf[(samples_per_channel_in_display_buf - samples_to_keep) * num_channels], copy_size);
-            samples_per_channel_in_display_buf = samples_to_keep;
+            samples_to_keep = display_buf_size_samples - samples_per_chan_read;
+            copy_size = samples_to_keep * num_chans * sizeof(double);
+            start_idx = ((samples_per_chan_displayed - samples_to_keep)
+                         * num_chans);
+            memcpy(display_buf, &display_buf[start_idx], copy_size);
+            samples_per_chan_displayed = samples_to_keep;
 
-            copy_size = samples_per_channel * num_channels * sizeof(double);
-            memcpy(&display_buf[samples_per_channel_in_display_buf * num_channels], hat_read_buf, copy_size);
-            samples_per_channel_in_display_buf += samples_per_channel;
+            copy_size = samples_per_chan_read * num_chans * sizeof(double);
+            memcpy(&display_buf[samples_per_chan_displayed * num_chans],
+                   hat_read_buf, copy_size);
+            samples_per_chan_displayed += samples_per_chan_read;
         }
     }
 
-    return samples_per_channel_in_display_buf;
+    return samples_per_chan_displayed;
 }
 
 
@@ -261,11 +274,12 @@ gboolean refresh_graph(int* start_sample_ptr)
 
     g_mutex_lock (&data_mutex);
 
-    // Update the limits for the time domain graph
-    gtk_databox_set_total_limits(GTK_DATABOX (dataBox), (gfloat)start_sample,
-        (gfloat)(start_sample + iFftSize), 6.0, -6.0);
+    // Set the new limits on the time domain graph
+    gfloat start = (gfloat)start_sample;
+    gfloat end = (gfloat)(start_sample + iFftSize);
+    gtk_databox_set_total_limits(GTK_DATABOX (dataBox), start, end, 6.0, -6.0);
 
-    // Tell the graph to update
+    // Re-draw the graphs
     gtk_widget_queue_draw(dataBox);
     gtk_widget_queue_draw(fftBox);
 
@@ -311,7 +325,7 @@ gboolean initialize_graphs() {
         chanMask >>= 1;
     }
 
-    // Set the limits for each graph
+    // Set the limits for the FFT graph - only needs to be done once per scan
     gtk_databox_set_total_limits(GTK_DATABOX (fftBox), 0.0,
         (gfloat)iRatePerChannel/2, 10.0, -150.0);
 
@@ -326,11 +340,9 @@ gboolean initialize_graphs() {
 
 // While the scan is running, read the data, write it to a
 // CSV file, and plot it in the graph.
-// This function runs as a background thread
-// for the duration of the scan.
+// This function runs as a background thread for the duration of the scan.
 static void * read_and_display_data ()
 {
-	////////int error_code;
     int chanMask = channel_mask;
     int channel = 0;
     uint32_t samples_read_per_channel = 0;
@@ -360,7 +372,7 @@ static void * read_and_display_data ()
     memset(display_buf, 0, display_buf_size_samples * sizeof(double));
     int samples_in_display_buf = 0;
 
-    // Initialize the graphs
+    // Initialize the graphs and use signal to synchronize threads
     pthread_mutex_lock(&graph_init_mutex);
     g_main_context_invoke(context, (GSourceFunc)initialize_graphs, NULL);
     pthread_cond_wait(&graph_init_cond, &graph_init_mutex);
@@ -402,7 +414,8 @@ static void * read_and_display_data ()
             // Error dialog must be displayed on the main thread.
             error_code = retval;
             g_main_context_invoke(context,
-                (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                (GSourceFunc)show_mcc172_error_main_thread,
+                (gpointer)&error_code);
 
             // If the scan fails to start clear it and
             // reset the app to start again
@@ -414,7 +427,8 @@ static void * read_and_display_data ()
                 // Error dialog must be displayed on the main thread.
                 error_code = retval;
                 g_main_context_invoke(context,
-                    (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                    (GSourceFunc)show_mcc172_error_main_thread,
+                    (gpointer)&error_code);
             }
 
             retval = mcc172_a_in_scan_cleanup(address);
@@ -423,10 +437,12 @@ static void * read_and_display_data ()
                 // Error dialog must be displayed on the main thread.
                 error_code = retval;
                 g_main_context_invoke(context,
-                    (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                    (GSourceFunc)show_mcc172_error_main_thread,
+                    (gpointer)&error_code);
             }
 
-            g_main_context_invoke(context, (GSourceFunc)stop_acquisition, NULL);
+            g_main_context_invoke(context, (GSourceFunc)stop_acquisition,
+                                  NULL);
             return NULL;
         }
     } while ((retval == RESULT_SUCCESS) &&
@@ -454,7 +470,8 @@ static void * read_and_display_data ()
             // Error dialog must be displayed on the main thread.
             error_code = retval;
             g_main_context_invoke(context,
-                (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                (GSourceFunc)show_mcc172_error_main_thread,
+                (gpointer)&error_code);
             break;
         }
         else if (read_status & STATUS_HW_OVERRUN)
@@ -462,7 +479,8 @@ static void * read_and_display_data ()
             // Error dialog must be displayed on the main thread.
             error_code = HW_OVERRUN;
             g_main_context_invoke(context,
-                (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                (GSourceFunc)show_mcc172_error_main_thread,
+                (gpointer)&error_code);
             break;
         }
         else if (read_status & STATUS_BUFFER_OVERRUN)
@@ -470,7 +488,8 @@ static void * read_and_display_data ()
             // Error dialog must be displayed on the main thread.
             error_code = BUFFER_OVERRUN;
             g_main_context_invoke(context,
-                (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                (GSourceFunc)show_mcc172_error_main_thread,
+                (gpointer)&error_code);
             break;
         }
 
@@ -492,15 +511,17 @@ static void * read_and_display_data ()
 
             // Error dialog must be displayed on the main thread.
             g_main_context_invoke(context,
-                (GSourceFunc)show_mcc172_error_main_thread, (gpointer)&error_code);
+                (GSourceFunc)show_mcc172_error_main_thread,
+                (gpointer)&error_code);
 
             // Call the Start/Stop event handler to reset the UI
             start_stop_event_handler(btnStart_Stop, NULL);
         }
 
-        samples_in_display_buf = copy_hat_data_to_display_buffer(hat_read_buf, samples_read_per_channel,
-                                        display_buf, samples_in_display_buf,
-                                        iFftSize, num_channels);
+        samples_in_display_buf = copy_hat_data_to_display_buffer(
+                                    hat_read_buf, samples_read_per_channel,
+                                    display_buf, samples_in_display_buf,
+                                    iFftSize, num_channels);
         // Set a mutex to prevent the data from changing while we plot it
         g_mutex_lock (&data_mutex);
 
@@ -509,7 +530,7 @@ static void * read_and_display_data ()
         int read_buf_index = 0;
         int chan_index = 0;
 
-        start_sample = sample_count >= iFftSize ? (sample_count - iFftSize) : 0;
+        start_sample = sample_count >= iFftSize ? (sample_count-iFftSize) : 0;
         // While there are channels to plot.
         while (chanMask > 0)
         {
@@ -517,13 +538,15 @@ static void * read_and_display_data ()
             if (chanMask & 1)
             {
                 copy_data_to_xy_arrays(display_buf, read_buf_index++,
-                    channel, num_channels, display_buf_size_samples, start_sample);
+                    channel, num_channels, display_buf_size_samples,
+                    start_sample);
 
                 if (samples_in_display_buf >= iFftSize)
                 {
                     // Calculate and display the FFT.
-                    calculate_real_fft(display_buf, iFftSize, num_channels, chan_index++,
-                        mcc172_info()->AI_MAX_RANGE, graphChannelInfo[channel].fft_Y);
+                    calculate_real_fft(display_buf, iFftSize, num_channels,
+                        chan_index++, mcc172_info()->AI_MAX_RANGE,
+                        graphChannelInfo[channel].fft_Y);
                 }
             }
             channel++;
@@ -534,13 +557,15 @@ static void * read_and_display_data ()
         memset(hat_read_buf, 0, read_buf_size_samples * sizeof(double));
 
         // Update the display.
-        g_main_context_invoke(context, (GSourceFunc)refresh_graph, &start_sample);
+        g_main_context_invoke(context, (GSourceFunc)refresh_graph,
+                              &start_sample);
 
         // Release the mutex
         g_mutex_unlock(&data_mutex);
 
         if(!continuous && sample_count == iFftSize) {
-            g_main_context_invoke(context, (GSourceFunc)stop_acquisition, NULL);
+            g_main_context_invoke(context, (GSourceFunc)stop_acquisition,
+                                  NULL);
         }
 
         // Allow 200 msec idle time between each read
@@ -580,8 +605,7 @@ gboolean stop_acquisition()
 //
 // If starting, change the button text to "Stop" and parse
 // the UI settings before starting the acquisition.
-// If stopping, change the button text
-// to "Start" and stop the acquisition.
+// If stopping, change the button text to "Start" and stop the acquisition.
 void start_stop_event_handler(GtkWidget *widget, gpointer data)
 {
     const gchar* StartStopBtnLbl = gtk_button_get_label(GTK_BUTTON(widget));
@@ -613,25 +637,30 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
         // Set variables based on the UI settings.
         channel_mask = create_selected_channel_mask();
 
-        gchar *fftText = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(comboBoxFftSize));
+        gchar *fftText = gtk_combo_box_text_get_active_text(
+                            GTK_COMBO_BOX_TEXT(comboBoxFftSize));
         iFftSize = atoi(fftText);
 
-        iRatePerChannel =  gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spinRate));
+        iRatePerChannel =  gtk_spin_button_get_value_as_int(
+                            GTK_SPIN_BUTTON(spinRate));
 
         set_iepe_configuration();
 
         mcc172_a_in_clock_config_write(address, SOURCE_LOCAL, iRatePerChannel);
-        mcc172_a_in_clock_config_read(address, &clock_source, &actual_rate_per_channel, &synced);
-        gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), actual_rate_per_channel);
+        mcc172_a_in_clock_config_read(address, &clock_source,
+                                      &actual_rate_per_channel, &synced);
+        gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate),
+                                  actual_rate_per_channel);
 
         // Set the continuous option based on the UI setting.
-        continuous =  gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rbContinuous));
+        continuous =  gtk_toggle_button_get_active(
+                            GTK_TOGGLE_BUTTON(rbContinuous));
         if (continuous == TRUE)
         {
             options |= OPTS_CONTINUOUS;
         }
 
-        // Start the analog scan.g_main_context_default
+        // Start the analog scan
         retval = mcc172_a_in_scan_start(address, channel_mask,
             10 * MAX_172_CHANNELS * iRatePerChannel, options);
         if (retval != RESULT_SUCCESS)
@@ -676,18 +705,8 @@ void select_log_file_event_handler(GtkWidget* widget, gpointer user_data)
     strcpy(csv_filename, choose_log_file(window, initial_filename));
 
     // Display the CSV log file name.
-    show_file_name();////////        // channel 2
-
+    show_file_name();
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// The following functions are used to initialize the user interface.  These
-// functions include displaying the user interface, setting g_main_context_defaultchannel colors,
-// and selecting the first available MCC 172 HAT device.
-//
-///////////////////////////////////////////////////////////////////////////////
 
 // Event handler that is called when the application is launched to create
 // the main window and its controls.
@@ -704,10 +723,10 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     GtkWidget *hboxMain, *vboxMain;
     GtkWidget *hboxFile;
-    GtkWidget *vboxConfig, *vboxSampleRateConfig, *vboxAcquireMode, *vboxButtons, *vboxGraph, *label;
+    GtkWidget *vboxConfig, *vboxSampleRateConfig, *vboxAcquireMode;
+    GtkWidget *vboxButtons, *vboxGraph, *label;
     GtkWidget *hboxChannel, *hboxIepe, *hboxFftSize, *hboxRate;
     GtkWidget *vboxChannel, *vboxIepe, *vboxLegend;
-    GtkDataboxGraph *dataGraph, *fftGraph;
     int i = 0;
 
     // Create the top level gtk window.
@@ -798,6 +817,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(chkChan[0]), TRUE);
 
+    // Define FFT Size options
     comboBoxFftSize = gtk_combo_box_text_new();
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "256");
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboBoxFftSize), NULL, "512");
@@ -809,12 +829,10 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     gtk_combo_box_set_active(GTK_COMBO_BOX(comboBoxFftSize), 3);
     gtk_box_pack_start(GTK_BOX(hboxFftSize), comboBoxFftSize, 0, 0, 0);
 
-
     // FILE indicator
     hboxFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxMain), hboxFile);
     labelFile = gtk_label_new(csv_filename);
-
 
     spinRate = gtk_spin_button_new_with_range (10, 100000, 10);
     gtk_box_pack_start(GTK_BOX(hboxRate), spinRate, 0, 0, 0);
@@ -827,32 +845,27 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(hboxMain), vboxGraph);
 
     // add the data graph
-    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&dataBox, &dataTable,
-        FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
+    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&dataBox,
+        &dataTable, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
     gtk_box_pack_start(GTK_BOX(vboxGraph), dataTable, TRUE, TRUE, 0);
 
     GtkDataboxRuler* rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(dataBox));
     gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
 
     GtkDataboxRuler* rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
-    gchar* formatX = "%%g";
+    gtk_databox_ruler_set_max_length(rulerX, 9);
+
+    gchar* formatX = "%%.0Lf";
     gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
-    gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
     gtk_databox_ruler_set_range(rulerY, 6.0, -6.0, 0.0);
-    gtk_databox_ruler_set_range(rulerX, 0.0, 500.0, 0.0);
+    gtk_databox_ruler_set_range(rulerX, 0.0, 2048.0, 0.0);
 
-    GdkRGBA grid_color;
-    grid_color.red = 0;
-    grid_color.green = 0;
-    grid_color.blue = 0;
-    grid_color.alpha = 0.3;
-    dataGraph = (GtkDataboxGraph*)gtk_databox_grid_new(11, 9, &grid_color, 1);
-    gtk_databox_graph_add(GTK_DATABOX (dataBox), GTK_DATABOX_GRAPH(dataGraph));
+    gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
     // add the FFT graph
-    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&fftBox, &fftTable,
-        FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
+    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&fftBox,
+        &fftTable, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
     gtk_box_pack_start(GTK_BOX(vboxGraph), fftTable, TRUE, TRUE, 0);
 
     rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(fftBox));
@@ -863,14 +876,18 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
     gtk_databox_ruler_set_range(rulerY, 10.0, -150.0, 0.0);
-    gtk_databox_ruler_set_range(rulerX, 0.0, 500.0, 0.0);
+    gtk_databox_ruler_set_range(rulerX, 0.0, 1024.0, 0.0);
 
-    grid_color.red = 0;
-    grid_color.green = 0;
-    grid_color.blue = 0;
-    grid_color.alpha = 0.3;
-    fftGraph = (GtkDataboxGraph*)gtk_databox_grid_new(15, 9, &grid_color, 1);
-    gtk_databox_graph_add(GTK_DATABOX (fftBox), GTK_DATABOX_GRAPH(fftGraph));
+    // Set the background color for the graphs
+    GdkRGBA background_color;
+    background_color.red = 217.0/255.0;
+    background_color.green = 217.0/255.0;
+    background_color.blue = 217.0/255.0;
+    background_color.alpha = 1;
+    pgtk_widget_override_background_color(dataBox, GTK_STATE_FLAG_NORMAL,
+                                          &background_color);
+    pgtk_widget_override_background_color(fftBox, GTK_STATE_FLAG_NORMAL,
+                                          &background_color);
 
     vboxAcquireMode= gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxConfig), vboxAcquireMode);
@@ -933,10 +950,9 @@ int open_first_hat_device(uint8_t* hat_address)
         hat_info_list = (struct HatInfo*)malloc(
             hat_count * sizeof(struct HatInfo));
 
-        // Get the list of MCC 172s.
+        // Get the list of MCC 172 devices
         hat_list(HAT_ID_MCC_172, hat_info_list);
-
-        // This application will use the first device (i.e. hat_info_list[0])
+        // Choose the first one
         *hat_address = hat_info_list[0].address;
 
         // Open the hat device

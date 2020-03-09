@@ -13,7 +13,8 @@
 
 
 #include <gtk/gtk.h>
-#include "gtkdatabox.h"
+#include <gtkdatabox.h>
+#include <gtkdatabox_util.h>
 #include <glib.h>
 
 #include "daqhats/daqhats.h"
@@ -77,12 +78,6 @@ EXTERN pthread_cond_t graph_init_cond;
 
 EXTERN int error_code;
 EXTERN char error_message[256];
-////////EXTERN GMainContext *error_context;
-
-////////EXTERN  kiss_fftr_cfg cfg;
-////////EXTERN  kiss_fft_scalar* in;
-////////EXTERN  kiss_fft_cpx* out;
-
 
 EXTERN char dbg_string[1000];
 EXTERN char dbg_string0[1000];
