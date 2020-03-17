@@ -28,17 +28,17 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=6
+current_page=9
 FILE_NAME_0=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Ferrors.c;0;4
 FILE_NAME_1=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Ferrors.h;0;4
 FILE_NAME_2=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Fglobals.c;0;4
 FILE_NAME_3=780;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Fglobals.h;0;4
 FILE_NAME_4=3185;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flog_file.c;0;4
 FILE_NAME_5=0;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flog_file.h;0;4
-FILE_NAME_6=4012;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flogger.c;0;4
+FILE_NAME_6=4718;C;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flogger.c;0;4
 FILE_NAME_7=356;Make;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Fmakefile;0;4
 FILE_NAME_8=0;CSS;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Ftheme.css;0;4
-FILE_NAME_9=232;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flogger.h;0;4
+FILE_NAME_9=230;C++;0;EUTF-8;1;1;0;%2Fhome%2Fpi%2Fdaqhats%2Fexamples%2Fc%2Fmcc118%2Fdata_logger%2Flogger%2Flogger.h;0;4
 
 [VTE]
 last_dir=/home/pi
