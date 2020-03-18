@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.3.0.3</td></tr>
+    <tr><td>Library Version<td>1.3.0.4</td></tr>
 </table>
 
 ## About

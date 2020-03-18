@@ -2358,6 +2358,12 @@ type of board.  The library may be used with C and C++.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#c.mcc172_iepe_config_write" title="mcc172_iepe_config_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_iepe_config_write()</span></code></a></td>
 <td>Write the IEPE configuration for a channel.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc172_a_in_sensitivity_read" title="mcc172_a_in_sensitivity_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_sensitivity_read()</span></code></a></td>
+<td>Read the sensitivity scaling for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc172_a_in_sensitivity_write" title="mcc172_a_in_sensitivity_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_sensitivity_write()</span></code></a></td>
+<td>Write the sensitivity scaling for a channel.</td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="#c.mcc172_a_in_clock_config_read" title="mcc172_a_in_clock_config_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_clock_config_read()</span></code></a></td>
 <td>Read the sampling clock configuration.</td>
 </tr>
@@ -2604,6 +2610,52 @@ type of board.  The library may be used with C and C++.</p>
 <li>1: IEPE power on </li>
 </ul>
 </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc172_a_in_sensitivity_read">
+<span class="target" id="mcc172_8h_1acb0c58072c6a81e0cc26fc2e99ac54b6"></span>int <code class="descname">mcc172_a_in_sensitivity_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_sensitivity_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 172 analog input sensitivity scaling factor for a single channel. </p>
+<p>The sensitivity is specified in mV / mechanical unit. The default value when opening the library is 1000, resulting in no scaling of the input voltage.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 1). </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the sensitivity for the specified channel </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc172_a_in_sensitivity_write">
+<span class="target" id="mcc172_8h_1a38c5fd4b8a7be4e7053dd340d6fb8412"></span>int <code class="descname">mcc172_a_in_sensitivity_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_sensitivity_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the MCC 172 analog input sensitivity scaling factor for a single channel. </p>
+<p>This applies a scaling factor to the analog input data so it returns values that are meaningful for the connected sensor.</p>
+<p>The sensitivity is specified in mV / mechanical unit. The default value when opening the library is 1000, resulting in no scaling of the input voltage. Changing this value will not change the values reported by <a class="reference internal" href="#mcc172_8h_1a2063cd2d28a65eb05e0637a22909f65b"><span class="std std-ref">mcc172_info()</span></a> since it is simply sensor scaling applied to the data before returning it.</p>
+<p>Examples:</p>
+<p><ul class="simple">
+<li>A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to 10,000 and the returned data will be in units of g.</li>
+<li>A vibration sensor with a sensitivity of 100 mV/g. Set the sensitivity to 100 and the returned data will be in units of g.</li>
+</ul>
+</p>
+<p>This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 1). </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: The sensitivity for the specified channel. </li>
 </ul>
 </dd>
 </dl>

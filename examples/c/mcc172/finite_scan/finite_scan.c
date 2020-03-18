@@ -4,6 +4,7 @@
         mcc172_iepe_config_write
         mcc172_a_in_clock_config_read
         mcc172_a_in_clock_config_write
+        mcc172_a_in_sensitivity_write
         mcc172_a_in_scan_start
         mcc172_a_in_scan_read
 
@@ -60,6 +61,8 @@ int main(void)
     uint8_t num_channels = convert_chan_mask_to_array(channel_mask,
         channel_array);
 
+    double sensitivity = 1000.0;    // 1000 mV / unit default
+    
     uint32_t samples_per_channel = 10240;
     uint32_t buffer_size = samples_per_channel * num_channels;
     double read_buf[buffer_size];
@@ -116,6 +119,10 @@ int main(void)
         result = mcc172_iepe_config_write(address, channel_array[i],
             iepe_enable);
         STOP_ON_ERROR(result);
+
+        result = mcc172_a_in_sensitivity_write(address, channel_array[i], 
+            sensitivity);
+        STOP_ON_ERROR(result);
     }
 
     // Set the ADC clock to the desired rate.
@@ -138,10 +145,12 @@ int main(void)
     printf("        mcc172_iepe_config_write\n");
     printf("        mcc172_a_in_clock_config_read\n");
     printf("        mcc172_a_in_clock_config_write\n");
+    printf("        mcc172_a_in_sensitivity_write\n");
     printf("        mcc172_a_in_scan_start\n");
     printf("        mcc172_a_in_scan_read\n");
     printf("    IEPE power: %s\n", iepe_enable ? "on" : "off");
     printf("    Channels: %s\n", channel_string);
+    printf("    Sensitivity: %0.1f\n", sensitivity);
     printf("    Samples per channel: %d\n", samples_per_channel);
     printf("    Requested scan rate: %-10.2f\n", scan_rate);
     printf("    Actual scan rate: %-10.2f\n", actual_scan_rate);

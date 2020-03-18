@@ -168,6 +168,7 @@ struct mcc172ScanThreadInfo
     uint8_t channels[NUM_CHANNELS];
     double slopes[NUM_CHANNELS];
     double offsets[NUM_CHANNELS];
+    double sensitivities[NUM_CHANNELS];
 };
 
 // Local data for each open MCC 172 board.
@@ -180,6 +181,7 @@ struct mcc172Device
     uint8_t trigger_source;     // Trigger source
     uint8_t trigger_mode;       // Trigger mode
     struct mcc172FactoryData factory_data;  // Factory data
+    double sensitivities[NUM_CHANNELS]; // Channel sensitivities
     struct mcc172ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
 
@@ -804,6 +806,10 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         if (scaled)
         {
             buffer[count] *= LSB_SIZE;
+            
+            // apply sensitivity
+            buffer[count] /= dev->scan_info->sensitivities[
+                dev->scan_info->channel_index];
         }
 
         dev->scan_info->channel_index++;
@@ -1072,6 +1078,8 @@ int mcc172_open(uint8_t address)
         dev->scan_info = NULL;
         dev->handle_count = 1;
         dev->reset_polarity = 1;
+        dev->sensitivities[0] = 1.0;
+        dev->sensitivities[1] = 1.0;
 
         if (custom_size > 0)
         {
@@ -1452,6 +1460,47 @@ int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 }
 
 /******************************************************************************
+  Write sensitivity for a channel.
+ *****************************************************************************/
+int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel, 
+    double value)
+{
+    if (!_check_addr(address) ||
+        (channel >= NUM_CHANNELS))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // don't allow changing while scan is running
+    if (_devices[address]->scan_info != NULL)
+    {
+        return RESULT_BUSY;
+    }
+
+    _devices[address]->sensitivities[channel] = value / 1000.0;
+    
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
+  Read the sensitivity for a channel.
+ *****************************************************************************/
+int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
+    double* value)
+{
+    if (!_check_addr(address) ||
+        (channel >= NUM_CHANNELS) ||
+        (value == NULL))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    *value = _devices[address]->sensitivities[channel] * 1000.0;
+    
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
   Configure the ADC clock
  *****************************************************************************/
 int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
@@ -1620,6 +1669,8 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
             info->channels[num_channels] = channel;
             info->slopes[num_channels] = dev->factory_data.slopes[channel];
             info->offsets[num_channels] = dev->factory_data.offsets[channel];
+            
+            info->sensitivities[num_channels] = dev->sensitivities[channel];
 
             num_channels++;
         }

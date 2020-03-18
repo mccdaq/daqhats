@@ -200,6 +200,55 @@ int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config);
 int mcc172_iepe_config_write(uint8_t address, uint8_t channel, uint8_t config);
 
 /**
+*   @brief Read the MCC 172 analog input sensitivity scaling factor for a single
+*       channel.
+*
+*   The sensitivity is specified in mV / mechanical unit. The default value
+*   when opening the library is 1000, resulting in no scaling of the input
+*   voltage.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param channel  The channel number (0 - 1).
+*   @param value    Receives the sensitivity for the specified channel
+*   @return [Result code](@ref ResultCode),
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
+*/
+int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
+    double* value);
+
+/**
+*   @brief Write the MCC 172 analog input sensitivity scaling factor for a
+*       single channel.
+*
+*   This applies a scaling factor to the analog input data so it returns values
+*   that are meaningful for the connected sensor.  
+*
+*   The sensitivity is specified in mV / mechanical unit. The default value
+*   when opening the library is 1000, resulting in no scaling of the input
+*   voltage.  Changing this value will not change the values reported by
+*   mcc172_info() since it is simply sensor scaling applied to the data before
+*   returning it.
+*
+*   Examples:
+*   
+*   - A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to
+*     10,000 and the returned data will be in units of g.
+*   - A vibration sensor with a sensitivity of 100 mV/g.  Set the sensitivity to
+*     100 and the returned data will be in units of g.
+*
+*   This function will fail and return [RESULT_BUSY](@ref RESULT_BUSY) if a scan
+*   is active when it is called.
+*
+*   @param address  The board address (0 - 7). Board must already be opened.
+*   @param channel  The channel number (0 - 1).
+*   @param value    The sensitivity for the specified channel.
+*   @return [Result code](@ref ResultCode),
+*       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
+*/
+int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel, 
+    double value);
+
+/**
 *   @brief Read the sampling clock configuration.
 *
 *   This function will return the sample clock configuration and rate. If the

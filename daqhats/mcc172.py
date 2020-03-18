@@ -94,6 +94,14 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             c_ubyte, c_ubyte, c_ubyte]
         self._lib.mcc172_iepe_config_write.restype = c_int
 
+        self._lib.mcc172_a_in_sensitivity_read.argtypes = [
+            c_ubyte, c_ubyte, POINTER(c_double)]
+        self._lib.mcc172_a_in_sensitivity_read.restype = c_int
+
+        self._lib.mcc172_a_in_sensitivity_write.argtypes = [
+            c_ubyte, c_ubyte, c_double]
+        self._lib.mcc172_a_in_sensitivity_write.restype = c_int
+
         self._lib.mcc172_a_in_clock_config_read.argtypes = [
             c_ubyte, POINTER(c_ubyte), POINTER(c_double),
             POINTER(c_ubyte)]
@@ -372,6 +380,74 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
                 self._address, channel, byref(mode)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return mode.value
+
+    def a_in_sensitivity_write(self, channel, value):
+        """
+        Write the MCC 172 analog input sensitivity scaling factor for a single
+        channel.
+
+        This applies a scaling factor to the analog input data so it returns
+        values that are meaningful for the connected sensor.
+
+        The sensitivity is specified in mV / mechanical unit. The default value
+        when opening the library is 1000, resulting in no scaling of the input
+        voltage.  Changing this value will not change the values reported by
+        :py:func:`info` since it is simply sensor scaling applied to the data
+        before returning it.
+
+        Examples:
+
+        * A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to
+          10,000 and the returned data will be in units of g.
+        * A vibration sensor with a sensitivity of 100 mV/g.  Set the
+          sensitivity to 100 and the returned data will be in units of g.
+
+        Args:
+            channel (int): The channel, 0 or 1.
+            value (float): The sensitivity for the specified channel.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        result = self._lib.mcc172_a_in_sensitivity_write(
+            self._address, channel, value)
+        if result == self._RESULT_BUSY:
+            raise HatError(
+                self._address, "Cannot change the sensitivity "
+                "while a scan is active.")
+        elif result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response.")
+        return
+
+    def a_in_sensitivity_read(self, channel):
+        """
+        Read the MCC 172 analog input sensitivity scaling factor for a single
+            channel.
+
+        The sensitivity is returned in mV / mechanical unit. The default value
+        when opening the library is 1000, resulting in no scaling of the input
+        voltage.
+
+        Args:
+            channel (int): The channel, 0 or 1.
+
+        Returns
+            float: The sensitivity factor for the channel.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        value = c_double()
+        if (self._lib.mcc172_a_in_sensitivity_read(
+                self._address, channel, byref(value)) != self._RESULT_SUCCESS):
+            raise HatError(self._address, "Incorrect response.")
+        return value.value
 
     def a_in_clock_config_write(
             self, clock_source, sample_rate_per_channel):

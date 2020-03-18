@@ -2972,6 +2972,12 @@ responds incorrectly.</li>
 <tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc172.iepe_config_write" title="daqhats.mcc172.iepe_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc172.iepe_config_write()</span></code></a></td>
 <td>Write the IEPE configuration for a channel.</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc172.a_in_sensitivity_read" title="daqhats.mcc172.a_in_sensitivity_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc172.a_in_sensitivity_read()</span></code></a></td>
+<td>Read the sensitivity factor for a channel.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#daqhats.mcc172.a_in_sensitivity_write" title="daqhats.mcc172.a_in_sensitivity_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc172.a_in_sensitivity_write()</span></code></a></td>
+<td>Write the sensitivity factor for a channel.</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#daqhats.mcc172.a_in_clock_config_read" title="daqhats.mcc172.a_in_clock_config_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">mcc172.a_in_clock_config_read()</span></code></a></td>
 <td>Read the sampling clock configuration.</td>
 </tr>
@@ -3218,6 +3224,76 @@ channel</p>
 <dl class="docutils">
 <dt>Returns</dt>
 <dd>int: The IEPE mode for the channel, 0 = IEPE off, 1 = IEPE on.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc172.a_in_sensitivity_write">
+<code class="descname">a_in_sensitivity_write</code><span class="sig-paren">(</span><em>channel</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_sensitivity_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the MCC 172 analog input sensitivity scaling factor for a single
+channel.</p>
+<p>This applies a scaling factor to the analog input data so it returns
+values that are meaningful for the connected sensor.</p>
+<p>The sensitivity is specified in mV / mechanical unit. The default value
+when opening the library is 1000, resulting in no scaling of the input
+voltage.  Changing this value will not change the values reported by
+<a class="reference internal" href="#daqhats.mcc172.info" title="daqhats.mcc172.info"><code class="xref py py-func docutils literal notranslate"><span class="pre">info()</span></code></a> since it is simply sensor scaling applied to the data
+before returning it.</p>
+<p>Examples:</p>
+<ul class="simple">
+<li>A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to
+10,000 and the returned data will be in units of g.</li>
+<li>A vibration sensor with a sensitivity of 100 mV/g.  Set the
+sensitivity to 100 and the returned data will be in units of g.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>channel</strong> (<em>int</em>) – The channel, 0 or 1.</li>
+<li><strong>value</strong> (<em>float</em>) – The sensitivity for the specified channel.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="daqhats.mcc172.a_in_sensitivity_read">
+<code class="descname">a_in_sensitivity_read</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_sensitivity_read" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Read the MCC 172 analog input sensitivity scaling factor for a single</dt>
+<dd>channel.</dd>
+</dl>
+<p>The sensitivity is returned in mV / mechanical unit. The default value
+when opening the library is 1000, resulting in no scaling of the input
+voltage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> (<em>int</em>) – The channel, 0 or 1.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>float: The sensitivity factor for the channel.</dd>
 </dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

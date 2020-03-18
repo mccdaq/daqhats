@@ -1,3 +1,6 @@
+1.3.0.4:
+    - Added sensitivity factor setting to the MCC 172 data.
+
 1.3.0.3:
     - Added error reporting if user passes OPTS_EXTCLOCK when starting a scan on MCC 172.
     - Clarified MCC 172 documentation.

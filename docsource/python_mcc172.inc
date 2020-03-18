@@ -27,6 +27,8 @@ Methods
     :py:func:`mcc172.calibration_coefficient_write`     Write the calibration coefficients for a channel.
     :py:func:`mcc172.iepe_config_read`                  Read the IEPE configuration for a channel.
     :py:func:`mcc172.iepe_config_write`                 Write the IEPE configuration for a channel.
+    :py:func:`mcc172.a_in_sensitivity_read`             Read the sensitivity factor for a channel.
+    :py:func:`mcc172.a_in_sensitivity_write`            Write the sensitivity factor for a channel.
     :py:func:`mcc172.a_in_clock_config_read`            Read the sampling clock configuration.
     :py:func:`mcc172.a_in_clock_config_write`           Write the sampling clock configuration.
     :py:func:`mcc172.trigger_config`                    Configure the external trigger input.
