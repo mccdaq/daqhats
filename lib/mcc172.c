@@ -168,7 +168,7 @@ struct mcc172ScanThreadInfo
     uint8_t channels[NUM_CHANNELS];
     double slopes[NUM_CHANNELS];
     double offsets[NUM_CHANNELS];
-    double sensitivities[NUM_CHANNELS];
+    double scale_factors[NUM_CHANNELS];
 };
 
 // Local data for each open MCC 172 board.
@@ -181,7 +181,7 @@ struct mcc172Device
     uint8_t trigger_source;     // Trigger source
     uint8_t trigger_mode;       // Trigger mode
     struct mcc172FactoryData factory_data;  // Factory data
-    double sensitivities[NUM_CHANNELS]; // Channel sensitivities
+    double sensitivities[NUM_CHANNELS];     // Channel sensitivities
     struct mcc172ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
 
@@ -805,10 +805,8 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         // convert to volts if desired
         if (scaled)
         {
-            buffer[count] *= LSB_SIZE;
-            
-            // apply sensitivity
-            buffer[count] /= dev->scan_info->sensitivities[
+            // apply sensitivity and LSB size
+            buffer[count] *= dev->scan_info->scale_factors[
                 dev->scan_info->channel_index];
         }
 
@@ -1477,6 +1475,7 @@ int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel,
         return RESULT_BUSY;
     }
 
+    // convert from mV/unit to V/unit
     _devices[address]->sensitivities[channel] = value / 1000.0;
     
     return RESULT_SUCCESS;
@@ -1495,6 +1494,7 @@ int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
         return RESULT_BAD_PARAMETER;
     }
 
+    // convert from V/unit to mV/unit
     *value = _devices[address]->sensitivities[channel] * 1000.0;
     
     return RESULT_SUCCESS;
@@ -1670,7 +1670,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
             info->slopes[num_channels] = dev->factory_data.slopes[channel];
             info->offsets[num_channels] = dev->factory_data.offsets[channel];
             
-            info->sensitivities[num_channels] = dev->sensitivities[channel];
+            // set the scaling factor using the LSB size and sensitivity
+            info->scale_factors[num_channels] = LSB_SIZE / 
+                dev->sensitivities[channel];
 
             num_channels++;
         }

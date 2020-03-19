@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MCC DAQ HAT Library'
-copyright = u'2019, Measurement Computing'
+copyright = u'2020, Measurement Computing'
 author = u'Measurement Computing'
 
 # The version info for the project you're documenting, acts as replacement for
