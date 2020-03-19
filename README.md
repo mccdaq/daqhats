@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.3.0.3</td></tr>
+    <tr><td>Library Version<td>1.4.0.0</td></tr>
 </table>
 
 ## About
@@ -13,6 +13,7 @@ This is the development repository for Measurement Computing DAQ HAT boards. The
 #### Supported MCC DAQ HAT hardware
 Hardware supported by this version of the MCC DAQ HAT Library:
 - [MCC 118](https://nwright-mcc.github.io/daqhats/overview.html#mcc-118)
+- [MCC 128](https://nwright-mcc.github.io/daqhats/overview.html#mcc-128)
 - [MCC 134](https://nwright-mcc.github.io/daqhats/overview.html#mcc-134)
 - [MCC 152](https://nwright-mcc.github.io/daqhats/overview.html#mcc-152)
 - [MCC 172](https://nwright-mcc.github.io/daqhats/overview.html#mcc-172)
@@ -133,6 +134,10 @@ firmware on the MCC 118 that is installed at address 0.
 
 ```sh
 mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
+```
+#### MCC 128
+```sh
+mcc128_firmware_update 0 ~/daqhats/tools/MCC_128.fw
 ```
 #### MCC 172
 ```sh
