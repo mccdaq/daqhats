@@ -99,8 +99,9 @@ int create_selected_channel_mask()
 {
     gboolean checked_status = FALSE;
     int selected_channel_mask = 0;
-
-    for (int i = 0; i < MAX_118_CHANNELS; i++)
+    int i;
+    
+    for (i = 0; i < MAX_118_CHANNELS; i++)
     {
         // Is the channel checked?
         checked_status = gtk_toggle_button_get_active(
@@ -118,13 +119,14 @@ int create_selected_channel_mask()
 }
 
 
-// Enable/disable the controls in the main window.  
-// Controls are disabled when the application is running 
+// Enable/disable the controls in the main window.
+// Controls are disabled when the application is running
 // and re-enabled when the application is stopped.
 void set_enable_state_for_controls(gboolean state)
 {
     // Set the state of the check boxes
-    for (int i = 0; i < MAX_118_CHANNELS; i++)
+    int i;
+    for (i = 0; i < MAX_118_CHANNELS; i++)
     {
         gtk_widget_set_sensitive (chkChan[i], state);
     }
@@ -144,7 +146,7 @@ void set_enable_state_for_controls(gboolean state)
 }
 
 
-// Copy the data for the specified channel from the interleaved 
+// Copy the data for the specified channel from the interleaved
 // HAT buffer to the array for the specified channel.
 void copy_data_to_xy_arrays(double* hat_read_buf, int read_buf_start_index,
     int channel, int stride, int buffer_size_samples, gboolean first_block)
@@ -154,13 +156,14 @@ void copy_data_to_xy_arrays(double* hat_read_buf, int read_buf_start_index,
     gfloat* Y = graphChannelInfo[channel].Y;
 
     int ii = 0;
-
-    // For the first block, set the indices and data.  
+    int i;
+    
+    // For the first block, set the indices and data.
     // For all other blocks, just set the data
     if (first_block)
     {
         // Set indices and data
-        for (int i = read_buf_start_index; i < buffer_size_samples; i+=stride)
+        for (i = read_buf_start_index; i < buffer_size_samples; i+=stride)
         {
             X[ii] = (gfloat)ii;
             Y[ii] = (gfloat)hat_read_buf[i];
@@ -170,8 +173,8 @@ void copy_data_to_xy_arrays(double* hat_read_buf, int read_buf_start_index,
     }
     else
     {
-		// Set data only
-		for (int i = read_buf_start_index; i < buffer_size_samples; i+=stride)
+        // Set data only
+        for (i = read_buf_start_index; i < buffer_size_samples; i+=stride)
         {
             Y[ii] = (gfloat)hat_read_buf[i];
 
@@ -197,7 +200,7 @@ gboolean refresh_graph(GtkWidget *box)
 }
 
 
-// Wait for the scan to complete, read the data, 
+// Wait for the scan to complete, read the data,
 // write it to a CSV file, and plot it in the graph.
 void analog_in_finite ()
 {
@@ -208,44 +211,44 @@ void analog_in_finite ()
     int retval = 0;
     uint16_t read_status = 0;
 
-    // Allocate arrays for the indices and data 
+    // Allocate arrays for the indices and data
     // for each channel in the scan.
     int num_channels = allocate_channel_xy_arrays(channel_mask,
         iNumSamplesPerChannel);
 
     // Set the timeout
     double scan_timeout = num_channels *
-		iNumSamplesPerChannel / iRatePerChannel * 10;
+        iNumSamplesPerChannel / iRatePerChannel * 10;
 
     // Setup the sample buffer.
     double hat_read_buf[iNumSamplesPerChannel*num_channels];
     buffer_size_samples = iNumSamplesPerChannel*num_channels;
 
     // Write channel numbers to file header
-	retval = init_log_file(log_file_ptr, channel_mask);
-	if (retval < 0)
-	{
-		int error_code;
-		switch (retval)
-		{
-		case -1:
-			error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-			break;
+    retval = init_log_file(log_file_ptr, channel_mask);
+    if (retval < 0)
+    {
+        int error_code;
+        switch (retval)
+        {
+        case -1:
+            error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
+            break;
 
-		default:
-			error_code = UNKNOWN_ERROR;
-			break;
-		}
+        default:
+            error_code = UNKNOWN_ERROR;
+            break;
+        }
 
-		// Error dialog must be displayed on the main thread.
-		g_main_context_invoke(context,
-			(GSourceFunc)show_mcc118_error_main_thread, &error_code);
+        // Error dialog must be displayed on the main thread.
+        g_main_context_invoke(context,
+            (GSourceFunc)show_mcc118_error_main_thread, &error_code);
 
-		// Call the Start/Stop event handler to reset the UI
-		start_stop_event_handler(btnStart_Stop, NULL);
+        // Call the Start/Stop event handler to reset the UI
+        start_stop_event_handler(btnStart_Stop, NULL);
 
-		return;
-	}
+        return;
+    }
 
     // Wait for the scan to start running.
     do
@@ -296,7 +299,7 @@ void analog_in_finite ()
         }
     }
 
-    // Parse the data and display it on the graph.  
+    // Parse the data and display it on the graph.
     // Convert the 1D interleaved data into a 2D array
     if (retval > 0)
     {
@@ -358,9 +361,9 @@ void analog_in_finite ()
 }
 
 
-// While the scan is running, read the data, write it to a 
+// While the scan is running, read the data, write it to a
 // CSV file, and plot it in the graph.
-// This function runs as a background thread 
+// This function runs as a background thread
 // for the duration of the scan.
 static void * analog_in_continuous ()
 {
@@ -379,37 +382,37 @@ static void * analog_in_continuous ()
 
     // Set the timeout
     double scan_timeout = num_channels *
-		iNumSamplesPerChannel / iRatePerChannel * 10;
+        iNumSamplesPerChannel / iRatePerChannel * 10;
 
     // Setup the sample buffer.
     buffer_size_samples = iNumSamplesPerChannel*num_channels;
     double hat_read_buf[buffer_size_samples];
 
     // Write channel numbers to file header
-	retval = init_log_file(log_file_ptr, channel_mask);
-	if (retval < 0)
-	{
-		int error_code;
-		switch (retval)
-		{
-		case -1:
-			error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-			break;
+    retval = init_log_file(log_file_ptr, channel_mask);
+    if (retval < 0)
+    {
+        int error_code;
+        switch (retval)
+        {
+        case -1:
+            error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
+            break;
 
-		default:
-			error_code = UNKNOWN_ERROR;
-			break;
-		}
+        default:
+            error_code = UNKNOWN_ERROR;
+            break;
+        }
 
-		// Error dialog must be displayed on the main thread.
-		g_main_context_invoke(context,
-			(GSourceFunc)show_mcc118_error_main_thread, &error_code);
+        // Error dialog must be displayed on the main thread.
+        g_main_context_invoke(context,
+            (GSourceFunc)show_mcc118_error_main_thread, &error_code);
 
-		// Call the Start/Stop event handler to reset the UI
-		start_stop_event_handler(btnStart_Stop, NULL);
+        // Call the Start/Stop event handler to reset the UI
+        start_stop_event_handler(btnStart_Stop, NULL);
 
-		return NULL;
-	}
+        return NULL;
+    }
 
     // Wait for the scan to start running.
     do
@@ -421,7 +424,7 @@ static void * analog_in_continuous ()
         {
             show_mcc118_error(retval);
 
-            // If the scan fails to start clear it and 
+            // If the scan fails to start clear it and
             // reset the app to start again
             g_print("Scan failure, Return code:  %d,  ReadStatus:  %d\n",
                 retval, read_status);
@@ -540,7 +543,7 @@ static void * analog_in_continuous ()
                         channel, num_channels, buffer_size_samples, FALSE);
                 }
 
-                // Set the index to start at the first 
+                // Set the index to start at the first
                 // sample of the next channel.
                 read_buf_index++;
             }
@@ -553,7 +556,7 @@ static void * analog_in_continuous ()
 
         first_block = FALSE;
 
-        // Set the condition to cause the display 
+        // Set the condition to cause the display
         // update function to update the display.
         g_main_context_invoke(context, (GSourceFunc)refresh_graph, box);
 
@@ -583,16 +586,16 @@ static void * analog_in_continuous ()
 
 // Event handler for the Start/Stop button.
 //
-// If starting, change the button text to "Stop" and parse 
+// If starting, change the button text to "Stop" and parse
 // the UI settings before starting the acquisition.
-// If stopping, change the button text 
+// If stopping, change the button text
 // to "Start" and stop the acquisition.
 void start_stop_event_handler(GtkWidget *widget, gpointer data)
 {
     const gchar* StartStopBtnLbl = gtk_button_get_label(GTK_BUTTON(widget));
     uint16_t options = 0;
     int retval = 0;
-    
+
     if (strcmp(StartStopBtnLbl , "Start") == 0)
     {
         // Open the log file.
@@ -645,7 +648,7 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
 
         if ((options & OPTS_CONTINUOUS) == OPTS_CONTINUOUS)
         {
-            // If continuous scan, start a thread 
+            // If continuous scan, start a thread
             // to read the data from the device
             if (pthread_create(&threadh, NULL, &analog_in_continuous, &tinfo) !=
                 0)
@@ -703,7 +706,8 @@ void select_log_file_event_handler(GtkWidget* widget, gpointer user_data)
 //   Assign a legend color and channel number for each channel on the device.
 void initialize_graph_channel_info (void)
 {
-    for (int i = 0; i < MAX_118_CHANNELS; i++)
+    int i;
+    for (i = 0; i < MAX_118_CHANNELS; i++)
     {
         switch(i)
         {
@@ -828,10 +832,10 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     vboxMain = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
     gtk_container_add(GTK_CONTAINER(window), vboxMain);
-    
+
     hboxMain = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxMain), hboxMain);
-    
+
     vboxConfig = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(hboxMain), vboxConfig);
 
@@ -884,7 +888,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     hboxRate = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxConfig), hboxRate);
-    
+
     // FILE indicator
     hboxFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxMain), hboxFile);
@@ -956,8 +960,8 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 // Display the CSV file name.
 void show_file_name()
 {
-	if(labelFile)
-		gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
+    if(labelFile)
+        gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
 }
 
 
