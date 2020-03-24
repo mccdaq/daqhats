@@ -65,9 +65,10 @@ void allocate_channel_xy_arrays(int channel, int numSamplesPerChannel)
 void set_enable_state_for_controls(gboolean state)
 {
     gboolean checked_status = FALSE;
-
+    int i;
+    
     // Set the state of the check boxes and CJC combo boxex
-    for (int i = 0; i < MAX_134_TEMP_CHANNELS; i++)
+    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
     {
         gtk_widget_set_sensitive (chkChan[i], state);
 
@@ -110,8 +111,9 @@ void copy_xy_arrays(int channel, int num_samples_to_copy)
     gfloat* X = graphChannelInfo[channel].X;
     gfloat* Y = graphChannelInfo[channel].Y;
 
+    int i;
     // Copy each sample and index to the previous sample location.
-    for (int i = 0; i < num_samples_to_copy; i++)
+    for (i = 0; i < num_samples_to_copy; i++)
     {
         X[i] = X[i+1];
         Y[i] = Y[i+1];
@@ -171,7 +173,8 @@ void refresh_graph(GtkWidget *box)
 
         // Calculate the values for the tick marks.
         gfloat* tick_values = g_new0(gfloat, num_ticks);
-        for (int i=0; i<num_ticks; i++)
+        int i;
+        for (i=0; i<num_ticks; i++)
         {
             tick_values[i] = tv;
             tv += inc;
@@ -363,8 +366,8 @@ void start_stop_event_handler(GtkWidget *widget, gpointer data)
         // Get the number of samles to be displayed.
         numSamplesToDisplay = gtk_spin_button_get_value_as_int(
             GTK_SPIN_BUTTON(spinNumSamples));
-
-        for (int i = 0; i < MAX_134_TEMP_CHANNELS; i++)
+        int i;
+        for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
         {
             if (graphChannelInfo[i].graph != NULL)
             {
@@ -529,7 +532,8 @@ void select_log_file_event_handler(GtkWidget* widget, gpointer user_data)
 //   Assign a legend color and channel number for each channel on the device.
 void initialize_graph_channel_info (void)
 {
-    for (int i = 0; i < MAX_134_TEMP_CHANNELS; i++)
+    int i;
+    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
     {
         switch(i)
         {
@@ -661,7 +665,8 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     GtkWidget *legend[MAX_134_TEMP_CHANNELS];
 
     // Add the temperature channel check boxes.
-    for (int i = 0; i < MAX_134_TEMP_CHANNELS; i++)
+    int i;
+    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
     {
         strcpy(chanNameBuffer, chanBase);
         strcpy(labelNameBuffer, labelName);
@@ -682,11 +687,11 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
 
     // Add the thermocouple type combo boxes.
-    for (int i = 0; i < MAX_134_CJC_CHANNELS; i++)
+    for (i = 0; i < MAX_134_CJC_CHANNELS; i++)
     {
         comboTcType[i] = gtk_combo_box_text_new ();
-
-        for (int j = 0; j < 8; j++)
+        int j;
+        for (j = 0; j < 8; j++)
         {
             gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(comboTcType[i]), 0, tcType[j]);
         }
@@ -729,7 +734,7 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     comboReadIntervalUnits = gtk_combo_box_text_new ();
     gtk_box_pack_start(GTK_BOX(hboxRate), comboReadIntervalUnits, 0, 0, 0);
-    for (int i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
         gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(comboReadIntervalUnits), 0, rateUnits[i]);
 
     gtk_combo_box_set_active (GTK_COMBO_BOX(comboReadIntervalUnits), 0);
@@ -787,8 +792,8 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 // Display the CSV file name.
 void show_file_name()
 {
-	if(labelFile)
-		gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
+    if(labelFile)
+        gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
 }
 
 
