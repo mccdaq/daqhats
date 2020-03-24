@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 
     // display the list
     printf("Found %d board(s):\n\n", info_count);
-    
+
     for (index = 0; index < info_count; index++)
     {
         address = info_list[index].address;
@@ -54,20 +54,45 @@ int main(int argc, char* argv[])
 
         if (info_list[index].id == HAT_ID_MCC_118)
         {
-            mcc118_open(address);
-            mcc118_firmware_version(address, &version, &boot_version);
-            printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
-            printf("Bootloader version: %X.%02X\n", (uint8_t)(boot_version >> 8), (uint8_t)boot_version);
-            mcc118_close(address);
+            if (mcc118_open(address) == RESULT_SUCCESS)
+            {
+                if (mcc118_firmware_version(address, &version, &boot_version)
+                    == RESULT_SUCCESS)
+                {
+                    printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
+                    printf("Bootloader version: %X.%02X\n", (uint8_t)(boot_version >> 8), (uint8_t)boot_version);
+                }
+                else
+                {
+                    printf("Can't read firmware version\n");
+                }
+                mcc118_close(address);
+            }
+            else
+            {
+                printf("Can't open device\n");
+            }
         }
         else if (info_list[index].id == HAT_ID_MCC_172)
         {
-            mcc172_open(address);
-            mcc172_firmware_version(address, &version);
-            printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
-            mcc172_close(address);
+            if (mcc172_open(address) == RESULT_SUCCESS)
+            {
+                if (mcc172_firmware_version(address, &version) == RESULT_SUCCESS)
+                {
+                    printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
+                }
+                else
+                {
+                    printf("Can't read firmware version\n");
+                }
+                mcc172_close(address);
+            }
+            else
+            {
+                printf("Can't open device\n");
+            }
         }
-        
+
         if (index < (info_count - 1))
         {
             printf("\n");

@@ -5,6 +5,7 @@
         mcc172.iepe_config_write
         mcc172.a_in_clock_config_write
         mcc172.a_in_clock_config_read
+        mcc172.a_in_sensitivity_write
         mcc172.a_in_scan_start
         mcc172.a_in_scan_read
         mcc172.a_in_scan_stop
@@ -14,10 +15,9 @@
 
     Description:
         Acquires blocks of analog input data for a user-specified group
-        of channels.  The RMS voltage for each channel is
-        displayed for each block of data received from the device.  The
-        acquisition is stopped when the specified number of samples is
-        acquired for each channel.
+        of channels.  The RMS value for each channel is displayed for each
+        block of data received from the device.  The acquisition is stopped
+        when the specified number of samples is acquired for each channel.
 
 """
 from __future__ import print_function
@@ -64,6 +64,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
     channel_mask = chan_list_to_mask(channels)
     num_channels = len(channels)
 
+    sensitivity = 1000.0
     samples_per_channel = 10000
     scan_rate = 10240.0
     options = OptionFlags.DEFAULT
@@ -80,6 +81,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
 
         for channel in channels:
             hat.iepe_config_write(channel, iepe_enable)
+            hat.a_in_sensitivity_write(channel, sensitivity)
 
         # Configure the clock and wait for sync to complete.
         hat.a_in_clock_config_write(SourceType.LOCAL, scan_rate)
@@ -95,6 +97,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         print('         mcc172.iepe_config_write')
         print('         mcc172.a_in_clock_config_write')
         print('         mcc172.a_in_clock_config_read')
+        print('         mcc172.a_in_sensitivity_write')
         print('         mcc172.a_in_scan_start')
         print('         mcc172.a_in_scan_read')
         print('         mcc172.a_in_scan_stop')
@@ -106,6 +109,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
             print('off')
         print('    Channels: ', end='')
         print(', '.join([str(chan) for chan in channels]))
+        print('    Sensitivity: ', sensitivity)
         print('    Requested scan rate: ', scan_rate)
         print('    Actual scan rate: ', actual_scan_rate)
         print('    Samples per channel', samples_per_channel)
@@ -124,7 +128,7 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         # Display the header row for the data table.
         print('Samples Read    Scan Count', end='')
         for chan in channels:
-            print('       Channel ', chan, sep='', end='')
+            print('      Ch ', chan, ' RMS', sep='', end='')
         print('')
 
         try:
@@ -191,15 +195,14 @@ def read_and_display_data(hat, samples_per_channel, num_channels):
         total_samples_read += samples_read_per_channel
 
         print('\r{:12}'.format(samples_read_per_channel),
-              ' {:12} '.format(total_samples_read), end='')
+              ' {:12}'.format(total_samples_read), end='')
 
         # Display the RMS voltage for each channel.
         if samples_read_per_channel > 0:
             for i in range(num_channels):
                 value = calc_rms(read_result.data, i, num_channels,
                                  samples_read_per_channel)
-                print('{:10.5f}'.format(value), 'Vrms ',
-                      end='')
+                print('{:14.5f}'.format(value), end='')
             stdout.flush()
 
     print('\n')

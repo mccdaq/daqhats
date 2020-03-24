@@ -19,6 +19,8 @@ Function                                        Description
 :c:func:`mcc172_calibration_coefficient_write`  Write the calibration coefficients for a channel.
 :c:func:`mcc172_iepe_config_read`               Read the IEPE configuration for a channel.
 :c:func:`mcc172_iepe_config_write`              Write the IEPE configuration for a channel.
+:c:func:`mcc172_a_in_sensitivity_read`          Read the sensitivity scaling for a channel.
+:c:func:`mcc172_a_in_sensitivity_write`         Write the sensitivity scaling for a channel.
 :c:func:`mcc172_a_in_clock_config_read`         Read the sampling clock configuration.
 :c:func:`mcc172_a_in_clock_config_write`        Write the sampling clock configuration.
 :c:func:`mcc172_trigger_config`                 Configure the external trigger input.
@@ -43,6 +45,8 @@ Function                                        Description
 .. doxygenfunction:: mcc172_calibration_coefficient_write
 .. doxygenfunction:: mcc172_iepe_config_read
 .. doxygenfunction:: mcc172_iepe_config_write
+.. doxygenfunction:: mcc172_a_in_sensitivity_read
+.. doxygenfunction:: mcc172_a_in_sensitivity_write
 .. doxygenfunction:: mcc172_a_in_clock_config_read
 .. doxygenfunction:: mcc172_a_in_clock_config_write
 .. doxygenfunction:: mcc172_trigger_config
