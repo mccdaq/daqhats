@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
                 if (mcc118_firmware_version(address, &version, &boot_version)
                     == RESULT_SUCCESS)
                 {
-                    printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)versi$
-                    printf("Bootloader version: %X.%02X\n", (uint8_t)(boot_version >> 8), (uint8_t)$
+                    printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
+                    printf("Bootloader version: %X.%02X\n", (uint8_t)(boot_version >> 8), (uint8_t)boot_version);
                 }
                 else
                 {
