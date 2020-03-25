@@ -124,10 +124,10 @@ struct MCC172DeviceInfo mcc172_device_info =
 
 #define MAX_SCAN_BUFFER_SIZE_SAMPLES    (16ul*1024ul*1024ul)    // 16 MS
 
-#define COUNT_NORMALIZE(x, c)  ((x / c) * c)
+#define COUNT_NORMALIZE(x, c)  (((x) / (c)) * (c))
 
-#define MIN(a, b)   ((a < b) ? a : b)
-#define MAX(a, b)   ((a > b) ? a : b)
+#define MIN(a, b)   (((a) < (b)) ? (a) : (b))
+#define MAX(a, b)   (((a) > (b)) ? (a) : (b))
 
 /// \cond
 // Contains the device-specific data stored at the factory.
@@ -352,8 +352,6 @@ static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
   Return: RESULT_SUCCESS if successful
  *****************************************************************************/
 
-void* rx_start_ptr;
-
 static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count,
     uint32_t reply_timeout_us, uint32_t retry_us)
@@ -379,8 +377,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     {
         return RESULT_BAD_PARAMETER;
     }
-
-    //uint16_t rx_buffer_size = MSG_RX_HEADER_SIZE + rx_data_count + 5;
 
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
@@ -433,7 +429,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         usleep(retry_us);
 
     // read the reply
-    //memset(dev->temp_buffer, 0xFF, rx_buffer_size);
     uint16_t frame_start = 0;
     uint16_t frame_length;
     uint16_t remaining = 0;
@@ -441,7 +436,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     // only read the first byte of the reply in order to test for the device
     // readiness
-    tr.tx_buf = (uintptr_t)NULL;//(uintptr_t)dev->temp_buffer;
+    tr.tx_buf = (uintptr_t)NULL;
     tr.rx_buf = (uintptr_t)dev->rx_buffer;
     tr.len = 1;
 
@@ -474,17 +469,24 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     if (got_reply)
     {
         // read the rest of the reply
-        tr.tx_buf = (uintptr_t)NULL;//dev->temp_buffer;
-        tr.rx_buf = (uintptr_t)&dev->rx_buffer[1];
-        tr.len = read_amount;
+        tr.tx_buf = (uintptr_t)NULL;
+
+        int read_start = 1;
+        int total_read = 1;
 
         got_reply = false;
         do
         {
+            tr.rx_buf = (uintptr_t)&dev->rx_buffer[read_start];
+            tr.len = read_amount;
+
             if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
             {
+                total_read += read_amount;
+                read_start += read_amount;
+
                 // parse the reply
-                got_reply = _parse_buffer(dev->rx_buffer, read_amount+1,
+                got_reply = _parse_buffer(dev->rx_buffer, total_read,
                     &frame_start, &frame_length, &remaining);
             }
             else
@@ -495,7 +497,8 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             diff = _difftime_us(&start_time, &current_time);
             timeout = (diff > reply_timeout_us);
-        } while (!got_reply && !timeout);
+        } while (!got_reply && !timeout &&
+                 ((read_start + read_amount) < MAX_SPI_TRANSFER));
     }
 
     if (!got_reply)
@@ -838,7 +841,6 @@ static void* _scan_thread(void* arg)
     bool calibrated;
     bool scaled;
     bool stop_thread;
-    //uint16_t largest_read;
     uint8_t rx_buffer[5];
     bool scan_running;
     int result;
@@ -885,8 +887,8 @@ static void* _scan_thread(void* arg)
     do
     {
         // read the scan status
-        if ((result = _spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
-            1*MSEC, 20)) == RESULT_SUCCESS)
+        if ((result = _spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0,
+            rx_buffer, 5, 1*MSEC, 20)) == RESULT_SUCCESS)
         {
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
             max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
@@ -1002,7 +1004,7 @@ static void* _scan_thread(void* arg)
         pthread_mutex_unlock(&_devices[address]->scan_mutex);
 
     } while (!stop_thread && !done);
-    
+
     if (info->scan_running)
     {
         // if we are stopped while the device is still running a scan then
@@ -1124,9 +1126,9 @@ int mcc172_open(uint8_t address)
 
         if (dev->reset_polarity == 0)
         {
-            // Initial prototypes had active low reset, and the GPIO signal 
-            // defaults to low. This causes the micro to be held in reset if 
-            // the library has not been opened since booting. In that case, add 
+            // Initial prototypes had active low reset, and the GPIO signal
+            // defaults to low. This causes the micro to be held in reset if
+            // the library has not been opened since booting. In that case, add
             // an extra delay for the micro to start.
             if (gpio_status(RESET_GPIO) == 0)
             {
@@ -1460,7 +1462,7 @@ int mcc172_iepe_config_read(uint8_t address, uint8_t channel, uint8_t* config)
 /******************************************************************************
   Write sensitivity for a channel.
  *****************************************************************************/
-int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel, 
+int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel,
     double value)
 {
     if (!_check_addr(address) ||
@@ -1477,7 +1479,7 @@ int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel,
 
     // convert from mV/unit to V/unit
     _devices[address]->sensitivities[channel] = value / 1000.0;
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -1496,7 +1498,7 @@ int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
 
     // convert from V/unit to mV/unit
     *value = _devices[address]->sensitivities[channel] * 1000.0;
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -1526,7 +1528,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     {
         sample_rate_per_channel = 200.0;
     }
-    
+
     // set the sample rate to one supported by the device
     divisor = MAX_SAMPLE_RATE / sample_rate_per_channel + 0.5;
 
@@ -1543,7 +1545,7 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
     buffer[0] = clock_source;
     buffer[1] = (uint8_t)(divisor - 1);
     result = _spi_transfer(address, CMD_AINCLOCKCONFIG_W, buffer, 2, NULL, 0,
-        20*MSEC, 10);
+        20*MSEC, 100);
 
     return result;
 }
@@ -1669,9 +1671,9 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
             info->channels[num_channels] = channel;
             info->slopes[num_channels] = dev->factory_data.slopes[channel];
             info->offsets[num_channels] = dev->factory_data.offsets[channel];
-            
+
             // set the scaling factor using the LSB size and sensitivity
-            info->scale_factors[num_channels] = LSB_SIZE / 
+            info->scale_factors[num_channels] = LSB_SIZE /
                 dev->sensitivities[channel];
 
             num_channels++;
@@ -1751,25 +1753,16 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 
     // Set the device read threshold based on the scan rate - read data
     // every 100ms or faster.
-    /*
-    if (sample_rate_per_channel > 2560.0)
+    info->read_threshold = (uint16_t)(sample_rate_per_channel / 10);
+    if (info->read_threshold > MAX_SAMPLES_READ)
     {
-        info->read_threshold = COUNT_NORMALIZE(256, info->channel_count);
-    }
-    else
-    */
+        info->read_threshold = MAX_SAMPLES_READ;
+    };
+    info->read_threshold = COUNT_NORMALIZE(info->read_threshold,
+        info->channel_count);
+    if (info->read_threshold == 0)
     {
-        info->read_threshold = (uint16_t)(sample_rate_per_channel / 10);
-        if (info->read_threshold > MAX_SAMPLES_READ)
-        {
-            info->read_threshold = MAX_SAMPLES_READ;
-        };
-        info->read_threshold = COUNT_NORMALIZE(info->read_threshold,
-            info->channel_count);
-        if (info->read_threshold == 0)
-        {
-            info->read_threshold = info->channel_count;
-        }
+        info->read_threshold = info->channel_count;
     }
 
     pthread_attr_t attr;
@@ -1821,7 +1814,7 @@ int mcc172_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
 
     info->thread_started = false;
-    
+
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
@@ -2379,7 +2372,7 @@ int mcc172_open_for_update(uint8_t address)
             _set_defaults(&dev->factory_data);
         }
 
-        
+
         // ensure GPIO signals are initialized
         if (dev->reset_polarity == 0)
         {
@@ -2426,7 +2419,7 @@ int mcc172_enter_bootloader(uint8_t address)
     }
 
     dev = _devices[address];
-    
+
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
