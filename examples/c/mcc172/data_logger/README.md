@@ -1,7 +1,7 @@
-# DataLogger Example
+# Data Logger Example
 
 ## About
-The **DataLogger** example shows how to acquire data from the **MCC 172 HAT**, display the data on
+The **Data Logger** example shows how to acquire data from the **MCC 172 HAT**, display the data on
 a strip chart, calculate and display FFT data, and log the data to a CSV file.
 
 ## Dependencies
