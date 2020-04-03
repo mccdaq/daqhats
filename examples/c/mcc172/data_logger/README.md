@@ -1,20 +1,17 @@
 # DataLogger Example
 
 ## About
-The **DataLogger** example shows how to acquire data from the **MCC 172 HAT**, display the data on 
-a strip chart, and log the data to a CSV file. 
-This example can be run from a terminal window, or accessed with an IDE such as **Geany** or **CodeBlocks**. 
+The **DataLogger** example shows how to acquire data from the **MCC 172 HAT**, display the data on
+a strip chart, calculate and display FFT data, and log the data to a CSV file.
 
 ## Dependencies
 - **GTK+** cross-platform toolkit for creating graphical user interfaces.
 - **GtkDatabox** widget used to display two-dimensional data.
 - **D-Bus AT-SPI** protocol.
-- Monitor connected to the **Raspberry Pi** to configure acquisition options and view acquired data 
- 
- > Project files are supplied for **Geany** and **CodeBlocks**. 
+- Monitor connected to the **Raspberry Pi** to configure acquisition options and view acquired data
 
 ## Install the Dependencies
-Install **GTK+**: 
+Install **GTK+**:
   ```sh
     sudo apt-get install libgtk-3-dev
   ```
@@ -36,35 +33,34 @@ Install **GTKDatabox**:
   ```sh
     sudo ldconfig
   ```
-  
-## Running the example from a terminal
-To run the example from a terminal window, enter the following commands:
-  ```sh
-    cd ~/daqhats/examples/c/mcc172/data_logger/logger
-    make
-    ./logger
-  ```
-## Running the example from Geany
-**Geany** is one of the editors supplied with Raspbian, so is probably already installed on your
-**Raspberry Pi**. If not, or to check for updates, run the following in a terminal:
-  ```sh
-    sudo apt-get install geany
-  ```
-To build the project, press Shift+F9 or select Make from the Build menu. Select the `logger.c` 
-file, then press F5 or select Execute from the Build menu.
 
-## Running the example from CodeBlocks
-To install **CodeBlocks**, run the following in a terminal:
+## Running the example
+To run the example, enter the following commands:
   ```sh
-    sudo apt-get install codeblocks
+    cd ~/daqhats/examples/c/mcc172/data_logger
+    make
+    ./data_logger
   ```
-Click `Build`, then `Run` to run the example.
+
+This example uses the Kiss FFT library (already included, but see
+https://github.com/mborgerding/kissfft for more information), which has the
+following license information:
+```
+Copyright (c) 2003-2010 Mark Borgerding . All rights reserved.
+
+KISS FFT is provided under:
+
+  SPDX-License-Identifier: BSD-3-Clause
+
+Being under the terms of the BSD 3-clause "New" or "Revised" License,
+according with:
+
+  LICENSES/BSD-3-Clause
+```
 
 ## Support/Feedback
-Contact technical support through our [support page](https://www.mccdaq.com/support/support_form.aspx). 
+Contact technical support through our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
 ## More Information
-- GTK+: https://www.gtk.org/ 
+- GTK+: https://www.gtk.org/
 - GTKDataBox: https://sourceforge.net/projects/gtkdatabox/
-- CodeBlocks: http://www.codeblocks.org/
-- Geany: https://www.geany.org/
