@@ -143,10 +143,26 @@ static int allocate_channel_xy_arrays()
         }
 
         // Free any existing data arrays
-        g_free(graphChannelInfo[chan].X);
-        g_free(graphChannelInfo[chan].Y);
-        g_free(graphChannelInfo[chan].fft_X);
-        g_free(graphChannelInfo[chan].fft_Y);
+        if(graphChannelInfo[chan].X != NULL)
+        {
+            g_free(graphChannelInfo[chan].X);
+            graphChannelInfo[chan].X = NULL;
+        }
+        if(graphChannelInfo[chan].Y != NULL)
+        {
+            g_free(graphChannelInfo[chan].Y);
+            graphChannelInfo[chan].Y = NULL;
+        }
+        if(graphChannelInfo[chan].fft_X != NULL)
+        {
+            g_free(graphChannelInfo[chan].fft_X);
+            graphChannelInfo[chan].fft_X = NULL;
+        }
+        if(graphChannelInfo[chan].fft_Y != NULL)
+        {
+            g_free(graphChannelInfo[chan].fft_Y);
+            graphChannelInfo[chan].fft_Y = NULL;
+        }
 
         // If this channel is in the scan, allocate new arrays
         if (chanMask & 1)
