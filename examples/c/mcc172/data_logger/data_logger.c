@@ -743,7 +743,11 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
               *hboxRate2, *hboxFftSize1, *hboxFftSize2, *hboxLogFile,
               *hboxZoom, *vboxChannel, *vboxLegend, *vboxSensitivity,
               *acqSeparator, *logFileSeparator, *chanSeparator, *endSeparator,
-              *dispSeparator, *dataTable, *fftTable, *btnZoomInY, *btnZoomOutY;
+              *dispSeparator, *dataTable, *fftTable, *btnZoomInY, *btnZoomOutY,
+              *separator;
+    GtkWidget *legend[MAX_172_CHANNELS];
+    GtkDataboxRuler *rulerY, *rulerX;
+    GdkRGBA background_color;
     PangoAttrList *titleAttrs;
     PangoAttribute *bold;
     GtkStyleContext *styleContext;
@@ -838,7 +842,6 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     gtk_container_add(GTK_CONTAINER(hboxChannel), vboxChannel);
     vboxLegend=gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(hboxChannel), vboxLegend);
-    GtkWidget *legend[MAX_172_CHANNELS];
     for (i = 0; i < MAX_172_CHANNELS; i++)
     {
         sprintf(chanName, "Channel %d", i);
@@ -945,7 +948,7 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     // Separators from the configuration controls
     endSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_box_pack_start(GTK_BOX(vboxConfig), endSeparator, FALSE, FALSE, 0);
-    GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
     gtk_container_add(GTK_CONTAINER(hboxMain), separator);
 
     // Add the time domain graph
@@ -957,12 +960,12 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&dataBox,
         &dataTable, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
     gtk_box_pack_start(GTK_BOX(vboxGraph), dataTable, TRUE, TRUE, 10);
-    GtkDataboxRuler* rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(dataBox));
+    rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(dataBox));
     gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
-    GtkDataboxRuler* rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
+    gtk_databox_ruler_set_max_length(rulerY, 7);
+    rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
     gtk_databox_ruler_set_max_length(rulerX, 9);
-    gchar* formatX = "%%.0Lf";
-    gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
+    gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0Lf");
     // Set the default limits
     gtk_databox_ruler_set_range(rulerY, 6.0, -6.0, 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 2048.0, 0.0);
@@ -978,14 +981,13 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(fftBox));
     gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
     rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(fftBox));
-    gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
+    gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0Lf");
     gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
     // Set the default limits
     gtk_databox_ruler_set_range(rulerY, 10.0, -150.0, 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 1024.0, 0.0);
 
     // Set the background color for the graphs
-    GdkRGBA background_color;
     background_color.red = 217.0/255.0;
     background_color.green = 217.0/255.0;
     background_color.blue = 217.0/255.0;
