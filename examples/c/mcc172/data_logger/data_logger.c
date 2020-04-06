@@ -714,8 +714,8 @@ static void sensitivity_changed_handler (GtkWidget* widget, gpointer user_dat)
 // Function to update the Y-Axis range on the Time Domain Plot
 static void set_y_axis_range()
 {
-    GtkDataboxRuler* rulerY;
-    gdouble yMin, yMax;
+    GtkDataboxRuler *rulerY, *rulerX;
+    gdouble yMin, yMax, xMin, xMax, position;
 
     // Get the Y-Axis ruler on the time domain plot
     rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(dataBox));
@@ -724,6 +724,12 @@ static void set_y_axis_range()
     yMax = 6000.0 / g_sensitivity * g_zoom_level;
     // Set the range
     gtk_databox_ruler_set_range(rulerY, yMax, yMin, 0.0);
+
+    rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
+    gtk_databox_ruler_get_range(rulerX, &xMin, &xMax, &position);
+    gtk_databox_set_total_limits(GTK_DATABOX (dataBox), xMin, xMax, yMax, yMin);
+    // Re-draw the graph
+    gtk_widget_queue_draw(dataBox);
 }
 
 // Event handler that is called when the application is launched to create
