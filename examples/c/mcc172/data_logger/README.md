@@ -11,27 +11,22 @@ a strip chart, calculate and display FFT data, and log the data to a CSV file.
 - Monitor connected to the **Raspberry Pi** to configure acquisition options and view acquired data
 
 ## Install the Dependencies
-Install **GTK+**:
+Install required packages: 
   ```sh
-    sudo apt-get install libgtk-3-dev
+  sudo apt install libgtk-3-dev at-spi2-core autoconf libtool
   ```
 Install **GTKDatabox**:
   ```sh
-    cd ~
-    git clone https://github.com/erikd/gtkdatabox.git
-    cd gtkdatabox
-    ./autogen.sh
-    ./configure
-    sudo make install
+  cd ~
+  git clone https://github.com/erikd/gtkdatabox.git
+  cd gtkdatabox
+  ./autogen.sh
+  ./configure
+  sudo make install
   ```
- Install **D-Bus AT-SPI**:
+Run ldconfig after installing the dependencies.
   ```sh
-    sudo apt-get install at-spi2-core
-  ```
-
-> You may need to run ldconfig after installing the dependencies.
-  ```sh
-    sudo ldconfig
+  sudo ldconfig
   ```
 
 ## Running the example
