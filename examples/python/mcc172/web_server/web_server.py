@@ -117,7 +117,7 @@ _app.layout = html.Div([
                 html.Label('Sample Rate (Hz)',
                            style={'font-weight': 'bold', 'display': 'block',
                                   'margin-top': 10}),
-                dcc.Input(id='sampleRate', type='number', max=100000.0,
+                dcc.Input(id='sampleRate', type='number', max=51200.0,
                           step=1, value=1000.0,
                           style={'width': 100, 'display': 'block'}),
                 html.Label('Samples to display',
@@ -149,11 +149,32 @@ _app.layout = html.Div([
                     value=[],
                     style={'width': 130, 'display': 'inline-block'}
                 ),
+                html.Label('Sensor Sensitivity (mV/unit)',
+                           style={'font-weight': 'bold', 'display': 'block',
+                                  'margin-top': 10}),
+                html.Div(id='sensitivityWrapper0', children=[
+                    html.Label('Channel 0: ',
+                               style={'margin-left': 15,
+                                      'display': 'inline-block'}),
+                    dcc.Input(id='sensitivity0', type='number', max=100000.0,
+                              step=1.0, value=1000.0,
+                              style={'width': 100, 'display': 'inline-block',
+                                     'margin': '5px 0px 0px 10px'}),
+                ]),
+                html.Div(id='sensitivityWrapper1', children=[
+                    html.Label('Channel 1: ',
+                               style={'margin-left': 15,
+                                      'display': 'inline-block'}),
+                    dcc.Input(id='sensitivity1', type='number', max=100000.0,
+                              step=1.0, value=1000.0,
+                              style={'width': 100, 'display': 'inline-block',
+                                     'margin': '5px 0px 0px 10px'}),
+                ]),
                 html.Button(
                     children='Configure',
                     id='startStopButton',
                     style={'width': 100, 'height': 35, 'text-align': 'center',
-                           'margin-top': 10}
+                           'margin-top': 20}
                 ),
             ], style={'width': 320, 'box-sizing': 'border-box', 'padding': 10,
                       'position': 'absolute', 'top': 0, 'left': 0}
@@ -314,17 +335,25 @@ def update_timer_interval(acq_state, chart_data_json_str, chart_info_json_str,
 @_app.callback(
     Output('sampleRate', 'value'),
     [Input('status', 'children')],
-    [State('sampleRate', 'value')]
+    [State('sampleRate', 'value'),
+     State('sensitivity0', 'value'),
+     State('sensitivity1', 'value')]
 )
-def update_sample_rate_input(acq_state, sample_rate_val):
+def update_sample_rate_input(acq_state, sample_rate_val, sensitivity0_val,
+                             sensitivity1_val):
     """
     A callback function to set the sample rate input to the
-    actual sample rate when the application status changes to configured.
+    actual sample rate and set the sensory sensitivity values for each channel
+    when the application status changes to configured.
 
     Args:
         acq_state (str): The application state of "idle", "configured",
             "running" or "error" - triggers the callback.
         sample_rate_val (float): The user specified sample rate value.
+        sensitivity0_val (float): The user specified sensor sensitivity for
+            channel 0.
+        sensitivity1_val (float): The user specified sensor sensitivity for
+            channel 1.
 
     Returns:
         float: The actual sample rate used for the acquisition
@@ -334,9 +363,11 @@ def update_sample_rate_input(acq_state, sample_rate_val):
         synced = False
         hat = globals()['_HAT']
         while not synced:
-            (_source_type, actual_scan_rate, synced) = hat.a_in_clock_config_read()
+            (_source, actual_scan_rate, synced) = hat.a_in_clock_config_read()
             if not synced:
                 sleep(0.005)
+        hat.a_in_sensitivity_write(0, sensitivity0_val)
+        hat.a_in_sensitivity_write(1, sensitivity1_val)
 
     return actual_scan_rate
 
@@ -422,6 +453,36 @@ def disable_iepe_checkboxes(acq_state):
             disabled = True
         options.append({'label': label, 'value': channel, 'disabled': disabled})
     return options
+
+
+@_app.callback(
+    Output('sensitivity0', 'disabled'),
+    [Input('status', 'children')]
+)
+def disable_sensitivity0_input(acq_state):
+    """
+    A callback function to disable the sensor sensitivity input for channel 0
+    when the application status changes to configured or running.
+    """
+    disabled = False
+    if acq_state == 'configured' or acq_state == 'running':
+        disabled = True
+    return disabled
+
+
+@_app.callback(
+    Output('sensitivity1', 'disabled'),
+    [Input('status', 'children')]
+)
+def disable_sensitivity1_input(acq_state):
+    """
+    A callback function to disable the sensor sensitivity input for channel 1
+    when the application status changes to configured or running.
+    """
+    disabled = False
+    if acq_state == 'configured' or acq_state == 'running':
+        disabled = True
+    return disabled
 
 
 @_app.callback(
@@ -605,7 +666,7 @@ def update_strip_chart(chart_data_json_str, active_channels):
         'data': plot_data,
         'layout': go.Layout(
             xaxis=dict(title='Samples', range=xaxis_range),
-            yaxis=dict(title='Voltage'),
+            yaxis=dict(title='Sensor Units'),
             margin={'l': 40, 'r': 40, 't': 50, 'b': 40, 'pad': 0},
             showlegend=True,
             title='Strip Chart'
