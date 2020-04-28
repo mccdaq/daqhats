@@ -12,6 +12,6 @@ char* choose_log_file(GtkWidget *parent_window, char* default_file_name);
 FILE* open_log_file (char* filename);
 int write_log_file(FILE* log_file_ptr, double* read_buf,
     int numberOfSamplesPerChannel, int numberOfChannels);
-int init_log_file(FILE* log_file_ptr);
+int init_log_file(FILE* log_file_ptr, uint8_t chanMask, int max_channels);
 
 #endif // LOG_FILE_H_INCLUDED

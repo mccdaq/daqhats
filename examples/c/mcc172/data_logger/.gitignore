@@ -1,6 +1,5 @@
 bin/*
 obj/*
-log_files/*
 *.cbp
 *.depend
 *.layout

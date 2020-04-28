@@ -23,7 +23,7 @@ gboolean show_error(int* error_code_ptr)
         switch (error_code)
         {
             case NO_HAT_DEVICES_FOUND:
-                error_msg = "No MCC 172 Hat devices were found.";
+                error_msg = "No MCC Hat devices were found.";
                 break;
             case HW_OVERRUN:
                 error_msg = "Hardware overrun has occurred.";
@@ -39,6 +39,15 @@ gboolean show_error(int* error_code_ptr)
                 break;
             case THREAD_ERROR:
                 error_msg = "Error creating worker thread.";
+                break;
+            case OPEN_TC_ERROR:
+                error_msg = "Open thermocouple detected.";
+                break;
+            case OVERRANGE_TC_ERROR:
+                error_msg = "Thermocouple voltage outside the valid range.";
+                break;
+            case COMMON_MODE_TC_ERROR:
+                error_msg = "Thermocouple voltage outside the common-mode range.";
                 break;
             case UNKNOWN_ERROR:
             default:

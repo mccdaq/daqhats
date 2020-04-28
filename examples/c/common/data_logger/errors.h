@@ -6,6 +6,9 @@
 #define UNABLE_TO_OPEN_FILE         -101
 #define MAXIMUM_FILE_SIZE_EXCEEDED  -102
 #define THREAD_ERROR                -103
+#define OPEN_TC_ERROR               -104
+#define OVERRANGE_TC_ERROR          -105
+#define COMMON_MODE_TC_ERROR        -106
 #define UNKNOWN_ERROR               -999
 
 // Status errors
