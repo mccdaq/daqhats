@@ -49,8 +49,8 @@ class ControlApp:
 
         # Get list of MCC 118 devices for the device list widget
         self.addr_list = self.list_devices()
-
-        if not self.addr_list == 0:
+        
+        if not self.addr_list:
             self.device_lister = tkinter.Label(self.top_frame, text="None found")
             self.open_button.config(state=tkinter.DISABLED)
         else:
