@@ -32,9 +32,9 @@ Run ldconfig after installing the dependencies.
 ## Running the example
 To run the example, enter the following commands:
   ```sh
-    cd ~/daqhats/examples/c/mcc134/data_logger
+    cd ~/daqhats/examples/c/mcc134/data_logger/logger
     make
-    ./data_logger
+    ./logger
   ```
 
 This example uses the Kiss FFT library (already included, but see

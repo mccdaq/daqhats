@@ -3,7 +3,7 @@
 
 #include <sys/stat.h>
 #include <string.h>
-#include "data_logger.h"
+#include "logger.h"
 
 FILE* log_file_ptr;
 char csv_filename[512];

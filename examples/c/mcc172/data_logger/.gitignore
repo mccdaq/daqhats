@@ -1,3 +1,4 @@
+LogFiles/*
 bin/*
 obj/*
 *.cbp

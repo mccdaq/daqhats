@@ -1,8 +1,7 @@
 #include <string.h>
 #include <glib.h>
-#include "data_logger.h"
-#include "errors.h"
 #include "log_file.h"
+#include "errors.h"
 
 // Function Prototypes
 static void get_path_and_filename(char* full_path, char* path, char* filename);

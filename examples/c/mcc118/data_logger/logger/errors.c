@@ -1,5 +1,5 @@
 #include <pthread.h>
-#include "data_logger.h"
+#include "logger.h"
 #include "errors.h"
 
 // Global Variables
