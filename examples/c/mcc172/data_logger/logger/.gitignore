@@ -1,0 +1,3 @@
+LogFiles/*
+*.o
+logger
