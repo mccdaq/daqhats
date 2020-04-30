@@ -1,6 +1,0 @@
-LogFiles/*
-bin/*
-obj/*
-*.cbp
-*.depend
-*.layout
