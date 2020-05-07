@@ -1,619 +1,703 @@
+#include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
-#include <math.h>
+#include <gtkdatabox.h>
+#include <gtkdatabox_util.h>
+#include <gtkdatabox_lines.h>
 
+#include "log_file.h"
+#include "errors.h"
 #include "logger.h"
+
+#define MAX_CHANNELS 4  // MCC134 Channel Count
+
+// Global Variables
+uint8_t g_hat_addr = 0;
+uint8_t g_chan_mask;
+int g_num_samples = 50;
+double g_zoom_level = 1.0;
+double g_sample_rate = 1.0;
+uint32_t g_sample_count = 0;
+gboolean g_done = TRUE;
+gboolean g_continuous = TRUE;
+const char *colors[8] = {"#DD3222", "#3482CB", "#75B54A", "#9966ff",
+                         "#FFC000", "#FF6A00", "#808080", "#6E1911"};
+GtkWidget *labelFile, *dataBox, *rbContinuous, *rbFinite, *spinRate,
+          *spinNumSamples, *btnSelectLogFile, *chkChan[MAX_CHANNELS],
+          *btnStart_Stop, *comboRateUnits, *comboTcType[MAX_CHANNELS];
+GMutex data_mutex;
+pthread_t threadh;
+guint g_timeout;
+pthread_mutex_t allocate_arrays_mutex;
+pthread_cond_t allocate_arrays_cond;
+pthread_mutex_t timer_mutex;
+pthread_cond_t timer_cond;
+typedef struct graph_channel_info
+{
+    GtkDataboxGraph*    graph;
+    GdkRGBA*            color;
+    uint                channelNumber;
+    gfloat*             X;
+    gfloat*             Y;
+    gint                buffSize;
+} GraphChannelInfo;
+GraphChannelInfo graphChannelInfo[MAX_CHANNELS];
+
+// Function Prototypes
+static int open_first_hat_device(uint8_t* hat_address);
+static void app_activate_handler(GtkApplication *app, gpointer user_data);
+static gboolean stop_scan(void);
 
 
 int main(void)
 {
     int retval = 0;
+    int i = 0;
     GtkApplication *app;
-
-    // Set the application name.
-    strcpy(application_name, "MCC 134 Data Logger");
+    GdkRGBA legendColor[MAX_CHANNELS];
 
     // Set the default filename.
     getcwd(csv_filename, sizeof(csv_filename));
-    strcat(csv_filename, "/LogFiles/csv_test.csv");
+    strcat(csv_filename, "/LogFiles/data.csv");
 
-    initialize_graph_channel_info();
+    // Initialize channel info array
+    for (i=0; i< MAX_CHANNELS; i++)
+    {
+        gdk_rgba_parse (&legendColor[i], colors[i]);
+        graphChannelInfo[i].color = &legendColor[i];
+        graphChannelInfo[i].channelNumber = i;
+    }
 
-    // Create the application structure and set
-    // an event handler for the activate event.
-    app = gtk_application_new("org.mcc.example", G_APPLICATION_FLAGS_NONE);
-
-    gtk_application_new("org.mcc.example", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(activate_event_handler),
-        NULL);
+    // Create the application structure and set the activate event handler.
+    app = gtk_application_new("mcc134.dataLogger", G_APPLICATION_FLAGS_NONE);
+    g_signal_connect(app, "activate", G_CALLBACK(app_activate_handler), NULL);
 
     // Start running the GTK appliction.
     g_application_run(G_APPLICATION(app), 0, NULL);
     g_object_unref(app);
 
     // Find the hat devices and open the first one.
-    retval = open_first_hat_device(&address);
+    retval = open_first_hat_device(&g_hat_addr);
 
     if (retval == 0)
     {
-        error_context = g_main_context_default();
+        context = g_main_context_default();
 
         // Start the GTK message loop.
         gtk_main();
 
         // Close the device.
-        mcc134_close(address);
+        mcc134_close(g_hat_addr);
     }
 
-    //Exit app...
     return 0;
 }
 
-
 // Allocate arrays for the indices and data for each channel in the scan.
-void allocate_channel_xy_arrays(int channel, int numSamplesPerChannel)
+static gboolean allocate_channel_xy_arrays(int *channel)
 {
-    // Create the new arrays for the current channels in the scan
-    graphChannelInfo[channel].X = g_new0 (gfloat, numSamplesPerChannel);
+    int chan = *channel;
+    int buff_size = 0;
 
-    graphChannelInfo[channel].Y = g_new0 (gfloat, numSamplesPerChannel);
+    pthread_mutex_lock(&allocate_arrays_mutex);
+
+    buff_size = g_sample_count < g_num_samples? g_sample_count : g_num_samples;
+
+    // Delete the previous array for each the channel (if it exists)
+    if (graphChannelInfo[chan].graph != NULL)
+    {
+        gtk_databox_graph_remove (GTK_DATABOX(dataBox),
+            GTK_DATABOX_GRAPH(graphChannelInfo[chan].graph));
+        graphChannelInfo[chan].graph= NULL;
+    }
+
+    // Free any existing data arrays
+    if(graphChannelInfo[chan].X != NULL)
+    {
+        g_free(graphChannelInfo[chan].X);
+        graphChannelInfo[chan].X = NULL;
+    }
+    if(graphChannelInfo[chan].Y != NULL)
+    {
+        g_free(graphChannelInfo[chan].Y);
+        graphChannelInfo[chan].Y = NULL;
+    }
+
+    // Allocate arrays for graph data and initialize to zero
+    graphChannelInfo[chan].Y = g_new0(gfloat, buff_size);
+    graphChannelInfo[chan].X = g_new0(gfloat, buff_size);
+    graphChannelInfo[chan].buffSize = buff_size;
+
+    if(buff_size > 0)
+    {
+        graphChannelInfo[chan].graph = gtk_databox_lines_new
+            ((guint)buff_size, graphChannelInfo[chan].X,
+            graphChannelInfo[chan].Y,
+            graphChannelInfo[chan].color, 1);
+        gtk_databox_graph_add(GTK_DATABOX (dataBox),
+            GTK_DATABOX_GRAPH(graphChannelInfo[chan].graph));
+    }
+
+    pthread_cond_signal(&allocate_arrays_cond);
+    pthread_mutex_unlock(&allocate_arrays_mutex);
+
+    return FALSE;
 }
 
+// Add each checked channel to the channel mask
+static int create_selected_channel_mask()
+{
+    gboolean checked = FALSE;
+    int selected_channel_mask = 0;
+    int i = 0;
+
+    for (i = 0; i < MAX_CHANNELS; i++)
+    {
+        // Is the channel checked?
+        checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chkChan[i]));
+
+        // If checked, add the channel to the mask
+        if (checked == TRUE)
+        {
+            selected_channel_mask |= 1<<i;
+        }
+    }
+
+    // return the channel mask
+    return selected_channel_mask;
+}
 
 // Enable/disable the controls in the main window.
-// Controls are disabled when the application is running
-// and re-enabled when the application is stopped.
-void set_enable_state_for_controls(gboolean state)
+// Controls are disabled when the acquisition is running
+// and re-enabled when the acquisition is stopped.
+static void set_enable_state_for_controls(gboolean state)
 {
-    gboolean checked_status = FALSE;
-    int i;
-    
-    // Set the state of the check boxes and CJC combo boxex
-    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
+    int i = 0;
+
+    for (i = 0; i < MAX_CHANNELS; i++)
     {
         gtk_widget_set_sensitive (chkChan[i], state);
+        gtk_widget_set_sensitive(comboTcType[i], state);
+    }
+    gtk_widget_set_sensitive (spinRate, state);
+    gtk_widget_set_sensitive (comboRateUnits, state);
+    gtk_widget_set_sensitive (spinNumSamples, state);
+    gtk_widget_set_sensitive (btnSelectLogFile, state);
+}
 
-        if (state == FALSE)
+// Copy data from the hat read buffer to the display buffer
+static void copy_hat_data_to_display_buffer(double* hat_read_buf,
+                                            int samples_per_chan_read,
+                                            double* display_buf, int num_chans)
+{
+    size_t copy_size = 0;
+    int samples_to_keep = 0;
+    int start_idx = 0;
+    int samples_per_chan_displayed = g_sample_count >= g_num_samples ?
+                                     g_num_samples : g_sample_count;
+
+    if (samples_per_chan_read > 0) {
+        // There are samples to be copied
+        if((samples_per_chan_displayed + samples_per_chan_read)
+           <= g_num_samples)
         {
-            // If the channel is being disabled, then disable its CJC combo box.
-            gtk_widget_set_sensitive (comboTcType[i], FALSE);
+            // The display buffer is not full yet
+            copy_size = samples_per_chan_read * num_chans * sizeof(double);
+            memcpy(&display_buf[samples_per_chan_displayed * num_chans],
+                   hat_read_buf, copy_size);
+            g_sample_count += samples_per_chan_read;
+        }
+        else {
+            // The display buffer is full and the values must first be shifted.
+            samples_to_keep = g_num_samples - samples_per_chan_read;
+            copy_size = samples_to_keep * num_chans * sizeof(double);
+            start_idx = ((samples_per_chan_displayed - samples_to_keep)
+                         * num_chans);
+            memcpy(display_buf, &display_buf[start_idx], copy_size);
+            samples_per_chan_displayed = samples_to_keep;
+
+            copy_size = samples_per_chan_read * num_chans * sizeof(double);
+            memcpy(&display_buf[samples_per_chan_displayed * num_chans],
+                   hat_read_buf, copy_size);
+            g_sample_count += samples_per_chan_read;
+        }
+    }
+
+    return;
+}
+
+// Copy the data for the specified channel from the interleaved
+// HAT buffer to the array for the specified channel.
+static void copy_data_to_xy_arrays(double* display_buf,
+                                   int read_buf_start_index, int channel,
+                                   int stride, uint32_t start_sample)
+{
+    uint32_t sample = start_sample;
+    uint32_t data_array_idx = 0;
+    int i = read_buf_start_index;
+
+    if(graphChannelInfo[channel].buffSize < g_num_samples)
+    {
+        pthread_mutex_lock(&allocate_arrays_mutex);
+        g_main_context_invoke(context, (GSourceFunc)allocate_channel_xy_arrays,
+                              &channel);
+        pthread_cond_wait(&allocate_arrays_cond, &allocate_arrays_mutex);
+        pthread_mutex_unlock(&allocate_arrays_mutex);
+    }
+
+    // Set indices and data
+    for (sample = start_sample; sample < g_sample_count; sample++)
+    {
+        graphChannelInfo[channel].X[data_array_idx] = (gfloat)sample;
+        graphChannelInfo[channel].Y[data_array_idx] = (gfloat)display_buf[i];
+        data_array_idx++;
+        i+=stride;
+    }
+}
+
+// Refresh the graph with the new data.
+static gboolean refresh_graph()
+{
+    int start_sample = 0;
+    int i = 0;
+    uint8_t chanMask = g_chan_mask;
+    int channel = 0;
+    gboolean first_chan = TRUE;
+    gdouble yMin = 0.0;
+    gdouble yMax = 100.0;
+    gdouble yMid = 50.0;
+    gdouble yRange = 100.0;
+    gfloat start, end;
+
+    g_mutex_lock (&data_mutex);
+
+    start_sample = g_sample_count >= g_num_samples ?
+            (g_sample_count - g_num_samples) : 0;
+
+    // Set the new limits on the time domain graph
+    start = (gfloat)start_sample;
+    end = (gfloat)(start_sample + g_num_samples - 1);
+
+    // Auto-scale Y-Axis
+    if(g_sample_count > 0)
+    {
+        while (chanMask > 0)
+        {
+            if (chanMask & 1)
+            {
+                if(first_chan)
+                {
+                    yMin = graphChannelInfo[channel].Y[0];
+                    yMax = graphChannelInfo[channel].Y[0];
+                    first_chan = FALSE;
+                }
+                for(i=0; i<graphChannelInfo[channel].buffSize; i++)
+                {
+                    if(graphChannelInfo[channel].Y[i] < yMin)
+                    {
+                        yMin = graphChannelInfo[channel].Y[i];
+                    }
+                    if(graphChannelInfo[channel].Y[i] > yMax)
+                    {
+                        yMax = graphChannelInfo[channel].Y[i];
+                    }
+                }
+            }
+            channel++;
+            chanMask >>= 1;
+        }
+        if(yMin == yMax)
+        {
+            yRange = 0.1;
         }
         else
         {
-            // Channel check boxes are being enabled.  If the channel
-            // is checked, enable the CJC combo box; otherwise, disable
-            // the CJC combo box
-            checked_status = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chkChan[i]));
-            if (checked_status == TRUE)
-                gtk_widget_set_sensitive (comboTcType[i], TRUE);
-            else
-                gtk_widget_set_sensitive (comboTcType[i],FALSE);
+            yRange = (yMax - yMin) / 0.8;
         }
+        yMid = (yMax + yMin) / 2.0;
+        yRange *= g_zoom_level;
+        yMin = yMid - (yRange / 2.0);
+        yMax = yMid + (yRange / 2.0);
 
+        gtk_databox_set_total_limits(GTK_DATABOX (dataBox), start, end, yMax, yMin);
+
+        // Re-draw the graphs
+        gtk_widget_queue_draw(dataBox);
     }
 
-    // Set the state of the text boxes
-    gtk_widget_set_sensitive (spinRate, state);
-    gtk_widget_set_sensitive (comboReadIntervalUnits, state);
-    gtk_widget_set_sensitive (spinNumSamples, state);
+    // release the mutex
+    g_mutex_unlock (&data_mutex);
 
-    // Set the state of the buttons
-    gtk_widget_set_sensitive (btnSelectLogFile, state);
-    gtk_widget_set_sensitive (btnQuit, state);
-
+    return FALSE;
 }
 
-
-// Copy X anf Y data to the left by one sample to make room at the end
-// of the arrays the the next sample.
-void copy_xy_arrays(int channel, int num_samples_to_copy)
+// While the scan is running, read the data, write it to a
+// CSV file, and plot it in the graph.
+// This function runs as a background thread for the duration of the scan.
+static void* read_and_display_data ()
 {
-    // Get the array pointers.
-    gfloat* X = graphChannelInfo[channel].X;
-    gfloat* Y = graphChannelInfo[channel].Y;
-
-    int i;
-    // Copy each sample and index to the previous sample location.
-    for (i = 0; i < num_samples_to_copy; i++)
-    {
-        X[i] = X[i+1];
-        Y[i] = Y[i+1];
-    }
-}
-
-
-// Refresh the graph with the new data.
-void refresh_graph(GtkWidget *box)
-{
-    gfloat min_x, max_x, min_y, max_y;
-
-    // Check if the Stop button has been pressed.
-    if (done == TRUE)
-        return;
-
-    // We need at least 2 samples to be able to draw a line in the graph.
-    if (total_samples_read < 2)
-        return;
-
-    // Get the min and max values for the X anf Y arrays.
-    gtk_databox_calculate_extrema(GTK_DATABOX(box), &min_x, &max_x, &min_y, &max_y);
-
-    int num_grid_lines = total_samples_read - 2;
-    int num_ticks = max_x - min_x + 1;
-    num_ticks = (num_ticks < 9) ? num_ticks : 9;
-
-    if (num_grid_lines > 0)
-    {
-        // Remove the old grid from the graph.
-        gtk_databox_graph_remove(GTK_DATABOX (box), grid_x);
-
-        // Clip the number of grid lines
-        if (num_grid_lines > 9)
-            num_grid_lines = 9;
-
-        // Create a new grid with the current number of grid lines and add
-        // it to the graph.
-        GdkRGBA grid_color;
-        grid_color.red = 0;
-        grid_color.green = 0;
-        grid_color.blue = 0;
-        grid_color.alpha = 0.3;
-        grid_x = (GtkDataboxGraph*)gtk_databox_grid_new(7, num_grid_lines, &grid_color, 1);
-        gtk_databox_graph_add(GTK_DATABOX (box), GTK_DATABOX_GRAPH(grid_x));
-
-        // Set the number of ticks in the ruler for the X axis.
-        GtkDataboxRuler* rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(box));
-        gtk_databox_ruler_set_manual_tick_cnt(rulerX, num_ticks);
-
-        // Set the first tick value.
-        gfloat tv = min_x;
-
-        // Calculate the increment between tick values by dividing
-        // the X axis range by the number of ticks.
-        gfloat inc = (max_x - min_x + 1) / num_ticks;
-
-        // Calculate the values for the tick marks.
-        gfloat* tick_values = g_new0(gfloat, num_ticks);
-        int i;
-        for (i=0; i<num_ticks; i++)
-        {
-            tick_values[i] = tv;
-            tv += inc;
-        }
-
-        // St the ruler with the new tick marks.
-        gtk_databox_ruler_set_manual_ticks(rulerX, tick_values);
-    }
-
-    // Set the X and Y limits for auto scaling.
-    gtk_databox_set_total_limits(GTK_DATABOX (box), min_x, max_x,
-        max_y+0.1, min_y-0.1);
-
-    // Tell the graph to update
-    gtk_widget_queue_draw(box);
-}
-
-
-// Timer function to read data asynchronously from the MCC134.  It reads
-// a value for each channel, stores the values to a CSV file, and the plots
-// the values in the graph.
-static gboolean read_data(gpointer data)
-{
-    uint8_t chan_mask = channel_mask;
+    int chanMask = g_chan_mask;
     int channel = 0;
-    int number_of_channels = 0;
-    int buffer_index = 0;
     int retval = 0;
+    int start_sample = 0;
+    int num_channels = 0;
+    int fail_count = 0;
+    int read_buf_index = 0;
+    uint32_t display_buf_size_samples;
+    double temp_val = 0.0;
+    double hat_read_buf[MAX_CHANNELS] = {0};
+    double *display_buf = NULL;
 
-    // Read the data for each channel that is enabled.
-    while (chan_mask != 0)
+    // Reset the sample count
+    g_sample_count = 0;
+
+    // Get the channel count
+    chanMask = g_chan_mask;
+    while (chanMask > 0)
     {
-        if (chan_mask & 1)
+        if (chanMask & 1)
         {
-            retval = mcc134_t_in_read(address, channel, &data_buffer[buffer_index++]);
-            number_of_channels++;
+            num_channels++;
         }
-
+        graphChannelInfo[channel].buffSize = 0;
         channel++;
-        chan_mask >>= 1;
+        chanMask >>= 1;
     }
 
-    // Increment the number of samples read for each channel.
-    total_samples_read++;
-
-    // Write the data to a log file as CSV data.
-    retval = write_log_file(log_file_ptr, data_buffer, 1, number_of_channels);
+    // Write channel numbers to file header
+    retval = init_log_file(log_file_ptr, g_chan_mask, MAX_CHANNELS);
     if (retval < 0)
     {
-        int error_code;
-        switch (retval)
-        {
-            case -1:
-                error_code = MAXIMUM_FILE_SIZE_EXCEEDED;
-                break;
-
-            default:
-                error_code = UNKNOWN_ERROR;
-                break;
-        }
-
-        // Error dialog must be displayed on the main thread.
-        g_main_context_invoke(context,
-            (GSourceFunc)show_mcc134_error_main_thread, &error_code);
-
-        // Call the Start?Stop event handler to reset the UI
-        start_stop_event_handler(btnStart_Stop, NULL);
-
-        done = TRUE;
+        g_done = TRUE;
+        set_enable_state_for_controls(TRUE);
+        return NULL;
     }
 
+    display_buf_size_samples = g_num_samples * num_channels;
+    display_buf = (double*)malloc(display_buf_size_samples * sizeof(double));
+    memset(display_buf, 0, display_buf_size_samples * sizeof(double));
 
-    chan_mask = channel_mask;
-    channel = 0;
-    int read_buf_index = 0;
-
-    // While there are channels to plot.
-    while (chan_mask > 0)
+    // Loop to read data continuously
+    while (g_done != TRUE)
     {
-        // If this channel is included in the acquisition, plot its data.
-        if (chan_mask & 1)
-        {
-            // If the display is not full, then add a sample to the end of the
-            // array; otherwise, move each samle left 1 spot and add the new
-            // sample at the end of the array.
-            if (total_samples_read <= numSamplesToDisplay)
-            {
-                // Display is not full, so just add a sample to the end.
+        chanMask = g_chan_mask;
+        channel = 0;
+        fail_count = 0;
+        read_buf_index = 0;
 
-                // Remove the old plot for the current channel.
-                if (graphChannelInfo[channel].graph != NULL)
+        // While there are channels to plot.
+        while (chanMask > 0)
+        {
+            // If this channel is included in the acquisition,
+            // read a value and add it to the plot.
+            if (chanMask & 1)
+            {
+                retval = mcc134_t_in_read(g_hat_addr, channel, &temp_val);
+                if(retval == RESULT_SUCCESS)
                 {
-                    gtk_databox_graph_remove(GTK_DATABOX (box),
-                        graphChannelInfo[channel].graph);
+                    if(temp_val == OPEN_TC_VALUE)
+                    {
+                        retval = OPEN_TC_ERROR;
+                    }
+                    else if(temp_val == OVERRANGE_TC_VALUE)
+                    {
+                        retval = OVERRANGE_TC_ERROR;
+                    }
+                    else if(temp_val == COMMON_MODE_TC_VALUE)
+                    {
+                        retval = COMMON_MODE_TC_ERROR;
+                    }
                 }
 
-                // Get the X and Y arrays.
-                gfloat* X = graphChannelInfo[channel].X;
-                gfloat* Y = graphChannelInfo[channel].Y;
+                if(retval != RESULT_SUCCESS)
+                {
+                    show_error_in_main_thread(retval);
+                    // Call the Start/Stop event handler to reset the UI
+                    g_main_context_invoke(context, (GSourceFunc)stop_scan,
+                                          NULL);
+                    fail_count++;
+                }
 
-                // Add a sample to the end.
-                X[total_samples_read-1] = total_samples_read - 1;
-                Y[total_samples_read-1] = (gfloat)data_buffer[read_buf_index];
-
-                // Create a new plot for the samples.
-                graphChannelInfo[channel].graph = gtk_databox_lines_new
-                    ((guint)total_samples_read, X, Y,
-                    graphChannelInfo[channel].color, 2);
-
-                // Add the plot for the current channel to the graph.
-                gtk_databox_graph_add(GTK_DATABOX (box),
-                    GTK_DATABOX_GRAPH(graphChannelInfo[channel].graph));
+                hat_read_buf[read_buf_index++] = temp_val;
             }
-            else
-            {
-                // Display is full, move each sample to the left by one position anofd
-                // add a new sample to the end of the array.
-
-                // Since the size of the plots has not changed (ie the display is full),
-                // reuse the plots from the previous interation.
-
-                // Move sample left by 1 position.
-                copy_xy_arrays(channel, numSamplesToDisplay-1);
-
-                // Get the X and Y arrays.
-                gfloat* X = graphChannelInfo[channel].X;
-                gfloat* Y = graphChannelInfo[channel].Y;
-
-                // Add the current sample and index to the end of the arrays.
-                X[numSamplesToDisplay-1] = total_samples_read - 1;
-                Y[numSamplesToDisplay-1] = (gfloat)data_buffer[read_buf_index];
-            }
-
-            // Increment the index to the sample for the next channel.
-            read_buf_index++;
+            channel++;
+            chanMask >>= 1;
         }
-        channel++;
-        chan_mask >>= 1;
+
+        if(fail_count == 0)
+        {
+            // Write the data to a log file as CSV data
+            retval = write_log_file(log_file_ptr, hat_read_buf, 1,
+                                    num_channels);
+            if (retval < 0)
+            {
+                // Call the Start/Stop event handler to reset the UI
+                g_main_context_invoke(context, (GSourceFunc)stop_scan, NULL);
+            }
+
+            copy_hat_data_to_display_buffer(hat_read_buf, 1, display_buf,
+                                            num_channels);
+
+            // Set a mutex to prevent the data from changing while we plot it
+            g_mutex_lock (&data_mutex);
+
+            chanMask = g_chan_mask;
+            channel = 0;
+            read_buf_index = 0;
+
+            start_sample = g_sample_count >= g_num_samples ?
+                            (g_sample_count - g_num_samples) : 0;
+            // While there are channels to plot.
+            while (chanMask > 0)
+            {
+                // If this channel is included in the acquisition,
+                // plot its data.
+                if (chanMask & 1)
+                {
+                    copy_data_to_xy_arrays(display_buf, read_buf_index++,
+                        channel, num_channels, start_sample);
+                }
+                channel++;
+                chanMask >>= 1;
+            }
+
+            // Update the display.
+            g_main_context_invoke(context, (GSourceFunc)refresh_graph, NULL);
+
+            // Release the mutex
+            g_mutex_unlock(&data_mutex);
+        }
+
+        // Wait for the timer signal
+        pthread_mutex_lock(&timer_mutex);
+        pthread_cond_wait(&timer_cond, &timer_mutex);
+        pthread_mutex_unlock(&timer_mutex);
     }
 
-    // Update the display.
-    refresh_graph(box);
-
-    // return FALSE to have the timer call this function again, or
-    // return TRUE to stop calling this function
-    if (done == FALSE)
-        return TRUE;
-    else
-        return FALSE;
+    free(display_buf);
+    return NULL;
 }
 
+// This is a timer function to signal to the worker thread to get a new input
+// value at the specified time interval.
+static gboolean read_timer (gpointer data)
+{
+    // Send the timer signal to the worker thread
+    pthread_mutex_unlock(&timer_mutex);
+    pthread_cond_signal(&timer_cond);
+    pthread_mutex_unlock(&timer_mutex);
+    if(g_done)
+    {
+        return FALSE;
+    }
+    return TRUE;
+}
 
 // Event handler for the Start/Stop button.
-//
-// If starting, change the button text to "Stop" and parse
-// the UI settings before starting the acquisition.
-// If stopping, change the button text
-// to "Start" and stop the acquisition.
-void start_stop_event_handler(GtkWidget *widget, gpointer data)
+// If starting, change the button text to "Stop" and start the acquisition.
+// If stopping, change the button text to "Start" and stop the acquisition.
+static void start_stop_event_handler(GtkWidget *widget, gpointer data)
 {
-    const gchar* StartStopBtnLbl = gtk_button_get_label(GTK_BUTTON(widget));
-    uint32_t read_interval_seconds = 0;
+    int retval = 0;
+    int unit_index = 0;
+    int tc_type_index = 0;
+    int i = 0;
+    const gchar* StartStopBtnLbl;
+    struct thread_info *tinfo;
 
-    total_samples_read = 0;
+    StartStopBtnLbl = gtk_button_get_label(GTK_BUTTON(widget));
 
     if (strcmp(StartStopBtnLbl , "Start") == 0)
     {
-        done =  FALSE;
-
-        // Open the log file.
-        log_file_ptr = open_log_file(csv_filename);
-
-        if (log_file_ptr == NULL)
-        {
-            show_mcc134_error(UNABLE_TO_OPEN_FILE);
-            done = TRUE;
-            return;
-        }
-
-        // Write channel numbers to file header
-        init_log_file(log_file_ptr, channel_mask);
-
-        // Disable the controls while acquiring data.
         set_enable_state_for_controls(FALSE);
+
+        // Set variables based on the UI settings.
+        g_chan_mask = create_selected_channel_mask();
 
         // Change the label on the start button to "Stop".
         gtk_button_set_label(GTK_BUTTON(widget), "Stop");
 
-        // Get the number of samles to be displayed.
-        numSamplesToDisplay = gtk_spin_button_get_value_as_int(
-            GTK_SPIN_BUTTON(spinNumSamples));
-        int i;
-        for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
-        {
-            if (graphChannelInfo[i].graph != NULL)
-            {
-                gtk_databox_graph_remove (GTK_DATABOX(box),
-                    graphChannelInfo[i].graph);
-                graphChannelInfo[i].graph = NULL;
-            }
-        }
+        g_done = FALSE;
 
-        // Allocate arrays for the indices and data
-        // for each channel in the scan.
-
-        int channel = 0;
-        int chan_mask = channel_mask;
-        while (chan_mask != 0)
-        {
-            if (chan_mask & 1)
-            {
-                allocate_channel_xy_arrays(channel, numSamplesToDisplay);
-            }
-
-            channel++;
-            chan_mask >>= 1;
-        }
-
-        // Get how often to read a channel.
-        ratePerChannel =  gtk_spin_button_get_value_as_int(
-            GTK_SPIN_BUTTON(spinRate));
-
+        g_num_samples = gtk_spin_button_get_value(
+                            GTK_SPIN_BUTTON(spinNumSamples));
+        g_sample_rate = gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinRate));
         // Get the units for how often to read a channel.
-        rateUnits = gtk_combo_box_get_active (GTK_COMBO_BOX(comboReadIntervalUnits));
+        unit_index = gtk_combo_box_get_active (GTK_COMBO_BOX(comboRateUnits));
 
         // Calculate the number of seconds between reads of a channel.
-        switch (rateUnits)
+        switch (unit_index)
         {
             // Seconds
+            default:
             case 0:
-                read_interval_seconds = (uint32_t)ratePerChannel;
                 break;
-
             // Minutes
             case 1:
-                read_interval_seconds = (uint32_t)ratePerChannel * 60;
+                g_sample_rate *= 60;
                 break;
-
             // Hours
             case 2:
-                read_interval_seconds = (uint32_t)ratePerChannel * 60 * 60;
+                g_sample_rate *= 60 * 60;
                 break;
-
             // Days
             case 3:
-                read_interval_seconds = (uint32_t)ratePerChannel * 60 * 60 * 24;
+                g_sample_rate *= 60 * 60 * 24;
                 break;
         }
 
-        context = g_main_context_default();
-
-        // Set the TC type for each active channel.
-        chan_mask = channel_mask;
-        channel = 0;
-        while (chan_mask != 0)
+        // Set the TC type for each channel
+        for(i=0; i<MAX_CHANNELS; i++)
         {
-            // Enable the channel for reading by setting read_dataits TC type.
-            if (chan_mask & 1)
+            tc_type_index = gtk_combo_box_get_active(
+                                GTK_COMBO_BOX(comboTcType[i]));
+            retval = mcc134_tc_type_write(g_hat_addr, i, tc_type_index);
+            if(retval != RESULT_SUCCESS)
             {
-                mcc134_tc_type_write(address, channel, selected_tc_type[channel]);
+                show_error(&retval);
+                g_done = TRUE;
+                set_enable_state_for_controls(TRUE);
+                return;
             }
-
-            channel++;;
-            chan_mask >>= 1;
         }
 
-        // Read the first sample immediately
-        read_data(NULL);
+        // Open the log file.
+        log_file_ptr = open_log_file(csv_filename);
+        if (log_file_ptr == NULL)
+        {
+            retval = UNABLE_TO_OPEN_FILE;
+            show_error(&retval);
+            g_done = TRUE;
+            set_enable_state_for_controls(TRUE);
+            return;
+        }
 
-        // Start the timer thread to read the data.
-        g_timeout_add_seconds (read_interval_seconds, read_data, NULL);
+        // Start a thread to read the data from the device
+        retval = pthread_create(&threadh, NULL, &read_and_display_data,
+                                &tinfo);
+        if(retval != RESULT_SUCCESS)
+        {
+            retval = THREAD_ERROR;
+            show_error(&retval);
+            gtk_button_set_label(GTK_BUTTON(btnStart_Stop), "Start");
+            set_enable_state_for_controls(TRUE);
+            g_done = TRUE;
+        }
+        else
+        {
+            // Start the timer
+            g_timeout = g_timeout_add_seconds((guint)g_sample_rate,
+                                              read_timer, NULL);
+        }
     }
     else
     {
+        // Set the done flag, stop the timer and
+        // wait for the worker thread to complete.
+        g_done = TRUE;
+        g_source_remove(g_timeout);
+        pthread_mutex_unlock(&timer_mutex);
+        pthread_cond_signal(&timer_cond);
+        pthread_mutex_unlock(&timer_mutex);
+        pthread_join(threadh, NULL);
+
         set_enable_state_for_controls(TRUE);
-
-        // Change the label on the stop button to "Start".current
+        // Change the label on the stop button to "Start"
         gtk_button_set_label(GTK_BUTTON(widget), "Start");
-
-        done = TRUE;
     }
+
+    return;
 }
 
-
-// Event handler for the Channel check box.
-//
-// Enable/disable controls associated with the channel.
-void channel_button_clicked(GtkWidget* widget, gpointer user_data)
+// A function to stop the acquisisiont that can be invoked
+// from the worker thread
+static gboolean stop_scan()
 {
-    int i = (int)user_data;
-    int checked = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    // Simulate a stop button press
+    start_stop_event_handler(btnStart_Stop, NULL);
 
-    if (checked == TRUE)
-    {
-        // Add the channel to the mask and enable the channel's TC control.
-        channel_mask += (int)pow(2,i);
-        gtk_widget_set_sensitive (comboTcType[i], TRUE);
-    }
-    else
-    {
-        // Remove the channel from the mask and disable the channel's TC control.
-        channel_mask -= (int)pow(2,i);
-        gtk_widget_set_sensitive (comboTcType[i], FALSE);
-    }
+    return FALSE;
 }
-
-
-// Event handler for the Thermocoupled Type Combo Box.
-//
-// Stores the TC type in the TC Type array.
-void tc_type_changed(GtkWidget* widget, gpointer user_data)
-{
-    int channel = (int)user_data;
-    int selection = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
-    selected_tc_type[channel] = selection;
-}
-
-
-// Event handler for the Rate Units Combo Box.
-//
-// Stores the seleced rate units.
-void rate_units_changed(GtkWidget* widget, gpointer user_data)
-{
-    int selection = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
-    selected_rate_units = selection;
-}
-
 
 // Event handler for the Select Log File button.
-//
-// Displays a GTK Open File dialog to select the log file to be opened.
-// The file name will be shown in the main window.
-void select_log_file_event_handler(GtkWidget* widget, gpointer user_data)
+// Displays a file select dialog to choose the log file to be opened.
+// The file name will be shown in footer of the main window.
+static void select_log_file_event_handler(GtkWidget* widget, char* user_data)
 {
-    // Get the initial file name.
-    char* initial_filename = user_data;
-
     // Select the log file.
-    strcpy(csv_filename, choose_log_file(window, initial_filename));
-
+    strcpy(csv_filename, choose_log_file(window, user_data));
     // Display the CSV log file name.
-    show_file_name();
+    gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// The following functions are used to initialize the user interface.  These
-// functions include displaying the user interface, setting channel colors,
-// and selecting the first available MCC 134 HAT device.
-//
-///////////////////////////////////////////////////////////////////////////////
-
-
-//   Assign a legend color and channel number for each channel on the device.
-void initialize_graph_channel_info (void)
+// Event handler for the time domain plot Y Zoom + button
+static void zoom_in_handler(GtkWidget* widget, gpointer user_dat)
 {
-    int i;
-    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
-    {
-        switch(i)
-        {
-        // channel 0
-        case 0:
-        default:
-            legendColor[i].red = 1;
-            legendColor[i].green = 0;
-            legendColor[i].blue = 0;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-            break;
-        // channel 1
-        case 1:
-            legendColor[i].red = 0;
-            legendColor[i].green = 1;
-            legendColor[i].blue = 0;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-           break;
-        // channel 2
-        case 2:
-            legendColor[i].red = 0;
-            legendColor[i].green = 0;
-            legendColor[i].blue = 1;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-           break;
-        // channel 3
-        case 3:
-            legendColor[i].red = 1;
-            legendColor[i].green = 1;
-            legendColor[i].blue = 0;
-            legendColor[i].alpha = 1;
-
-            graphChannelInfo[i].color = &legendColor[i];
-            graphChannelInfo[i].channelNumber = i;
-            break;
-        }
-    }
+    g_zoom_level *= 0.8;
+    refresh_graph();
 }
 
+// Event handler for the time domain plot Y Zoom - button
+static void zoom_out_handler(GtkWidget* widget, gpointer user_dat)
+{
+    g_zoom_level /= 0.8;
+    refresh_graph();
+}
 
 // Event handler that is called when the application is launched to create
 // the main window and its controls.
-void activate_event_handler(GtkApplication *app, gpointer user_data)
+static void app_activate_handler(GtkApplication *app, gpointer user_data)
 {
-    GtkCssProvider* cssProvider = gtk_css_provider_new();
-    gtk_css_provider_load_from_path(cssProvider, "theme.css", NULL);
+    GtkCssProvider* cssProvider;
+    GtkWidget *hboxMain, *vboxMain, *hboxFile, *vboxConfig, *vboxSampleRate,
+              *vboxNumSamples, *vboxGraph, *label, *vboxTcType,
+              *hboxChannel, *hboxRate1, *hboxRate2, *hboxNumSamples1,
+              *hboxNumSamples2, *hboxLogFile, *hboxZoom, *vboxChannel,
+              *vboxLegend, *acqSeparator, *logFileSeparator, *chanSeparator,
+              *endSeparator, *dispSeparator, *dataTable, *btnZoomInY,
+              *btnZoomOutY, *separator;
+    GtkWidget *legend[MAX_CHANNELS];
+    GtkDataboxRuler *rulerY, *rulerX;
+    GdkRGBA background_color;
+    PangoAttrList *titleAttrs;
+    PangoAttribute *bold;
+    GtkStyleContext *styleContext;
+    int i = 0;
+    int type_idx = 0;
+    // TC Types must be in the same order as the daqhats library
+    char* tcType[] = {"J", "K", "T", "E", "R", "S", "B", "N"};
+    char* rateUnits[] = {"Sec", "Min", "Hour", "Day"};
+    char chanName[20];
+    char legendName[20];
+    char chan_css[100] = "";
+    char css_str[1024] = "#startStop.circular {border-color: #3B5998; "
+                         "background-color: #3B5998;}\n";
+
+    // Set CSS styling for the legend
+    for(i=0; i<MAX_CHANNELS; i++)
+    {
+        sprintf(chan_css, "#Chan%d block.filled {background-color: %s; "
+            "border-color: %s;}\n", i, colors[i], colors[i]);
+        strcat(css_str, chan_css);
+    }
+
+    // Set CSS styling for channel legend
+    cssProvider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(GTK_CSS_PROVIDER (cssProvider), css_str,
+                                    -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                GTK_STYLE_PROVIDER(cssProvider),
                                GTK_STYLE_PROVIDER_PRIORITY_USER);
 
-    GtkWidget *hboxMain, *vboxMain;
-    GtkWidget *hboxFile;
-    GtkWidget *vboxConfig;
-
-    GtkWidget *rateLabel, *numSamplesLabel;
-    GtkWidget *hboxChannel;
-    GtkWidget *vboxChannel, *vboxChannelLegend;
-////////    GtkWidget *vboxCJC, *vboxCJCLegend;
-    GtkWidget *hboxRate, *hboxNumSamples;
-
-    GtkWidget *hboxTcType, *vboxTcType;
-////////    GtkDataboxGraph* graph;
-////////    int i = 0;
-
-    char* tcType[] = {"J", "K", "T", "E", "R", "S", "B", "N"};
-    char* rateUnits[] = {"Sec", "Min", "Hour", "Day"};
+    // Create attribute list for section headings
+    titleAttrs = pango_attr_list_new ();
+    bold = pango_attr_weight_new (PANGO_WEIGHT_BOLD);
+    pango_attr_list_insert (titleAttrs, bold);
 
     // Create the top level gtk window.
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_widget_set_size_request(window, 900, 500);
+    gtk_widget_set_size_request(window, 900, 700);
     gtk_container_set_border_width(GTK_CONTAINER(window), 10);
 
     // Create the GDK resources for the main window
@@ -621,9 +705,6 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
 
     // Connect the event handler to the "delete_event" event
     g_signal_connect(window, "delete_event", G_CALLBACK (gtk_main_quit), NULL);
-
-    // Display the CSV log file name.
-    show_file_name();
 
     vboxMain = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
     gtk_container_add(GTK_CONTAINER(window), vboxMain);
@@ -634,172 +715,185 @@ void activate_event_handler(GtkApplication *app, gpointer user_data)
     vboxConfig = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_add(GTK_CONTAINER(hboxMain), vboxConfig);
 
-    hboxChannel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxChannel);
-
-    vboxChannel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxChannel);
-
-    vboxChannelLegend = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxChannelLegend);
-
-////////    vboxCJC = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-////////    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxCJC);
-////////
-////////    vboxCJCLegend = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-////////    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxCJCLegend);
-
-    hboxTcType = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxTcType);
-
-    vboxTcType = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxTcType);
-
-    char* chanBase = "Channel ";
-    char* labelName = "Chan";
-////////    i = 0;
-    char chanNumBuf[5];
-    char labelNumBuf[5];
-    char chanNameBuffer[20];
-    char labelNameBuffer[20];
-    GtkWidget *legend[MAX_134_TEMP_CHANNELS];
-
-    // Add the temperature channel check boxes.
-    int i;
-    for (i = 0; i < MAX_134_TEMP_CHANNELS; i++)
-    {
-        strcpy(chanNameBuffer, chanBase);
-        strcpy(labelNameBuffer, labelName);
-        sprintf(chanNumBuf, "%d", i);
-        sprintf(labelNumBuf, "%d", i);
-        strcat(chanNameBuffer, chanNumBuf);
-        strcat(labelNameBuffer, labelNumBuf);
-
-        chkChan[i] = gtk_check_button_new_with_label(chanNameBuffer);
-        gtk_box_pack_start(GTK_BOX(vboxChannel), chkChan[i], TRUE, 0, 0);
-
-        g_signal_connect(GTK_TOGGLE_BUTTON(chkChan[i]), "clicked", G_CALLBACK(channel_button_clicked), (gpointer)i);
-
-        legend[i] = gtk_label_new("  ");
-        gtk_box_pack_start(GTK_BOX(vboxChannelLegend), legend[i], TRUE, 0, 0);
-        gtk_widget_set_name(legend[i], labelNameBuffer);
-    }
-
-
-    // Add the thermocouple type combo boxes.
-    for (i = 0; i < MAX_134_CJC_CHANNELS; i++)
-    {
-        comboTcType[i] = gtk_combo_box_text_new ();
-        int j;
-        for (j = 0; j < 8; j++)
-        {
-            gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(comboTcType[i]), 0, tcType[j]);
-        }
-        gtk_box_pack_start(GTK_BOX(vboxTcType), comboTcType[i], TRUE, 0, 0);
-
-        g_signal_connect(GTK_COMBO_BOX_TEXT(comboTcType[i]), "changed", G_CALLBACK(tc_type_changed), (gpointer)i);
-
-        gtk_combo_box_set_active (GTK_COMBO_BOX(comboTcType[i]), 0);
-        selected_tc_type[i] = gtk_combo_box_get_active (GTK_COMBO_BOX(comboTcType[i]));
-        gtk_widget_set_sensitive (comboTcType[i], FALSE);
-    }
-
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(chkChan[0]), TRUE);
-
-
-    hboxNumSamples = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
-    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxNumSamples);
-
-    numSamplesLabel = gtk_label_new("Samples To Display:    ");
-    gtk_box_pack_start(GTK_BOX(hboxNumSamples), numSamplesLabel, 0, 0, 0);
-
-    spinNumSamples = gtk_spin_button_new_with_range (10, 1000, 10);
-    gtk_box_pack_start(GTK_BOX(hboxNumSamples), spinNumSamples, 0, 0, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinNumSamples), 50.);
-
-    hboxRate = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxRate);
-
-    // FILE indicator
-    hboxFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(vboxMain), hboxFile);
-    labelFile = gtk_label_new(csv_filename);
-
-    rateLabel = gtk_label_new("Read every:");
-    gtk_box_pack_start(GTK_BOX(hboxRate), rateLabel, 0, 0, 0);
-
-    spinRate = gtk_spin_button_new_with_range (1, 1000, 1);
-    gtk_box_pack_start(GTK_BOX(hboxRate), spinRate, 0, 0, 5);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), 1.);
-
-    comboReadIntervalUnits = gtk_combo_box_text_new ();
-    gtk_box_pack_start(GTK_BOX(hboxRate), comboReadIntervalUnits, 0, 0, 0);
-    for (i = 0; i < 4; i++)
-        gtk_combo_box_text_append (GTK_COMBO_BOX_TEXT(comboReadIntervalUnits), 0, rateUnits[i]);
-
-    gtk_combo_box_set_active (GTK_COMBO_BOX(comboReadIntervalUnits), 0);
-    g_signal_connect(GTK_COMBO_BOX(comboReadIntervalUnits), "changed", G_CALLBACK(rate_units_changed), NULL);
-
-    GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-    gtk_container_add(GTK_CONTAINER(hboxMain), separator);
-    g_signal_connect(window, "delete_event", G_CALLBACK (gtk_main_quit), NULL);
-
-    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&box, &table,
-        FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
-    gtk_box_pack_start(GTK_BOX(hboxMain), table, TRUE, TRUE, 0);
-
-    GtkDataboxRuler* rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(box));
-    gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
-
-    GtkDataboxRuler* rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(box));
-    gchar* formatX = "%%6.0lf";
-    gtk_databox_ruler_set_linear_label_format(rulerX, formatX);
-    gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
-
-    gtk_databox_ruler_set_range(rulerY, 10.0, -10.0, 0.0);
-    gtk_databox_ruler_set_range(rulerX, 0.0, 50.0, 0.0);
-
-    GdkRGBA grid_color;
-    grid_color.red = 0;
-    grid_color.green = 0;
-    grid_color.blue = 0;
-    grid_color.alpha = 0.3;
-    grid_x = (GtkDataboxGraph*)gtk_databox_grid_new(7, 9, &grid_color, 1);
-    gtk_databox_graph_add(GTK_DATABOX (box), GTK_DATABOX_GRAPH(grid_x));
-
-    btnSelectLogFile = gtk_button_new_with_label ( "Select Log File ...");
-    g_signal_connect(btnSelectLogFile, "clicked",
-        G_CALLBACK(select_log_file_event_handler), csv_filename);
-    gtk_box_pack_start(GTK_BOX(vboxConfig), btnSelectLogFile, 0, 0, 5);
-
+    /******** Actions Section ********/
+    // Start/Stop Button
     btnStart_Stop = gtk_button_new_with_label("Start");
     g_signal_connect(btnStart_Stop, "clicked",
         G_CALLBACK(start_stop_event_handler), NULL);
-    gtk_box_pack_start(GTK_BOX(vboxConfig), btnStart_Stop, 0, 0, 5);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), btnStart_Stop, FALSE, FALSE, 0);
+    gtk_widget_set_name(GTK_WIDGET(btnStart_Stop), "startStop");
+    styleContext = gtk_widget_get_style_context(GTK_WIDGET(btnStart_Stop));
+    gtk_style_context_add_class(styleContext, "circular");
 
-    btnQuit = gtk_button_new_with_label( "Quit");
-    g_signal_connect(btnQuit, "clicked", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_box_pack_start(GTK_BOX(vboxConfig), btnQuit, TRUE, FALSE, 0);
+    /******** Display Settings ********/
+    dispSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), dispSeparator, FALSE, FALSE, 0);
+    label = gtk_label_new("Display Settings");
+    gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), label, FALSE, FALSE, 0);
+    // Time Domain Zoom Buttons
+    hboxZoom = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxZoom);
 
-    // FILE indicator
+    label = gtk_label_new("Zoom Y:");
+    gtk_box_pack_start(GTK_BOX(hboxZoom), label, FALSE, FALSE, 0);
+
+    btnZoomOutY = gtk_button_new_with_label ( "-");
+    gtk_box_pack_start(GTK_BOX(hboxZoom), btnZoomOutY, TRUE, FALSE, 3);
+    styleContext = gtk_widget_get_style_context(GTK_WIDGET(btnZoomOutY));
+    gtk_style_context_add_class(styleContext, "circular");
+    g_signal_connect(btnZoomOutY, "clicked", G_CALLBACK(zoom_out_handler),
+                     NULL);
+
+    btnZoomInY = gtk_button_new_with_label ( "+");
+    gtk_box_pack_start(GTK_BOX(hboxZoom), btnZoomInY, TRUE, FALSE, 0);
+    styleContext = gtk_widget_get_style_context(GTK_WIDGET(btnZoomInY));
+    gtk_style_context_add_class(styleContext, "circular");
+    g_signal_connect(btnZoomInY, "clicked", G_CALLBACK(zoom_in_handler), NULL);
+
+    /******** Channel Settings ********/
+    chanSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), chanSeparator, FALSE, FALSE, 0);
+    label = gtk_label_new("Channel Settings");
+    gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), label, FALSE, FALSE, 0);
+    hboxChannel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxChannel);
+    // Channel Select
+    vboxChannel = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxChannel);
+    label = gtk_label_new("Chan Select:");
+    gtk_box_pack_start(GTK_BOX(vboxChannel), label, FALSE, FALSE, 0);
+    vboxTcType=gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxTcType);
+    label = gtk_label_new("TC Type:");
+    gtk_box_pack_start(GTK_BOX(vboxTcType), label, FALSE, FALSE, 0);
+    vboxLegend=gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(hboxChannel), vboxLegend);
+    label = gtk_label_new("");  // Needed for spacing
+    gtk_box_pack_start(GTK_BOX(vboxLegend), label, FALSE, FALSE, 0);
+    for (i = 0; i < MAX_CHANNELS; i++)
+    {
+        sprintf(chanName, "Channel %d", i);
+        chkChan[i] = gtk_check_button_new_with_label(chanName);
+        gtk_box_pack_start(GTK_BOX(vboxChannel), chkChan[i], TRUE, FALSE, 0);
+
+        legend[i] = gtk_level_bar_new_for_interval(0.0, 100.0);
+        gtk_level_bar_set_value(GTK_LEVEL_BAR(legend[i]), 100.0);
+        gtk_box_pack_start(GTK_BOX(vboxLegend), legend[i], TRUE, FALSE, 0);
+        sprintf(legendName, "Chan%d", i);
+        gtk_widget_set_name(legend[i], legendName);
+        comboTcType[i] = gtk_combo_box_text_new ();
+
+        for (type_idx = 0; type_idx < 8; type_idx++)
+        {
+            gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboTcType[i]), 0,
+                                      tcType[type_idx]);
+        }
+        gtk_box_pack_start(GTK_BOX(vboxTcType), comboTcType[i], FALSE, 0, 0);
+        gtk_combo_box_set_active (GTK_COMBO_BOX(comboTcType[i]), 0);
+    }
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(chkChan[0]), TRUE);
+
+    /******** Acquisition Settings ********/
+    acqSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), acqSeparator, FALSE, FALSE, 0);
+    label = gtk_label_new("Acquisition Settings");
+    gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), label, FALSE, FALSE, 0);
+    // Sample Rate
+    vboxSampleRate = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), vboxSampleRate);
+    hboxRate1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxSampleRate), hboxRate1);
+    label = gtk_label_new("Read Every:");
+    gtk_box_pack_start(GTK_BOX(hboxRate1), label, FALSE, FALSE, 0);
+    hboxRate2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxSampleRate), hboxRate2);
+    spinRate = gtk_spin_button_new_with_range (1, 100000, 1);
+    gtk_box_pack_start(GTK_BOX(hboxRate2), spinRate, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinRate), 1.);
+    comboRateUnits = gtk_combo_box_text_new ();
+    gtk_box_pack_start(GTK_BOX(hboxRate2), comboRateUnits, 0, 0, 0);
+    for (i = 0; i < 4; i++)
+        gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboRateUnits), 0,
+                                  rateUnits[i]);
+
+    gtk_combo_box_set_active(GTK_COMBO_BOX(comboRateUnits), 0);
+    // Number of Samples
+    vboxNumSamples = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), vboxNumSamples);
+    hboxNumSamples1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxNumSamples), hboxNumSamples1);
+    label = gtk_label_new("Samples To Display:");
+    gtk_box_pack_start(GTK_BOX(hboxNumSamples1), label, FALSE, FALSE, 0);
+    hboxNumSamples2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxNumSamples), hboxNumSamples2);
+    spinNumSamples = gtk_spin_button_new_with_range (10, 1000, 1);
+    gtk_box_pack_start(GTK_BOX(hboxNumSamples2), spinNumSamples, FALSE, FALSE,
+                       0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinNumSamples), 50.);
+
+    /******** Log File Settings ********/
+    logFileSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), logFileSeparator, FALSE, FALSE, 0);
+    label = gtk_label_new("Log File Settings");
+    gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), label, FALSE, FALSE, 0);
+    hboxLogFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), hboxLogFile);
+    btnSelectLogFile = gtk_button_new_with_label ( "Select Log File ...");
+    g_signal_connect(btnSelectLogFile, "clicked",
+        G_CALLBACK(select_log_file_event_handler), csv_filename);
+    gtk_box_pack_start(GTK_BOX(hboxLogFile), btnSelectLogFile, FALSE, FALSE, 0);
+    styleContext = gtk_widget_get_style_context(GTK_WIDGET(btnSelectLogFile));
+    gtk_style_context_add_class(styleContext, "circular");
+
+    /******** Graphs ********/
+    // Separators from the configuration controls
+    endSeparator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(vboxConfig), endSeparator, FALSE, FALSE, 0);
+    separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_container_add(GTK_CONTAINER(hboxMain), separator);
+
+    // Add the time domain graph
+    vboxGraph = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(hboxMain), vboxGraph);
+    label = gtk_label_new("Temperature (°C)");
+    gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
+    gtk_box_pack_start(GTK_BOX(vboxGraph), label, FALSE, FALSE, 0);
+    gtk_databox_create_box_with_scrollbars_and_rulers_positioned (&dataBox,
+        &dataTable, FALSE, FALSE, TRUE, TRUE, FALSE, TRUE);
+    gtk_box_pack_start(GTK_BOX(vboxGraph), dataTable, TRUE, TRUE, 10);
+    rulerY = gtk_databox_get_ruler_y(GTK_DATABOX(dataBox));
+    gtk_databox_ruler_set_text_orientation(rulerY, GTK_ORIENTATION_HORIZONTAL);
+    gtk_databox_ruler_set_max_length(rulerY, 7);
+    rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
+    gtk_databox_ruler_set_max_length(rulerX, 9);
+    gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0Lf");
+    // Set the default limits
+    gtk_databox_ruler_set_range(rulerY, 100.0, 0.0, 0.0);
+    gtk_databox_ruler_set_range(rulerX, 0.0, 50.0, 0.0);
+    gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
+
+    // Set the background color for the graphs
+    gdk_rgba_parse (&background_color, "#d9d9d9");
+    pgtk_widget_override_background_color(dataBox, GTK_STATE_FLAG_NORMAL,
+                                          &background_color);
+
+    /******** Log file name display ********/
+    hboxFile = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxMain), hboxFile);
+    labelFile = gtk_label_new(csv_filename);
     gtk_box_pack_start(GTK_BOX(hboxFile), labelFile, TRUE, FALSE, 0);
 
     // Show the top level window and all of its controls
     gtk_widget_show_all(window);
 }
 
-
-// Display the CSV file name.
-void show_file_name()
-{
-    if(labelFile)
-        gtk_label_set_text(GTK_LABEL(labelFile), csv_filename);
-}
-
-
-// Find all of the HAT devices that are installed
+// Find all of the MCC134 HAT devices that are installed
 // and open a connection to the first one.
-int open_first_hat_device(uint8_t* hat_address)
+static int open_first_hat_device(uint8_t* hat_address)
 {
     int hat_count = 0;
     struct HatInfo* hat_info_list = NULL;
@@ -815,23 +909,22 @@ int open_first_hat_device(uint8_t* hat_address)
         hat_info_list = (struct HatInfo*)malloc(
             hat_count * sizeof(struct HatInfo));
 
-        // Get the list of MCC 134s.
+        // Get the list of MCC 134 devices
         hat_list(HAT_ID_MCC_134, hat_info_list);
-
-        // This application will use the first device (i.e. hat_info_list[0])
+        // Choose the first one
         *hat_address = hat_info_list[0].address;
 
         // Open the hat device
         retval = mcc134_open(*hat_address);
-        if (retval != RESULT_SUCCESS)
+        if(retval != RESULT_SUCCESS)
         {
-            show_mcc134_error(retval);
+            show_error(&retval);
         }
     }
     else
     {
         retval = NO_HAT_DEVICES_FOUND;
-        show_mcc134_error(retval);
+        show_error(&retval);
     }
 
     if (hat_info_list != NULL)

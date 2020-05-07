@@ -1,20 +1,17 @@
 #ifndef LOG_FILE_H_INCLUDED
 #define LOG_FILE_H_INCLUDED
 
-#include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "globals.h"
+#include "logger.h"
 
-extern FILE* log_file_ptr;
+FILE* log_file_ptr;
+char csv_filename[512];
 
-extern void get_path_and_filename(char* full_path, char* path,
-    char* filename);
-extern char* choose_log_file(GtkWidget *parent_window,
-    char* default_file_name);
-extern FILE* open_log_file (char* filename);
-extern int write_log_file(FILE* log_file_ptr, double* read_buf,
+char* choose_log_file(GtkWidget *parent_window, char* default_file_name);
+FILE* open_log_file (char* filename);
+int write_log_file(FILE* log_file_ptr, double* read_buf,
     int numberOfSamplesPerChannel, int numberOfChannels);
-extern int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask);
+int init_log_file(FILE* log_file_ptr, uint8_t chanMask, int max_channels);
 
 #endif // LOG_FILE_H_INCLUDED

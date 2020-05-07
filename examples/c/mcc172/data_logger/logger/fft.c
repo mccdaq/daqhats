@@ -1,11 +1,16 @@
-#include <glib.h>
-#include "fft.h"
-#include "globals.h"
+#include <stdlib.h>
+#include <math.h>
 #include "kiss_fft/kiss_fftr.h"
+#include "fft.h"
 
 #define USE_WINDOW
 
-double hann_window(int index, int max)
+// Function Prototypes
+static double hann_window(int index, int max);
+static double window_compensation(void);
+
+
+static double hann_window(int index, int max)
 {
 #ifdef USE_WINDOW
     // Hann window function.
@@ -16,7 +21,7 @@ double hann_window(int index, int max)
 #endif
 }
 
-double window_compensation(void)
+static double window_compensation(void)
 {
 #ifdef USE_WINDOW
     // Hann window compensation factor.

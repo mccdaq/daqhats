@@ -31,9 +31,9 @@ README file in the multi_hat_synchronous_scan example folder for more
 information.
 
 ### User Interface
-- **data_logger**: acquires and displays data on a strip chart, and logs the 
-data to a CSV file. This example can be run from a terminal window or 
-accessed with an IDE. Refer to the README file in the data_logger example 
+- **data_logger**: acquires and displays data on a strip chart, 
+calculates and displays FFT data, and logs the 
+data to a CSV file. Refer to the README file in the data_logger example 
 folder for more information.
 
 ## Running an Example
@@ -44,8 +44,8 @@ enter the following command:
 ```
    ./<example name>
 ```
-You can run the data_logger example from a terminal or IDE; refer to the 
-README in the data_logger example folder for instructions.
+The data_logger example requires a monitor connected to the **Raspberry Pi**; 
+refer to the README in the data_logger example folder for instructions.
 
 ## Support/Feedback
 Contact technical support through our 

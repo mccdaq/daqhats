@@ -1,13 +1,17 @@
+#include <string.h>
+#include <glib.h>
 #include "log_file.h"
+#include "errors.h"
 
-FILE* log_file_ptr = NULL;
+// Function Prototypes
+static void get_path_and_filename(char* full_path, char* path, char* filename);
+static void check_log_file_error (int status);
 
 
 // Get the error message for the specified error code.
-void get_path_and_filename(char* full_path, char* path, char* filename)
+static void get_path_and_filename(char* full_path, char* path, char* filename)
 {
     char* p;
-
     int path_len = 0;
 
     // Get the pointer to the last occurance of '/'.  This is the
@@ -25,7 +29,6 @@ void get_path_and_filename(char* full_path, char* path, char* filename)
 
     return;
 }
-
 
 // Show the OpenFile dialog to allow the name of the log file to be chosen.
 char* choose_log_file(GtkWidget *parent_window, char* default_path)
@@ -47,12 +50,12 @@ char* choose_log_file(GtkWidget *parent_window, char* default_path)
     }
 
     // Create the OpenFile dialog.
-    dialog = gtk_file_chooser_dialog_new ("Open File",
+    dialog = gtk_file_chooser_dialog_new ("Select Log File",
                                           (GtkWindow*)parent_window,
                                           GTK_FILE_CHOOSER_ACTION_SAVE,
                                           ("_Cancel"),
                                           GTK_RESPONSE_CANCEL,
-                                          ("_Open"),
+                                          ("_OK"),
                                           GTK_RESPONSE_ACCEPT,
                                           NULL);
 
@@ -107,15 +110,13 @@ FILE* open_log_file (char* path)
     return log_file_ptr;
 }
 
-int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask)
+int init_log_file(FILE* log_file_ptr, uint8_t chanMask, int max_channels)
 {
     int i = 0;
-    int chanMask = 0;
     int channel = 0;
     int write_status = 1;
     int num_channels = 0;
 
-    chanMask = current_channel_mask;
     channel = 0;
 
 	if (write_status <= 0)
@@ -123,10 +124,10 @@ int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask)
 		// exit if an error occurred.
 		return write_status;
 	}
-	
-    for (i = 0; i < MAX_118_CHANNELS; i++)
+
+    for (i = 0; i < max_channels; i++)
     {
-        // If this channel is in the scan, 
+        // If this channel is in the scan,
         // print the channel number
         if (chanMask & 1)
         {
@@ -145,9 +146,14 @@ int init_log_file(FILE* log_file_ptr, uint8_t current_channel_mask)
         chanMask >>= 1;
     }
     write_status = fprintf(log_file_ptr, "\n");
+
+    // Check error status and display error message
+    check_log_file_error(write_status);
+
     return write_status;
 }
-    
+
+
 // Convert the numeric data to ASCII values, seperated by commas (CSV), and
 // write the data using the specified file pointer.
 int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
@@ -155,7 +161,7 @@ int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
 {
     int i = 0;
     int j = 0;
-    int write_status = 1;
+    int write_status = 0;
 
     char str[1000];
     char buf[256];
@@ -191,9 +197,25 @@ int write_log_file(FILE* log_file_ptr, double* read_buf, int samplesPerChannel,
         scan_start_index += numberOfChannels;
     }
 
-    // Flush the file to insure all data is written.
+    // Flush the file to ensure all data is written.
     fflush(log_file_ptr);
+
+    // Check error status and display error message
+    check_log_file_error(write_status);
 
     // Return the error code.
     return write_status;
+}
+
+static void check_log_file_error (int status)
+{
+    if(status == -1)
+    {
+        show_error_in_main_thread(MAXIMUM_FILE_SIZE_EXCEEDED);
+    }
+    else if (status < 0)
+    {
+        show_error_in_main_thread(UNKNOWN_ERROR);
+    }
+    return;
 }

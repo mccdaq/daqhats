@@ -1,4 +1,8 @@
+LogFiles/*
 *.o
 logger
-LogFiles/*
-
+bin/*
+obj/*
+*.cbp
+*.depend
+*.layout
