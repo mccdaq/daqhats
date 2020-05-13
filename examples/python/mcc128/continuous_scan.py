@@ -2,11 +2,13 @@
 #  -*- coding: utf-8 -*-
 
 """
-    MCC 118 Functions Demonstrated:
-        mcc118.a_in_scan_start
-        mcc118.a_in_scan_read
-        mcc118.a_in_scan_stop
-        mcc118_a_in_scan_cleanup
+    MCC 128 Functions Demonstrated:
+        mcc128.a_in_scan_start
+        mcc128.a_in_scan_read
+        mcc128.a_in_scan_stop
+        mcc128_a_in_scan_cleanup
+        mcc128.a_in_mode_write
+        mcc128.a_in_range_write
 
     Purpose:
         Perform a continuous acquisition on 1 or more channels.
@@ -20,9 +22,10 @@
 from __future__ import print_function
 from sys import stdout
 from time import sleep
-from daqhats import mcc118, OptionFlags, HatIDs, HatError
+from daqhats import mcc128, OptionFlags, HatIDs, HatError, AnalogInputMode, \
+    AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \
-    chan_list_to_mask
+    chan_list_to_mask, input_mode_to_string, input_range_to_string
 
 READ_ALL_AVAILABLE = -1
 
@@ -36,10 +39,13 @@ def main():
     """
 
     # Store the channels in a list and convert the list to a channel mask that
-    # can be passed as a parameter to the MCC 118 functions.
+    # can be passed as a parameter to the MCC 128 functions.
     channels = [0, 1, 2, 3]
     channel_mask = chan_list_to_mask(channels)
     num_channels = len(channels)
+
+    input_mode = AnalogInputMode.SE
+    input_range = AnalogInputRange.BIP_10V
 
     samples_per_channel = 0
 
@@ -48,19 +54,27 @@ def main():
     scan_rate = 1000.0
 
     try:
-        # Select an MCC 118 HAT device to use.
-        address = select_hat_device(HatIDs.MCC_118)
-        hat = mcc118(address)
+        # Select an MCC 128 HAT device to use.
+        address = select_hat_device(HatIDs.MCC_128)
+        hat = mcc128(address)
 
-        print('\nSelected MCC 118 HAT device at address', address)
+        hat.a_in_mode_write(input_mode)
+        hat.a_in_range_write(input_range)
+
+        print('\nSelected MCC 128 HAT device at address', address)
 
         actual_scan_rate = hat.a_in_scan_actual_rate(num_channels, scan_rate)
 
-        print('\nMCC 118 continuous scan example')
+        print('\nMCC 128 continuous scan example')
         print('    Functions demonstrated:')
-        print('         mcc118.a_in_scan_start')
-        print('         mcc118.a_in_scan_read')
-        print('         mcc118.a_in_scan_stop')
+        print('         mcc128.a_in_scan_start')
+        print('         mcc128.a_in_scan_read')
+        print('         mcc128.a_in_scan_stop')
+        print('         mcc128.a_in_scan_cleanup')
+        print('         mcc128.a_in_mode_write')
+        print('         mcc128.a_in_range_write')
+        print('    Input mode: ', input_mode_to_string(input_mode))
+        print('    Input range: ', input_range_to_string(input_range))
         print('    Channels: ', end='')
         print(', '.join([str(chan) for chan in channels]))
         print('    Requested scan rate: ', scan_rate)
@@ -111,7 +125,7 @@ def read_and_display_data(hat, num_channels):
     detected.
 
     Args:
-        hat (mcc118): The mcc118 HAT device object.
+        hat (mcc128): The mcc128 HAT device object.
         num_channels (int): The number of channels to display.
 
     Returns:

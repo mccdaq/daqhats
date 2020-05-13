@@ -122,8 +122,8 @@ def main(): # pylint: disable=too-many-locals, too-many-statements
         print('Starting scan ... Press Ctrl-C to stop\n')
 
         try:
-            read_and_display_data(hat, channels, samples_per_channel, 
-                actual_scan_rate)
+            read_and_display_data(hat, channels, samples_per_channel,
+                                  actual_scan_rate)
 
         except KeyboardInterrupt:
             # Clear the '^C' from the display.
@@ -231,7 +231,7 @@ def read_and_display_data(hat, channels, samples_per_channel, scan_rate):
 
     # Separate the data by channel
     read_data = read_result.data.reshape((len(channels), -1), order='F')
-    
+
     for channel in channels:
         print('===== Channel {}:\n'.format(channel))
 

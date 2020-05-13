@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 #  -*- coding: utf-8 -*-
 """
-    MCC 118 Functions Demonstrated:
-        mcc118.trigger_mode
-        mcc118.a_in_status
-        mcc118.a_in_scan_start
-        mcc118.a_in_scan_read
+    MCC 128 Functions Demonstrated:
+        mcc128.trigger_mode
+        mcc128.a_in_status
+        mcc128.a_in_scan_start
+        mcc128.a_in_scan_read
+        mcc128.a_in_scan_stop
+        mcc128_a_in_scan_cleanup
+        mcc128.a_in_mode_write
+        mcc128.a_in_range_write
 
     Purpose:
         Perform a triggered finite acquisition on 1 or more channels.
@@ -20,9 +24,10 @@
 from __future__ import print_function
 from time import sleep
 from sys import stdout
-from daqhats import mcc118, OptionFlags, TriggerModes, HatIDs, HatError
+from daqhats import mcc128, OptionFlags, TriggerModes, HatIDs, HatError, \
+    AnalogInputMode, AnalogInputRange
 from daqhats_utils import select_hat_device, enum_mask_to_string, \
-    chan_list_to_mask
+    chan_list_to_mask, input_mode_to_string, input_range_to_string
 
 CURSOR_BACK_2 = '\x1b[2D'
 ERASE_TO_END_OF_LINE = '\x1b[0K'
@@ -32,10 +37,13 @@ def main():
     This function is executed automatically when the module is run directly.
     """
     # Store the channels in a list and convert the list to a channel mask that
-    # can be passed as a parameter to the MCC 118 functions.
+    # can be passed as a parameter to the MCC 128 functions.
     channels = [0, 1, 2, 3]
     channel_mask = chan_list_to_mask(channels)
     num_channels = len(channels)
+
+    input_mode = AnalogInputMode.SE
+    input_range = AnalogInputRange.BIP_10V
 
     samples_per_channel = 10000
     scan_rate = 1000.0
@@ -43,20 +51,29 @@ def main():
     trigger_mode = TriggerModes.RISING_EDGE
 
     try:
-        # Select an MCC 118 HAT device to use.
-        address = select_hat_device(HatIDs.MCC_118)
-        hat = mcc118(address)
+        # Select an MCC 128 HAT device to use.
+        address = select_hat_device(HatIDs.MCC_128)
+        hat = mcc128(address)
 
-        print('\nSelected MCC 118 HAT device at address', address)
+        hat.a_in_mode_write(input_mode)
+        hat.a_in_range_write(input_range)
+
+        print('\nSelected MCC 128 HAT device at address', address)
 
         actual_scan_rate = hat.a_in_scan_actual_rate(num_channels, scan_rate)
 
-        print('\nMCC 118 continuous scan example')
+        print('\nMCC 128 continuous scan example')
         print('    Functions demonstrated:')
-        print('         mcc118.trigger_mode')
-        print('         mcc118.a_in_scan_status')
-        print('         mcc118.a_in_scan_start')
-        print('         mcc118.a_in_scan_read')
+        print('         mcc128.trigger_mode')
+        print('         mcc128.a_in_scan_status')
+        print('         mcc128.a_in_scan_start')
+        print('         mcc128.a_in_scan_read')
+        print('         mcc128.a_in_scan_stop')
+        print('         mcc128.a_in_scan_cleanup')
+        print('         mcc128.a_in_mode_write')
+        print('         mcc128.a_in_range_write')
+        print('    Input mode: ', input_mode_to_string(input_mode))
+        print('    Input range: ', input_range_to_string(input_range))
         print('    Channels: ', end='')
         print(', '.join([str(chan) for chan in channels]))
         print('    Requested scan rate: ', scan_rate)
@@ -108,7 +125,7 @@ def wait_for_trigger(hat):
     triggered status is True or the running status is False.
 
     Args:
-        hat (mcc118): The mcc118 HAT device object on which the status will
+        hat (mcc128): The mcc128 HAT device object on which the status will
             be monitored.
 
     Returns:
@@ -134,7 +151,7 @@ def read_and_display_data(hat, samples_per_channel, num_channels):
     is detected.
 
     Args:
-        hat (mcc118): The mcc118 HAT device object.
+        hat (mcc128): The mcc128 HAT device object.
         samples_per_channel: The number of samples to read for each channel.
         num_channels (int): The number of channels to display.
 

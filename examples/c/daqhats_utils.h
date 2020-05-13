@@ -50,6 +50,9 @@
    comma separated string respresentation of the options. */
 void convert_options_to_string(uint32_t options, char* options_str)
 {
+    if (options_str == NULL)
+        return;
+
     strcpy(options_str, "");
 
     if (options == OPTS_DEFAULT)
@@ -85,10 +88,13 @@ void convert_options_to_string(uint32_t options, char* options_str)
 /* This function converts the trigger mode defined by the trigger_mode
    parameter to a string representation and returns the string
    respresentation of the trigger mode. */
-void convert_trigger_mode_to_string(uint8_t trigger_mode, 
+void convert_trigger_mode_to_string(uint8_t trigger_mode,
     char* trigger_mode_str)
 {
-    switch (trigger_mode) 
+    if (trigger_mode_str == NULL)
+        return;
+
+    switch (trigger_mode)
     {
     case TRIG_FALLING_EDGE:
         strcpy(trigger_mode_str, "TRIG_FALLING_EDGE");
@@ -107,13 +113,64 @@ void convert_trigger_mode_to_string(uint8_t trigger_mode,
     return;
 }
 
+/* This function converts the analog input mode defined by the mode
+   parameter to a string representation and returns the string
+   respresentation of the input mode. */
+void convert_input_mode_to_string(uint8_t mode, char* mode_str)
+{
+    if (mode_str == NULL)
+        return;
+
+    switch (mode)
+    {
+    case A_IN_MODE_SE:
+        strcpy(mode_str, "SINGLE_ENDED");
+        break;
+    case A_IN_MODE_DIFF:
+    default:
+        strcpy(mode_str, "DIFFERENTIAL");
+        break;
+    }
+    return;
+}
+
+/* This function converts the analog input range defined by the range
+   parameter to a string representation and returns the string
+   respresentation of the input range. */
+void convert_input_range_to_string(uint8_t range, char* range_str)
+{
+    if (range_str == NULL)
+        return;
+
+    switch (range)
+    {
+    case A_IN_RANGE_BIP_10V:
+        strcpy(range_str, "+/- 10 V");
+        break;
+    case A_IN_RANGE_BIP_5V:
+        strcpy(range_str, "+/- 5 V");
+        break;
+    case A_IN_RANGE_BIP_2V:
+        strcpy(range_str, "+/- 2 V");
+        break;
+    case A_IN_RANGE_BIP_1V:
+    default:
+        strcpy(range_str, "+/- 1 V");
+        break;
+    }
+    return;
+}
+
 /* This function converts the thermocouple type defined by the tc_type
    parameter to a string representation and returns the string
    respresentation. */
-void convert_tc_type_to_string(uint8_t tc_type, 
+void convert_tc_type_to_string(uint8_t tc_type,
     char* tc_type_str)
 {
-    switch (tc_type) 
+    if (tc_type_str == NULL)
+        return;
+
+    switch (tc_type)
     {
     case TC_TYPE_J:
         strcpy(tc_type_str, "J");
@@ -156,6 +213,9 @@ void convert_chan_mask_to_string(uint32_t channel_mask, char* chans_str)
     int i = 0;
     char chan_string[8];
 
+    if (chans_str == NULL)
+        return;
+
     strcpy(chans_str, "");
 
     while (channel_mask > 0)
@@ -179,6 +239,9 @@ int convert_chan_mask_to_array(uint32_t channel_mask, int chans[])
 {
     int i = 0;
     int chan_count = 0;
+
+    if (chans == NULL)
+        return 0;
 
     while (channel_mask > 0)
     {
@@ -217,8 +280,8 @@ void cursorUp() {printf("\033[A");}
 void flush_stdin(void)
 {
     int c;
-    
-    do 
+
+    do
     {
         c = getchar();
     } while (c != '\n' && c != EOF);
@@ -229,7 +292,7 @@ int enter_press()
     int stdin_value = 0;
     struct timeval tv;
     fd_set fds;
-    
+
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     FD_ZERO(&fds);
@@ -240,7 +303,7 @@ int enter_press()
     {
         flush_stdin();
     }
-    
+
     return stdin_value;
 }
 
@@ -255,6 +318,9 @@ int select_hat_device(uint16_t hat_filter_id, uint8_t* address)
     int address_int = 0;
     int return_val = -1;
     int i;
+
+    if (address == NULL)
+        return -1;
 
     // Get the number of HAT devices that are connected that are of the
     // requested type.
@@ -292,7 +358,7 @@ int select_hat_device(uint16_t hat_filter_id, uint8_t* address)
                 free(hats);
                 return -1;
             }
-            
+
             *address = (uint8_t)address_int;
 
             // Find the HAT device with the specified address in the list.
