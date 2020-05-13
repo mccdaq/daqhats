@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """
 Wraps all of the methods from the MCC 128 library for use in Python.
 """
@@ -5,23 +6,26 @@ import sys
 from collections import namedtuple
 from ctypes import c_ubyte, c_int, c_ushort, c_ulong, c_long, c_double, \
     POINTER, c_char_p, byref, create_string_buffer
+from enum import IntEnum, unique
 from daqhats.hats import Hat, HatError, OptionFlags
 
 @unique
 class AnalogInputMode(IntEnum):
     """Analog input modes."""
-    SE      = 0     #: Single-ended mode.
-    DIFF    = 1     #: Differential mode.
+    #: Single-ended mode.
+    SE = 0      # pylint: disable=invalid-name
+    #: Differential mode.
+    DIFF = 1
 
 @unique
 class AnalogInputRange(IntEnum):
     """Analog input ranges."""
     BIP_10V = 0     #: +/- 10V input range.
-    BIP_5V  = 1     #: +/- 5V input range.
-    BIP_2V  = 2     #: +/- 2V input range.
-    BIP_1V  = 3     #: +/- 1V input range
+    BIP_5V = 1      #: +/- 5V input range.
+    BIP_2V = 2      #: +/- 2V input range.
+    BIP_1V = 3      #: +/- 1V input range
 
-class mcc128(Hat): # pylint: disable=invalid-name
+class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
     """
     The class for an MCC 128 board.
 
@@ -62,7 +66,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         AI_MIN_RANGE=[-10.0, -5.0, -2.0, -1.0],
         AI_MAX_RANGE=[+10.0, +5.0, +2.0, +1.0])
 
-    def __init__(self, address=0):
+    def __init__(self, address=0): # pylint: disable=too-many-statements
         """
         Initialize the class.
         """
@@ -99,6 +103,18 @@ class mcc128(Hat): # pylint: disable=invalid-name
 
         self._lib.mcc128_trigger_mode.argtypes = [c_ubyte, c_ubyte]
         self._lib.mcc128_trigger_mode.restype = c_int
+
+        self._lib.mcc128_a_in_mode_write.argtypes = [c_ubyte, c_ubyte]
+        self._lib.mcc128_a_in_mode_write.restype = c_int
+
+        self._lib.mcc128_a_in_mode_read.argtypes = [c_ubyte, POINTER(c_ubyte)]
+        self._lib.mcc128_a_in_mode_read.restype = c_int
+
+        self._lib.mcc128_a_in_range_write.argtypes = [c_ubyte, c_ubyte]
+        self._lib.mcc128_a_in_range_write.restype = c_int
+
+        self._lib.mcc128_a_in_range_read.argtypes = [c_ubyte, POINTER(c_ubyte)]
+        self._lib.mcc128_a_in_range_read.restype = c_int
 
         self._lib.mcc128_a_in_read.argtypes = [
             c_ubyte, c_ubyte, c_ulong, POINTER(c_double)]
@@ -161,7 +177,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         Return constant information about this type of device.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **NUM_AI_MODES** (int): The number of analog input modes (2.)
             * **NUM_AI_CHANNELS** (list of int): The number of analog input
@@ -186,7 +202,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         Read the board firmware version.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **version** (string): The firmware version, i.e "1.03".
 
@@ -269,7 +285,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         my_date = my_buffer.value.decode('ascii')
         return my_date
 
-    def calibration_coefficient_read(self, mode, range):
+    def calibration_coefficient_read(self, a_in_mode, a_in_range):
         """
         Read the calibration coefficients for a specified input mode and range.
 
@@ -278,11 +294,11 @@ class mcc128(Hat): # pylint: disable=invalid-name
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
-            mode (:py:class:`AnalogInputMode`): The input mode.
-            mode (:py:class:`AnalogInputRange`): The input range.
+            a_in_mode (:py:class:`AnalogInputMode`): The input mode.
+            a_in_range (:py:class:`AnalogInputRange`): The input range.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **slope** (float): The slope.
             * **offset** (float): The offset.
@@ -296,15 +312,16 @@ class mcc128(Hat): # pylint: disable=invalid-name
         slope = c_double()
         offset = c_double()
         if (self._lib.mcc128_calibration_coefficient_read(
-                self._address, mode, range, byref(slope), byref(offset))
-                != self._RESULT_SUCCESS):
+                self._address, a_in_mode, a_in_range, byref(slope),
+                byref(offset)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         cal_info = namedtuple('MCC128CalInfo', ['slope', 'offset'])
         return cal_info(
             slope=slope.value,
             offset=offset.value)
 
-    def calibration_coefficient_write(self, mode, range, slope, offset):
+    def calibration_coefficient_write(self, a_in_mode, a_in_range, slope,
+                                      offset):
         """
         Temporarily write the calibration coefficients for a specified input
         mode and range.
@@ -319,8 +336,8 @@ class mcc128(Hat): # pylint: disable=invalid-name
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
-            mode (:py:class:`AnalogInputMode`): The input mode.
-            range (:py:class:`AnalogInputRange`): The input range.
+            a_in_mode (:py:class:`AnalogInputMode`): The input mode.
+            a_in_range (:py:class:`AnalogInputRange`): The input range.
             slope (float): The new slope value.
             offset (float): The new offset value.
 
@@ -331,7 +348,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         if (self._lib.mcc128_calibration_coefficient_write(
-                self._address, mode, range, slope, offset)
+                self._address, a_in_mode, a_in_range, slope, offset)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
@@ -365,7 +382,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
             raise HatError(self._address, "Incorrect response.")
         return
 
-    def a_in_mode_write(self, mode):
+    def a_in_mode_write(self, a_in_mode):
         """
         This sets the analog input mode to one of the valid values:
 
@@ -375,7 +392,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
           positive and negative inputs.)
 
         Args:
-            mode (:py:class:`AnalogInputMode`): The input mode.
+            a_in_mode (:py:class:`AnalogInputMode`): The input mode.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -384,17 +401,92 @@ class mcc128(Hat): # pylint: disable=invalid-name
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        result = self._lib.mcc128_a_in_mode_write(self._address, mode)
+        result = self._lib.mcc128_a_in_mode_write(self._address, a_in_mode)
 
         if result == self._RESULT_BAD_PARAMETER:
             raise ValueError("Invalid mode argument.")
         elif result == self._RESULT_BUSY:
-            raise HatError(self._address, "The mode cannot be changed while "
-                "a scan is running.")
+            raise HatError(self._address,
+                           "The mode cannot be changed while "
+                           "a scan is running.")
         elif result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response {}.".format(
                 result))
         return
+
+    def a_in_mode_read(self):
+        """
+        Read the analog input mode.
+
+        Reads the current analog input mode.
+
+        Returns:
+            :py:class:`AnalogInputMode`: The current analog input mode.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        mode = c_ubyte()
+        if (self._lib.mcc128_a_in_mode_read(self._address, byref(mode))
+                != self._RESULT_SUCCESS):
+            raise HatError(self._address, "Incorrect response.")
+        return mode.value
+
+    def a_in_range_write(self, a_in_range):
+        """
+        This sets the analog input range to one of the valid values:
+
+        * :py:const:`AnalogInputRange.BIP_10V`: +/- 10V range
+        * :py:const:`AnalogInputRange.BIP_5V`: +/- 5V range
+        * :py:const:`AnalogInputRange.BIP_2V`: +/- 2V range
+        * :py:const:`AnalogInputRange.BIP_1V`: +/- 1V range
+
+        Args:
+            a_in_range (:py:class:`AnalogInputRange`): The input range.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+
+        result = self._lib.mcc128_a_in_range_write(self._address, a_in_range)
+
+        if result == self._RESULT_BAD_PARAMETER:
+            raise ValueError("Invalid mode argument.")
+        elif result == self._RESULT_BUSY:
+            raise HatError(self._address,
+                           "The range cannot be changed while a scan is "
+                           "running.")
+        elif result != self._RESULT_SUCCESS:
+            raise HatError(self._address, "Incorrect response {}.".format(
+                result))
+        return
+
+    def a_in_range_read(self):
+        """
+        Read the analog input range.
+
+        Reads the current analog input range.
+
+        Returns:
+            :py:class:`AnalogInputRange`: The current analog input range.
+
+        Raises:
+            HatError: the board is not initialized, does not respond, or
+                responds incorrectly.
+        """
+        if not self._initialized:
+            raise HatError(self._address, "Not initialized.")
+        a_in_range = c_ubyte()
+        if (self._lib.mcc128_a_in_range_read(self._address, byref(a_in_range))
+                != self._RESULT_SUCCESS):
+            raise HatError(self._address, "Incorrect response.")
+        return a_in_range.value
 
     def a_in_read(self, channel, options=OptionFlags.DEFAULT):
         """
@@ -417,25 +509,25 @@ class mcc128(Hat): # pylint: disable=invalid-name
                 :py:const:`OptionFlags.DEFAULT` if unspecified.
 
         Returns:
-            float: the read value
+            float: The read value.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
                 responds incorrectly.
-            ValueError: the channel number is invalid.
         """
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        if channel not in range(self._AIN_NUM_CHANNELS):
-            raise ValueError("Invalid channel {0}. Must be 0-{1}.".format(
-                channel, self._AIN_NUM_CHANNELS-1))
-
         data_value = c_double()
 
-        if (self._lib.mcc128_a_in_read(
-                self._address, channel, options, byref(data_value))
-                != self._RESULT_SUCCESS):
+        result = self._lib.mcc128_a_in_read(
+            self._address, channel, options, byref(data_value))
+        if result == self._RESULT_BUSY:
+            raise HatError(self._address,
+                           "The input cannot be read during a scan.")
+        elif result == self._RESULT_BAD_PARAMETER:
+            raise HatError(self._address, "Invalid argument.")
+        elif result != self._RESULT_SUCCESS:
             raise HatError(self._address, "Incorrect response.")
         return data_value.value
 
@@ -456,7 +548,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
                 internal sampling clock, max 100,000.0.
 
         Returns:
-            float: the actual sample rate
+            float: The actual sample rate.
 
         Raises:
             ValueError: a scan argument is invalid.
@@ -606,7 +698,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         size of that buffer in samples.
 
         Returns:
-            int: the buffer size in samples
+            int: The buffer size in samples.
 
         Raises:
             HatError: the board is not initialized or no scan buffer is
@@ -636,7 +728,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         the scan thread buffer.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -702,7 +794,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
                 samples and the timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -825,7 +917,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
                 timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -933,7 +1025,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         Read the number of channels in the current analog input scan.
 
         Returns:
-            int: the number of channels (0 if no scan is active, 1-8 otherwise)
+            int: The number of channels (0 if no scan is active, 1-8 otherwise.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -1004,7 +1096,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
                 * 3 = output 1 kHz square wave
 
         Returns:
-            int: the value read at the CLK pin after applying the mode (0 or 1).
+            int: The value read at the CLK pin after applying the mode (0 or 1.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -1034,7 +1126,7 @@ class mcc128(Hat): # pylint: disable=invalid-name
         This value read at the pin for input testing.
 
         Returns:
-            int: the value read at the TRIG pin (0 or 1).
+            int: The value read at the TRIG pin (0 or 1.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or

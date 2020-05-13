@@ -153,7 +153,7 @@ class mcc152(Hat): # pylint: disable=invalid-name,too-many-public-methods
         Return constant information about this type of device.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **NUM_DIO_CHANNELS** (int): The number of digital I/O channels
               (8.)

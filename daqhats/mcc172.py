@@ -168,7 +168,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         Return constant information about this type of device.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **NUM_AI_CHANNELS** (int): The number of analog input channels
               (2.)
@@ -190,7 +190,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         Read the board firmware and bootloader versions.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **version** (string): The firmware version, i.e "1.03".
 
@@ -281,8 +281,11 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
 
             calibrated_ADC_code = (raw_ADC_code - offset) * slope
 
+        Args:
+            channel (int): The analog input channel (0-1.)
+
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **slope** (float): The slope.
             * **offset** (float): The offset.
@@ -318,6 +321,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
             calibrated_ADC_code = (raw_ADC_code - offset) * slope
 
         Args:
+            channel (int): The analog input channel (0-1.)
             slope (float): The new slope value.
             offset (float): The new offset value.
 
@@ -649,7 +653,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
                 internal sampling clock.
 
         Returns:
-            float: the actual sample rate
+            float: The actual sample rate.
         """
         divisor = 51200.0 / sample_rate_per_channel + 0.5
         if divisor < 1.0:
@@ -784,7 +788,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         size of that buffer in samples.
 
         Returns:
-            int: the buffer size in samples
+            int: The buffer size in samples.
 
         Raises:
             HatError: the board is not initialized or no scan buffer is
@@ -814,7 +818,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         the scan thread buffer.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -880,7 +884,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
                 samples and the timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -1003,7 +1007,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
                 timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -1111,7 +1115,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         Read the number of channels in the current analog input scan.
 
         Returns:
-            int: the number of channels (0 if no scan is active, 1-2 otherwise)
+            int: The number of channels (0 if no scan is active, 1-2 otherwise.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -1176,7 +1180,7 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         will return the values present on those signals.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **clock** (int): The current value of the clock signal (0 or 1).
             * **sync** (int): The current value of the sync signal (0 or 1).

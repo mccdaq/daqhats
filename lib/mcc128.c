@@ -27,6 +27,11 @@
 
 #define NUM_AI_MODES            2
 
+#define NUM_CHANNELS            8   // The max number of analog input channels.
+
+#define NUM_AI_CHANNELS_SE      8
+#define NUM_AI_CHANNELS_DIFF    4
+
 #define MAX_CODE                (65535)
 
 #define INPUT_MIN               (-10.0)
@@ -44,19 +49,31 @@
 #define RANGE_2V_GAIN           5
 #define RANGE_1V_GAIN           10
 
-#define LSB_SIZE(x)             ((INPUT_MAX - INPUT_MIN) / (x*(MAX_CODE+1)))
-#define VOLTAGE_MIN(x)          (INPUT_MIN / x)
-#define VOLTAGE_MAX(x)          ((INPUT_MAX - LSB_SIZE(x))/x)
+const double RANGE_GAINS[] =    {1.0, 2.0, 5.0, 10.0};
+
+#define LSB_SIZE(x)             ((INPUT_MAX - INPUT_MIN) / ((x)*(MAX_CODE+1)))
+#define VOLTAGE_MIN(x)          (INPUT_MIN / (x))
+#define VOLTAGE_MAX(x)          ((INPUT_MAX - LSB_SIZE(x))/(x))
 #define RANGE_MIN(x)            VOLTAGE_MIN(x)
-#define RANGE_MAX(x)            (INPUT_MAX/x)
+#define RANGE_MAX(x)            (INPUT_MAX/(x))
+
+const double LSB_SIZES[] =
+{
+    LSB_SIZE(RANGE_10V_GAIN),
+    LSB_SIZE(RANGE_5V_GAIN),
+    LSB_SIZE(RANGE_2V_GAIN),
+    LSB_SIZE(RANGE_1V_GAIN)
+};
+
+const double RANGE_OFFSETS[] =  {10.0, 5.0, 2.0, 1.0};
 
 struct MCC128DeviceInfo mcc128_device_info =
 {
     // The number of analog input modes
     NUM_AI_MODES,
     // The number of analog input channels in each mode.
-    {8, 4},
-    // The minimum uncalibrated ADC code.
+    {NUM_AI_CHANNELS_SE, NUM_AI_CHANNELS_DIFF},
+    // The minimum uncalibrated ADC code (0.)
     0,
     // The maximum uncalibrated ADC code (65535.)
     MAX_CODE,
@@ -64,23 +81,24 @@ struct MCC128DeviceInfo mcc128_device_info =
     NUM_RANGES,
     // The input voltage corresponding to the minimum code in each range
     // (-10.0V, -5.0V, -2.0V, -1.0V.)
-    {VOLTAGE_MIN(RANGE_10V_GAIN), VOLTAGE_MIN(RANGE_5V_GAIN), 
+    {VOLTAGE_MIN(RANGE_10V_GAIN), VOLTAGE_MIN(RANGE_5V_GAIN),
     VOLTAGE_MIN(RANGE_2V_GAIN), VOLTAGE_MIN(RANGE_1V_GAIN)},
     // The input voltage corresponding to the maximum code in each range
     // (+10.0V - 1 LSB.)
-    {VOLTAGE_MAX(RANGE_10V_GAIN), VOLTAGE_MAX(RANGE_5V_GAIN), 
+    {VOLTAGE_MAX(RANGE_10V_GAIN), VOLTAGE_MAX(RANGE_5V_GAIN),
     VOLTAGE_MAX(RANGE_2V_GAIN), VOLTAGE_MAX(RANGE_1V_GAIN)},
     // The minimum voltage of the input range in each range
     // (-10.0V.)
     {RANGE_MIN(RANGE_10V_GAIN), RANGE_MIN(RANGE_5V_GAIN),
     RANGE_MIN(RANGE_2V_GAIN), RANGE_MIN(RANGE_1V_GAIN)},
     // The maximum voltage of the input range (+10.0V.)
-    {RANGE_MAX(RANGE_10V_GAIN), RANGE_MAX(RANGE_5V_GAIN), 
+    {RANGE_MAX(RANGE_10V_GAIN), RANGE_MAX(RANGE_5V_GAIN),
     RANGE_MAX(RANGE_2V_GAIN), RANGE_MAX(RANGE_1V_GAIN)}
 };
 
 #define CLOCK_TIMEBASE          16e6
 #define MAX_ADC_RATE            100000.0
+#define MIN_ADC_RATE            1.0
 #define MIN_SCAN_RATE           (CLOCK_TIMEBASE / 0xFFFFFFFF)
 
 // Delay / timeout constants
@@ -96,7 +114,8 @@ struct MCC128DeviceInfo mcc128_device_info =
 #define CMD_AINSCANSTATUS       0x12
 #define CMD_AINSCANDATA         0x13
 #define CMD_AINSCANSTOP         0x14
-#define CMD_AINSCANSTATUSDATA   0x15
+#define CMD_AINMODE             0x15
+#define CMD_AINRANGE            0x16
 
 #define CMD_BLINK               0x40
 #define CMD_ID                  0x41
@@ -104,18 +123,9 @@ struct MCC128DeviceInfo mcc128_device_info =
 #define CMD_TESTCLOCK           0x43
 #define CMD_TESTTRIGGER         0x44
 
-#define CMD_BOOTMEM_READ        0x52
-#define CMD_BOOTMEM_WRITE       0x53
-
-#define CMD_BL_ENTER            0x54
-#define CMD_BL_ERASE            0x55
-#define CMD_BL_WRITE            0x56
-#define CMD_BL_READ_CRC         0x57
-#define CMD_BL_JUMP             0x58
-
 #define CMD_READ_REPLY          0x7F
 
-#define MAX_TX_DATA_SIZE        (256)    // size of transmit / receive SPI 
+#define MAX_TX_DATA_SIZE        (256)    // size of transmit / receive SPI
                                          // buffer in device
 
 #define MSG_START               (0xDB)
@@ -141,7 +151,9 @@ struct MCC128DeviceInfo mcc128_device_info =
 
 #define TX_BUFFER_SIZE          (MAX_TX_DATA_SIZE + MSG_TX_HEADER_SIZE)
 
-#define MAX_SAMPLES_READ        512
+#define SAMPLE_SIZE_BYTES       2
+#define MAX_SAMPLES_READ        ((MAX_SPI_TRANSFER - MSG_RX_HEADER_SIZE)/ \
+                                SAMPLE_SIZE_BYTES)
 
 // MCC 128 command response codes
 #define FW_RES_SUCCESS          0x00
@@ -153,18 +165,17 @@ struct MCC128DeviceInfo mcc128_device_info =
 #define FW_RES_OTHER_ERROR      0x06
 
 
-#define SERIAL_SIZE     (8+1)   ///< The maximum size of the serial number 
+#define SERIAL_SIZE     (8+1)   ///< The maximum size of the serial number
                                 // string, plus NULL.
-#define CAL_DATE_SIZE   (10+1)  ///< The maximum size of the calibration date 
+#define CAL_DATE_SIZE   (10+1)  ///< The maximum size of the calibration date
                                 // string, plus NULL.
-#define NUM_CHANNELS    8       ///< The number of analog input channels.
 
 #define MAX_SCAN_BUFFER_SIZE_SAMPLES    (16ul*1024ul*1024ul)    // 16 MS
 
-#define COUNT_NORMALIZE(x, c)  ((x / c) * c)
+#define COUNT_NORMALIZE(x, c)  (((x) / (c)) * (c))
 
-#define MIN(a, b)   ((a < b) ? a : b)
-#define MAX(a, b)   ((a > b) ? a : b)
+#define MIN(a, b)   (((a) < (b)) ? (a) : (b))
+#define MAX(a, b)   (((a) > (b)) ? (a) : (b))
 
 /// \cond
 // Contains the device-specific data stored at the factory.
@@ -174,10 +185,10 @@ struct mcc128FactoryData
     char serial[SERIAL_SIZE];
     // Calibration date in the format 2017-09-19
     char cal_date[CAL_DATE_SIZE];
-    // Calibration coefficients - per channel slopes
-    double slopes[NUM_CHANNELS];
-    // Calibration coefficents - per channel offsets
-    double offsets[NUM_CHANNELS];
+    // Calibration coefficients - per mode & range slopes
+    double slopes[NUM_AI_MODES][NUM_RANGES];
+    // Calibration coefficents - per mode & range offsets
+    double offsets[NUM_AI_MODES][NUM_RANGES];
 };
 
 // Local data for analog input scans
@@ -186,25 +197,26 @@ struct mcc128ScanThreadInfo
     pthread_t handle;
     double* scan_buffer;
     uint32_t buffer_size;
-    uint32_t write_index;
-    uint32_t read_index;
-    uint32_t samples_transferred;
-    uint32_t buffer_depth;
+    volatile uint32_t write_index;
+    volatile uint32_t read_index;
+    volatile uint32_t samples_transferred;
+    volatile uint32_t buffer_depth;
 
     uint16_t read_threshold;
     uint16_t options;
-    bool hw_overrun;
-    bool buffer_overrun;
-    bool thread_started;
-    bool thread_running;
+    volatile bool hw_overrun;
+    volatile bool buffer_overrun;
+    volatile bool thread_started;
+    volatile bool thread_running;
     bool stop_thread;
     bool triggered;
-    bool scan_running;
+    volatile bool scan_running;
     uint8_t channel_count;
     uint8_t channel_index;
-    uint8_t channels[NUM_CHANNELS];
-    double slopes[NUM_CHANNELS];
-    double offsets[NUM_CHANNELS];
+    uint8_t modes[NUM_CHANNELS];
+    uint8_t ranges[NUM_CHANNELS];
+    double slopes[NUM_AI_MODES][NUM_RANGES];
+    double offsets[NUM_AI_MODES][NUM_RANGES];
 };
 
 // Local data for each open MCC 128 board.
@@ -214,10 +226,16 @@ struct mcc128Device
     uint16_t fw_version;        // firmware version
     uint16_t boot_version;      // bootloader version
     int spi_fd;                 // SPI file descriptor
+    uint8_t ain_mode;           // Analog input mode (SE / diff)
+    uint8_t ain_range;          // Analog input range
     uint8_t trigger_mode;       // Trigger mode
     struct mcc128FactoryData factory_data;   // Factory data
     struct mcc128ScanThreadInfo* scan_info; // Scan info
     pthread_mutex_t scan_mutex;
+
+    uint8_t tx_buffer[MAX_SPI_TRANSFER];
+    uint8_t temp_buffer[MAX_SPI_TRANSFER];
+    uint8_t rx_buffer[MAX_SPI_TRANSFER];
 };
 
 /// \endcond
@@ -229,12 +247,12 @@ static struct mcc128Device* _devices[MAX_NUMBER_HATS];
 static bool _mcc128_lib_initialized = false;
 
 static const char* const spi_device = SPI_DEVICE_0; // the spidev device
-static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0, 
+static const uint8_t spi_mode = SPI_MODE_1;         // use mode 1 (CPOL=0,
                                                     // CPHA=1)
 static const uint8_t spi_bits = 8;                  // 8 bits per transfer
-static const uint32_t spi_speed = 9600000;          // maximum SPI clock 
+static const uint32_t spi_speed = 18000000;         // maximum SPI clock
                                                     // frequency
-static const uint16_t spi_delay = 0;                // delay in us before 
+static const uint16_t spi_delay = 0;                // delay in us before
                                                     // removing CS
 
 // *****************************************************************************
@@ -261,7 +279,7 @@ static bool _check_addr(uint8_t address)
 /******************************************************************************
   Parse a buffer and look for a valid message
  *****************************************************************************/
-static bool _parse_buffer(uint8_t* buffer, uint16_t length, 
+static bool _parse_buffer(uint8_t* buffer, uint16_t length,
     uint16_t* frame_start, uint16_t* frame_length, uint16_t* remaining)
 {
     uint8_t* ptr = buffer;
@@ -339,13 +357,14 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
     *remaining = _remaining;
     *frame_length = _frame_length;
     *frame_start = _frame_start;
+
     return found_frame;
 }
 
 /******************************************************************************
   Create a message frame for sending to the device
  *****************************************************************************/
-static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count, 
+static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
     void* data)
 {
     if (count > MAX_TX_DATA_SIZE)
@@ -380,24 +399,24 @@ static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
 
   Return: RESULT_SUCCESS if successful
  *****************************************************************************/
-static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data, 
-    uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count, 
+static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
+    uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count,
     uint32_t reply_timeout_us, uint32_t retry_us)
 {
     struct timespec start_time;
     struct timespec current_time;
     uint32_t diff;
-    bool got_reply;
+    bool got_reply = false;
     int lock_fd;
     int ret;
     uint8_t temp;
-    bool timeout;
+    bool timeout = false;
 
     uint16_t tx_count;
-    uint8_t* tx_buffer;
-    uint8_t* rx_buffer;
-    uint8_t* temp_buffer;
     struct mcc128Device* dev = _devices[address];
+    struct spi_ioc_transfer tr;
+
+    memset(&tr, 0, sizeof(struct spi_ioc_transfer));
 
     if (!_check_addr(address) ||                // check address failed
         (tx_data_count && (tx_data == NULL)) || // no tx buffer when count != 0
@@ -406,35 +425,10 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         return RESULT_BAD_PARAMETER;
     }
 
-    // allocate buffers
-    uint16_t tx_buffer_size = MSG_TX_HEADER_SIZE + tx_data_count;
-    tx_buffer = (uint8_t*)calloc(1, tx_buffer_size);
-    uint16_t rx_buffer_size = MSG_RX_HEADER_SIZE + rx_data_count + 5;
-    rx_buffer = (uint8_t*)calloc(1, rx_buffer_size);
-    uint16_t temp_buffer_size = MAX(rx_buffer_size, tx_buffer_size);
-    temp_buffer = (uint8_t*)calloc(1, temp_buffer_size);
-
-    if ((tx_buffer == NULL) ||
-        (rx_buffer == NULL) ||
-        (temp_buffer == NULL))
-    {
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
-
-        return RESULT_RESOURCE_UNAVAIL;
-    }
-
-    // create a tx frame
-    tx_count = _create_frame(tx_buffer, command, tx_data_count, tx_data);
-
     // Obtain a spi lock
     if ((lock_fd = _obtain_lock()) < 0)
     {
         // could not get a lock within 5 seconds, report as a timeout
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_LOCK_TIMEOUT;
     }
 
@@ -445,9 +439,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     if (ret == -1)
     {
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_UNDEFINED;
     }
     if (temp != spi_mode)
@@ -456,64 +447,54 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         if (ret == -1)
         {
             _release_lock(lock_fd);
-            free(tx_buffer);
-            free(rx_buffer);
-            free(temp_buffer);
             return RESULT_UNDEFINED;
         }
     }
 
+    tx_count = _create_frame(dev->tx_buffer, command, tx_data_count, tx_data);
+
     // Init the spi ioctl structure, using temp_buffer for the intermediate
     // reply.
-    struct spi_ioc_transfer tr = {
-        .tx_buf = (uintptr_t)tx_buffer,
-        .rx_buf = (uintptr_t)temp_buffer,
-        .len = tx_count,
-        .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
-        .bits_per_word = spi_bits,
-    };
+    tr.tx_buf = (uintptr_t)dev->tx_buffer,
+    tr.rx_buf = (uintptr_t)dev->temp_buffer,
+    tr.len = tx_count,
+    tr.delay_usecs = spi_delay,
+    tr.speed_hz = spi_speed,
+    tr.bits_per_word = spi_bits,
+    tr.cs_change = 0;
 
     // send the command
-    clock_gettime(CLOCK_MONOTONIC, &start_time);
-
     if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
     {
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_UNDEFINED;
     }
+
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
 
     if (retry_us)
         usleep(retry_us);
 
     // read the reply
-    memset(temp_buffer, 0xFF, rx_buffer_size);
     uint16_t frame_start = 0;
     uint16_t frame_length;
     uint16_t remaining = 0;
     uint16_t read_amount = rx_data_count + MSG_RX_HEADER_SIZE;
 
-    // only read the first byte of the reply in order to test for the device 
+    // only read the first byte of the reply in order to test for the device
     // readiness
-    struct spi_ioc_transfer tr1 = {
-        .tx_buf = (uintptr_t)temp_buffer,
-        .rx_buf = (uintptr_t)rx_buffer,
-        .len = 1,
-        .delay_usecs = spi_delay,
-        .speed_hz = spi_speed,
-        .bits_per_word = spi_bits,
-    };
+    tr.tx_buf = (uintptr_t)NULL;//(uintptr_t)dev->temp_buffer;
+    tr.rx_buf = (uintptr_t)dev->rx_buffer;
+    tr.len = 1;
+
     got_reply = false;
 
     do
     {
         // loop until a reply is ready
-        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr1)) >= 1)
+        if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
         {
-            if (rx_buffer[0] != 0)
+            if (dev->rx_buffer[0] != 0)
             {
                 got_reply = true;
             }
@@ -534,55 +515,54 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     if (got_reply)
     {
         // read the rest of the reply
-        struct spi_ioc_transfer tr2 = {
-            .tx_buf = (uintptr_t)temp_buffer,
-            .rx_buf = (uintptr_t)&rx_buffer[1],
-            .len = read_amount,
-            .delay_usecs = spi_delay,
-            .speed_hz = spi_speed,
-            .bits_per_word = spi_bits,
-        };
+        tr.tx_buf = (uintptr_t)NULL;//dev->temp_buffer;
+
+        int read_start = 1;
+        int total_read = 1;
 
         got_reply = false;
         do
         {
-            if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr2)) >= 1)
+            tr.rx_buf = (uintptr_t)&dev->rx_buffer[read_start];
+            tr.len = read_amount;
+
+            if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
             {
+                total_read += read_amount;
+                read_start += read_amount;
+
                 // parse the reply
-                got_reply = _parse_buffer(rx_buffer, read_amount+1, 
+                got_reply = _parse_buffer(dev->rx_buffer, total_read,
                     &frame_start, &frame_length, &remaining);
             }
             else
             {
-                printf("ioctl failed %d %d\n", errno, tr2.len);
                 usleep(300);
             }
 
             clock_gettime(CLOCK_MONOTONIC, &current_time);
             diff = _difftime_us(&start_time, &current_time);
             timeout = (diff > reply_timeout_us);
-        } while (!got_reply && !timeout);
+        } while (!got_reply && !timeout &&
+                 ((read_start + read_amount) < MAX_SPI_TRANSFER));
     }
 
     if (!got_reply)
     {
         // clear the SPI lock
         _release_lock(lock_fd);
-        free(tx_buffer);
-        free(rx_buffer);
-        free(temp_buffer);
         return RESULT_TIMEOUT;
     }
 
-    if (rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] == 
-        tx_buffer[MSG_TX_INDEX_COMMAND])
+    if (dev->rx_buffer[frame_start+MSG_RX_INDEX_COMMAND] ==
+        dev->tx_buffer[MSG_TX_INDEX_COMMAND])
     {
-        switch (rx_buffer[frame_start+MSG_RX_INDEX_STATUS])
+        switch (dev->rx_buffer[frame_start+MSG_RX_INDEX_STATUS])
         {
         case FW_RES_SUCCESS:
             if (rx_data_count > 0)
             {
-                memcpy(rx_data, &rx_buffer[frame_start+MSG_RX_INDEX_DATA], 
+                memcpy(rx_data, &dev->rx_buffer[frame_start+MSG_RX_INDEX_DATA],
                     rx_data_count);
             }
             ret = RESULT_SUCCESS;
@@ -612,11 +592,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     // clear the SPI lock
     _release_lock(lock_fd);
-
-    free(tx_buffer);
-    free(rx_buffer);
-    free(temp_buffer);
-
     return ret;
 }
 
@@ -625,16 +600,20 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
  *****************************************************************************/
 static void _set_defaults(struct mcc128FactoryData* data)
 {
-    int i;
+    int i, j;
 
     if (data)
     {
         strcpy(data->serial, "00000000");
         strcpy(data->cal_date, "1970-01-01");
-        for (i = 0; i < NUM_CHANNELS; i++)
+
+        for (i = 0; i < NUM_AI_MODES; i++)
         {
-            data->slopes[i] = 1.0;
-            data->offsets[i] = 0.0;
+            for (j = 0; j < NUM_RANGES; j++)
+            {
+                data->slopes[i][j] = 1.0;
+                data->offsets[i][j] = 0.0;
+            }
         }
     }
 }
@@ -649,29 +628,41 @@ static void _set_defaults(struct mcc128FactoryData* data)
         "serial": "00000000",
         "calibration":
         {
-            "date": "2017-09-19",
+            "date": "2020-04-19",
             "slopes":
-            [
-                1.000000,
-                1.000000,
-                1.000000,
-                1.000000,
-                1.000000,
-                1.000000,
-                1.000000,
-                1.000000
-            ],
+            {
+                "se":
+                [
+                    1.000000,
+                    1.000000,
+                    1.000000,
+                    1.000000
+                ],
+                "diff":
+                [
+                    1.000000,
+                    1.000000,
+                    1.000000,
+                    1.000000
+                ]
+            },
             "offsets":
-            [
-                0.000000,
-                0.000000,
-                0.000000,
-                0.000000,
-                0.000000,
-                0.000000,
-                0.000000,
-                0.000000
-            ]
+            {
+                "se":
+                [
+                    0.000000,
+                    0.000000,
+                    0.000000,
+                    0.000000
+                ],
+                "diff":
+                [
+                    0.000000,
+                    0.000000,
+                    0.000000,
+                    0.000000
+                ]
+            }
         }
     }
 
@@ -681,10 +672,13 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
 {
     bool got_serial = false;
     bool got_date = false;
-    bool got_slopes = false;
-    bool got_offsets = false;
+    bool got_se_slopes = false;
+    bool got_se_offsets = false;
+    bool got_diff_slopes = false;
+    bool got_diff_offsets = false;
     cJSON* child;
     cJSON* calchild;
+    cJSON* coefchild;
     cJSON* subchild;
     int index;
 
@@ -726,59 +720,137 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
                     calchild->valuestring)
                 {
                     // Found the calibration date
-                    strncpy(data->cal_date, calchild->valuestring, 
+                    strncpy(data->cal_date, calchild->valuestring,
                         CAL_DATE_SIZE-1);
                     got_date = true;
                 }
                 else if (!strcmp(calchild->string, "slopes") &&
-                        (calchild->type == cJSON_Array))
+                        (calchild->type == cJSON_Object))
                 {
-                    // Found the slopes array, must go down a level
-                    subchild = calchild->child;
-                    index = 0;
+                    // Found the slopes, must go down a level
+                    coefchild = calchild->child;
 
-                    while (subchild)
+                    while (coefchild)
                     {
-                        // Iterate through the slopes array
-                        if ((subchild->type == cJSON_Number) &&
-                            (index < NUM_CHANNELS))
+                        if (!strcmp(coefchild->string, "se") &&
+                                (coefchild->type == cJSON_Array))
                         {
-                            data->slopes[index] = subchild->valuedouble;
-                            index++;
-                        }
-                        subchild = subchild->next;
-                    }
+                            // Found the SE slopes, must go down a level
+                            subchild = coefchild->child;
+                            index = 0;
 
-                    if (index == NUM_CHANNELS)
-                    {
-                        // Must have all channels to be successful
-                        got_slopes = true;
+                            while (subchild)
+                            {
+                                // Get the slope for each range
+                                if ((subchild->type == cJSON_Number) &&
+                                    (index < NUM_RANGES))
+                                {
+                                    data->slopes[A_IN_MODE_SE][index] =
+                                        subchild->valuedouble;
+                                    index++;
+                                }
+                                subchild = subchild->next;
+                            }
+
+                            if (index == NUM_RANGES)
+                            {
+                                // Must have all ranges to be successful
+                                got_se_slopes = true;
+                            }
+                        }
+                        else if (!strcmp(coefchild->string, "diff") &&
+                                (coefchild->type == cJSON_Array))
+                        {
+                            // Found the diff slopes array, must go down a level
+                            subchild = coefchild->child;
+                            index = 0;
+
+                            while (subchild)
+                            {
+                                // Iterate through the slopes array
+                                if ((subchild->type == cJSON_Number) &&
+                                    (index < NUM_RANGES))
+                                {
+                                    data->slopes[A_IN_MODE_DIFF][index] =
+                                        subchild->valuedouble;
+                                    index++;
+                                }
+                                subchild = subchild->next;
+                            }
+
+                            if (index == NUM_RANGES)
+                            {
+                                // Must have all ranges to be successful
+                                got_diff_slopes = true;
+                            }
+                        }
+
+                        coefchild = coefchild->next;
                     }
                 }
                 else if (!strcmp(calchild->string, "offsets") &&
-                        (calchild->type == cJSON_Array))
+                        (calchild->type == cJSON_Object))
                 {
-                    // Found the offsets array, must go down a level
-                    subchild = calchild->child;
-                    index = 0;
+                    // Found the offsets, must go down a level
+                    coefchild = calchild->child;
 
-                    while (subchild)
+                    while (coefchild)
                     {
-                        // Iterate through the offsets array
-                        if ((subchild->type == cJSON_Number) &&
-                            (index < NUM_CHANNELS))
+                        if (!strcmp(coefchild->string, "se") &&
+                                (coefchild->type == cJSON_Array))
                         {
-                            data->offsets[index] = subchild->valuedouble;
-                            index++;
-                        }
-                        subchild = subchild->next;
-                    }
+                            // Found the SE offsets array, must go down a level
+                            subchild = coefchild->child;
+                            index = 0;
 
-                    if (index == NUM_CHANNELS)
-                    {
-                        // Must have all channels to be successful
-                        got_offsets = true;
-                    }
+                            while (subchild)
+                            {
+                                // Iterate through the array
+                                if ((subchild->type == cJSON_Number) &&
+                                    (index < NUM_RANGES))
+                                {
+                                    data->offsets[A_IN_MODE_SE][index] =
+                                        subchild->valuedouble;
+                                    index++;
+                                }
+                                subchild = subchild->next;
+                            }
+
+                            if (index == NUM_RANGES)
+                            {
+                                // Must have all ranges to be successful
+                                got_se_offsets = true;
+                            }
+                        }
+                        else if (!strcmp(coefchild->string, "diff") &&
+                                (coefchild->type == cJSON_Array))
+                        {
+                            // Found the diff offsets array, must go down a level
+                            subchild = coefchild->child;
+                            index = 0;
+
+                            while (subchild)
+                            {
+                                // Iterate through the array
+                                if ((subchild->type == cJSON_Number) &&
+                                    (index < NUM_RANGES))
+                                {
+                                    data->offsets[A_IN_MODE_DIFF][index] =
+                                        subchild->valuedouble;
+                                    index++;
+                                }
+                                subchild = subchild->next;
+                            }
+
+                            if (index == NUM_RANGES)
+                            {
+                                // Must have all ranges to be successful
+                                got_diff_offsets = true;
+                            }
+                        }
+
+                        coefchild = coefchild->next;
+                    };
                 }
 
                 calchild = calchild->next;
@@ -787,7 +859,8 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
         child = child->next;
     }
 
-    if (got_serial && got_date && got_slopes && got_offsets)
+    if (got_serial && got_date &&
+        got_se_slopes && got_se_offsets && got_diff_slopes && got_diff_offsets)
     {
         // Report success if all required items were found
         return 1;
@@ -825,7 +898,10 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     uint16_t count;
     int ret;
     struct mcc128Device* dev;
+    struct mcc128ScanThreadInfo* info;
     uint16_t* rx_data;
+    uint8_t mode;
+    uint8_t range;
 
     if (!_check_addr(address) ||
         (buffer == NULL))
@@ -834,8 +910,14 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     }
 
     dev = _devices[address];
+    info = dev->scan_info;
+    if (info == NULL)
+    {
+        return RESULT_UNDEFINED;
+    }
 
-    rx_data = (uint16_t*)calloc(1, sample_count * sizeof(uint16_t));
+
+    rx_data = (uint16_t*)calloc(1, sample_count * SAMPLE_SIZE_BYTES);
     if (rx_data == NULL)
     {
         return RESULT_RESOURCE_UNAVAIL;
@@ -843,7 +925,7 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
 
     // send the read scan data command
     ret = _spi_transfer(address, CMD_AINSCANDATA, &sample_count, 2, rx_data,
-        sample_count*sizeof(uint16_t), 40*MSEC, 1);
+        sample_count*SAMPLE_SIZE_BYTES, 40*MSEC, 1);
 
     if (ret != RESULT_SUCCESS)
     {
@@ -856,26 +938,27 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         // convert raw values to double
         buffer[count] = (double)rx_data[count];
 
+        mode = info->modes[info->channel_index];
+        range = info->ranges[info->channel_index];
+
         if (calibrated)
         {
-            // apply the appropriate cal factor to each sample in the list
-            buffer[count] *= dev->scan_info->slopes[
-                dev->scan_info->channel_index];
-            buffer[count] += dev->scan_info->offsets[
-                dev->scan_info->channel_index];
+            // apply the correct cal factor to each sample in the list
+            buffer[count] *= info->slopes[mode][range];
+            buffer[count] += info->offsets[mode][range];
         }
 
         // convert to volts if desired
         if (scaled)
         {
-            buffer[count] *= LSB_SIZE(RANGE_10V_GAIN);
-            buffer[count] += VOLTAGE_MIN(RANGE_10V_GAIN);
+            buffer[count] *= LSB_SIZES[range];
+            buffer[count] += RANGE_OFFSETS[range];
         }
 
-        dev->scan_info->channel_index++;
-        if (dev->scan_info->channel_index >= dev->scan_info->channel_count)
+        info->channel_index++;
+        if (info->channel_index >= info->channel_count)
         {
-            dev->scan_info->channel_index = 0;
+            info->channel_index = 0;
         }
     }
 
@@ -899,9 +982,9 @@ static void* _scan_thread(void* arg)
     struct mcc128ScanThreadInfo* info = _devices[address]->scan_info;
     bool calibrated;
     bool scaled;
+    bool stop_thread;
     uint8_t rx_buffer[5];
     bool scan_running;
-    bool stop_thread;
 
     free(arg);
 
@@ -937,7 +1020,7 @@ static void* _scan_thread(void* arg)
         calibrated = true;
     }
 
-#define MIN_SLEEP_US	200
+#define MIN_SLEEP_US	100
 #define TRIG_SLEEP_US	1000
 
     done = false;
@@ -945,7 +1028,7 @@ static void* _scan_thread(void* arg)
     do
     {
         // read the scan status
-        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5, 
+        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
             1*MSEC, 20) == RESULT_SUCCESS)
         {
             available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
@@ -1001,9 +1084,9 @@ static void* _scan_thread(void* arg)
                         read_count = (info->buffer_size - info->write_index);
                     }
 
-                    if ((error = _a_in_read_scan_data(address, read_count, 
-                        scaled, calibrated, 
-                        &info->scan_buffer[info->write_index])) == 
+                    if ((error = _a_in_read_scan_data(address, read_count,
+                        scaled, calibrated,
+                        &info->scan_buffer[info->write_index])) ==
                         RESULT_SUCCESS)
                     {
                         info->write_index += read_count;
@@ -1076,6 +1159,38 @@ static void* _scan_thread(void* arg)
     return NULL;
 }
 
+static int _calc_scan_period(double sample_rate, uint16_t* period,
+    uint8_t* divider)
+{
+    uint32_t my_period;
+    uint16_t my_divider;
+
+    if ((period == NULL) || (divider == NULL))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // find divider value
+    my_divider = 1;
+    do
+    {
+        my_period = (uint32_t)((CLOCK_TIMEBASE / my_divider) /
+            sample_rate + 0.5) - 1;
+        if (my_period > 0xFFFF)
+        {
+            my_divider *= 2;
+        }
+    } while ((my_period > 0xFFFF) && (my_divider < 256));
+
+    if (my_period > 0xFFFF)
+    {
+        my_period = 0xFFFF;
+    }
+
+    *period = (uint16_t)my_period;
+    *divider = (uint8_t)(my_divider - 1);
+    return RESULT_SUCCESS;
+}
 
 //*****************************************************************************
 // Global Functions
@@ -1102,10 +1217,10 @@ int mcc128_open(uint8_t address)
 
     if (_devices[address] == NULL)
     {
-        // this is either the first time this device is being opened or it is 
+        // this is either the first time this device is being opened or it is
         // not a 128
 
-        // read the EEPROM file(s), verify that it is an MCC 128, and get the 
+        // read the EEPROM file(s), verify that it is an MCC 128, and get the
         // cal data
         if (_hat_info(address, &info, NULL, &custom_size) == RESULT_SUCCESS)
         {
@@ -1121,7 +1236,7 @@ int mcc128_open(uint8_t address)
         }
         else
         {
-            // no EEPROM info was found - allow opening the board with an 
+            // no EEPROM info was found - allow opening the board with an
             // uninitialized EEPROM
             custom_size = 0;
             custom_data = NULL;
@@ -1135,19 +1250,6 @@ int mcc128_open(uint8_t address)
         // initialize the struct elements
         dev->scan_info = NULL;
         dev->handle_count = 1;
-
-        pthread_mutex_init(&dev->scan_mutex, NULL);
-
-        // open the SPI device handle
-        dev->spi_fd = open(spi_device, O_RDWR);
-        if (dev->spi_fd < 0)
-        {
-            pthread_mutex_destroy(&dev->scan_mutex);
-            free(custom_data);
-            free(dev);
-            _devices[address] = NULL;
-            return RESULT_RESOURCE_UNAVAIL;
-        }
 
         if (custom_size > 0)
         {
@@ -1182,10 +1284,27 @@ int mcc128_open(uint8_t address)
                 "values\n", address);
         }
 
+        // ensure GPIO signals are initialized
+        gpio_dir(IRQ_GPIO, 1);
+
+        gpio_write(RESET_GPIO, 0);
+        gpio_dir(RESET_GPIO, 0);
+
+        pthread_mutex_init(&dev->scan_mutex, NULL);
+
+        // open the SPI device handle
+        dev->spi_fd = open(spi_device, O_RDWR);
+        if (dev->spi_fd < 0)
+        {
+            free(custom_data);
+            free(dev);
+            _devices[address] = NULL;
+            return RESULT_RESOURCE_UNAVAIL;
+        }
     }
     else
     {
-        // the device has already been opened and initialized, increment 
+        // the device has already been opened and initialized, increment
         // reference count
         dev = _devices[address];
         dev->handle_count++;
@@ -1196,23 +1315,20 @@ int mcc128_open(uint8_t address)
     do
     {
         // Try to communicate with the device and verify that it is an MCC 128
-        ret = _spi_transfer(address, CMD_ID, NULL, 0, id_data, 
-            3*sizeof(uint16_t), 20*MSEC, 10);
+        ret = _spi_transfer(address, CMD_ID, NULL, 0, id_data,
+            2*sizeof(uint16_t), 20*MSEC, 10);
 
         if (ret == RESULT_SUCCESS)
         {
-            // the ID command returns the product ID, compare it with the MCC 
+            // the ID command returns the product ID, compare it with the MCC
             // 128
             if (id_data[0] == HAT_ID_MCC_128)
             {
                 // save the firmware version
                 dev->fw_version = id_data[1];
-                dev->boot_version = id_data[2];
-                return RESULT_SUCCESS;
             }
             else
             {
-                pthread_mutex_destroy(&dev->scan_mutex);
                 free(dev);
                 _devices[address] = NULL;
                 return RESULT_INVALID_DEVICE;
@@ -1222,7 +1338,16 @@ int mcc128_open(uint8_t address)
         attempts++;
     } while ((ret != RESULT_SUCCESS) && (attempts < 2));
 
-    return RESULT_SUCCESS;
+    if (ret == RESULT_SUCCESS)
+    {
+        return RESULT_SUCCESS;
+    }
+    else
+    {
+        free(dev);
+        _devices[address] = NULL;
+        return ret;
+    }
 }
 
 /******************************************************************************
@@ -1276,11 +1401,10 @@ int mcc128_blink_led(uint8_t address, uint8_t count)
     }
 
     // send command
-    int ret = _spi_transfer(address, CMD_BLINK, &count, 1, NULL, 0, 20*MSEC, 
-        10);
+    int ret = _spi_transfer(address, CMD_BLINK, &count, 1, NULL, 0, 20*MSEC,
+        0);
     return ret;
 }
-
 
 /******************************************************************************
   Return the board firmware version
@@ -1293,8 +1417,9 @@ int mcc128_firmware_version(uint8_t address, uint16_t* version)
     }
 
     if (version)
+    {
         *version = _devices[address]->fw_version;
-
+    }
     return RESULT_SUCCESS;
 }
 
@@ -1309,7 +1434,7 @@ int mcc128_reset(uint8_t address)
     }
 
     // send reset command
-    int ret = _spi_transfer(address, CMD_RESET, NULL, 0, NULL, 0, 20*MSEC, 10);
+    int ret = _spi_transfer(address, CMD_RESET, NULL, 0, NULL, 0, 20*MSEC, 0);
     return ret;
 }
 
@@ -1356,32 +1481,34 @@ int mcc128_calibration_date(uint8_t address, char* buffer)
 /******************************************************************************
   Read the calibration coefficients.
  *****************************************************************************/
-int mcc128_calibration_coefficient_read(uint8_t address, uint8_t channel, 
-    uint8_t mode, uint8_t range, double* slope, double* offset)
+int mcc128_calibration_coefficient_read(uint8_t address, uint8_t mode,
+uint8_t range, double* slope, double* offset)
 {
     // validate parameters
     if (!_check_addr(address) ||
-        (channel >= NUM_CHANNELS) ||
+        (mode >= NUM_AI_MODES) ||
+        (range >= NUM_RANGES) ||
         (slope == NULL) ||
         (offset == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
 
-    *slope = _devices[address]->factory_data.slopes[channel];
-    *offset = _devices[address]->factory_data.offsets[channel];
+    *slope = _devices[address]->factory_data.slopes[mode][range];
+    *offset = _devices[address]->factory_data.offsets[mode][range];
     return RESULT_SUCCESS;
 }
 
 /******************************************************************************
   Write the calibration coefficients.
  *****************************************************************************/
-int mcc128_calibration_coefficient_write(uint8_t address, uint8_t channel, 
-    uint8_t mode, uint8_t range, double slope, double offset)
+int mcc128_calibration_coefficient_write(uint8_t address, uint8_t mode,
+uint8_t range, double slope, double offset)
 {
     // validate parameters
     if (!_check_addr(address) ||
-        (channel >= NUM_CHANNELS))
+        (mode >= NUM_AI_MODES) ||
+        (range >= NUM_RANGES))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1391,31 +1518,117 @@ int mcc128_calibration_coefficient_write(uint8_t address, uint8_t channel,
         return RESULT_BUSY;
     }
 
-    _devices[address]->factory_data.slopes[channel] = slope;
-    _devices[address]->factory_data.offsets[channel] = offset;
+    _devices[address]->factory_data.slopes[mode][range] = slope;
+    _devices[address]->factory_data.offsets[mode][range] = offset;
     return RESULT_SUCCESS;
 }
 
+/******************************************************************************
+  Set the analog input mode.
+ *****************************************************************************/
+int mcc128_a_in_mode_write(uint8_t address, uint8_t mode)
+{
+    if (!_check_addr(address) ||
+        (mode > A_IN_MODE_DIFF))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // don't allow changing while scan is running
+    if (_devices[address]->scan_info != NULL)
+    {
+        return RESULT_BUSY;
+    }
+
+    _devices[address]->ain_mode = mode;
+    // ToDo - write to device?
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
+  Read the analog input mode.
+ *****************************************************************************/
+int mcc128_a_in_mode_read(uint8_t address, uint8_t* mode)
+{
+    if (!_check_addr(address) ||
+        (mode == NULL))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // ToDo - read from device?
+    *mode = _devices[address]->ain_mode;
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
+  Set the analog input range.
+ *****************************************************************************/
+int mcc128_a_in_range_write(uint8_t address, uint8_t range)
+{
+    if (!_check_addr(address) ||
+        (range > A_IN_RANGE_BIP_1V))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // don't allow changing while scan is running
+    if (_devices[address]->scan_info != NULL)
+    {
+        return RESULT_BUSY;
+    }
+
+    _devices[address]->ain_range = range;
+    // ToDo - write to device?
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
+  Read the analog input range.
+ *****************************************************************************/
+int mcc128_a_in_range_read(uint8_t address, uint8_t* range)
+{
+    if (!_check_addr(address) ||
+        (range == NULL))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    // ToDo - read from device?
+    *range = _devices[address]->ain_range;
+    return RESULT_SUCCESS;
+}
 
 /******************************************************************************
   Perform a single reading of an analog input channel and return the value.
  *****************************************************************************/
-int mcc128_a_in_read(uint8_t address, uint8_t channel, uint32_t options, 
+int mcc128_a_in_read(uint8_t address, uint8_t channel, uint32_t options,
     double* value)
 {
     int ret;
     uint16_t code;
     double val;
+    uint8_t mode;
+    uint8_t range;
+    uint8_t fw_channel;
 
     if (!_check_addr(address) ||
-        (channel >= NUM_CHANNELS) ||
+        ((_devices[address]->ain_mode == A_IN_MODE_SE) ?
+         (channel >= NUM_AI_CHANNELS_SE) : (channel >= NUM_AI_CHANNELS_DIFF)) ||
         (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
 
+    mode = _devices[address]->ain_mode;
+    range = _devices[address]->ain_range;
+
+    fw_channel = ((range & 0x03) << 4) |
+                 ((mode & 0x01) << 3) |
+                 (channel & 0x07);
+
     // send the AIn command
-    ret = _spi_transfer(address, CMD_AIN, &channel, 1, &code, 2, 20*MSEC, 10);
+    ret = _spi_transfer(address, CMD_AIN, &fw_channel, 1, &code, 2, 20*MSEC, 10);
 
     if (ret != RESULT_SUCCESS)
     {
@@ -1429,14 +1642,16 @@ int mcc128_a_in_read(uint8_t address, uint8_t channel, uint32_t options,
     }
     else
     {
-        val = ((double)code * _devices[address]->factory_data.slopes[channel]) +
-            _devices[address]->factory_data.offsets[channel];
+        val = ((double)code *
+            _devices[address]->factory_data.slopes[mode][range]) +
+            _devices[address]->factory_data.offsets[mode][range];
     }
 
     // calculate voltage?
     if ((options & OPTS_NOSCALEDATA) == 0)
     {
-        val = (val * LSB_SIZE(RANGE_10V_GAIN)) + VOLTAGE_MIN(RANGE_10V_GAIN);
+        val = (val * LSB_SIZE(RANGE_GAINS[range])) +
+            VOLTAGE_MIN(RANGE_GAINS[range]);
     }
     *value = val;
     return RESULT_SUCCESS;
@@ -1466,13 +1681,15 @@ int mcc128_trigger_mode(uint8_t address, uint8_t mode)
 /******************************************************************************
   Read the actual scan rate for a set of scan parameters.
  *****************************************************************************/
-int mcc128_a_in_scan_actual_rate(uint8_t channel_count, 
+int mcc128_a_in_scan_actual_rate(uint8_t channel_count,
     double sample_rate_per_channel, double* actual_sample_rate_per_channel)
 {
     double adc_rate;
-    uint32_t period;
+    uint16_t period;
+    uint8_t divider;
 
-    if ((channel_count == 0) || (channel_count > 8) ||
+
+    if ((channel_count == 0) || (channel_count > NUM_CHANNELS) ||
         (actual_sample_rate_per_channel == NULL))
     {
         return RESULT_BAD_PARAMETER;
@@ -1486,44 +1703,34 @@ int mcc128_a_in_scan_actual_rate(uint8_t channel_count,
         return RESULT_BAD_PARAMETER;
     }
 
-    // calculate period value
-    if (sample_rate_per_channel <= ((double)CLOCK_TIMEBASE / 0xFFFFFFFF))
-    {
-        period = 0xFFFFFFFF;
-    }
-    else
-    {
-        period = (uint32_t)(CLOCK_TIMEBASE / sample_rate_per_channel + 0.5) - 1;
-    }
+    // calculate divider and period
+    _calc_scan_period(sample_rate_per_channel, &period, &divider);
 
-    *actual_sample_rate_per_channel = CLOCK_TIMEBASE / (period + 1);
+    *actual_sample_rate_per_channel = (CLOCK_TIMEBASE / ((double)divider + 1)) /
+        ((double)period + 1);
 
     return RESULT_SUCCESS;
 }
 
-/******************************************************************************
-  Start an analog input scan.  This function will allocate a scan thread info
-  structure and scan buffer, send the start command to the device, then start a
-  scan data thread that constantly reads the scan status and data.
- *****************************************************************************/
-int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask, 
-    uint32_t samples_per_channel, double sample_rate_per_channel, 
-    uint32_t options)
+int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
+    uint8_t* queue, uint32_t samples_per_channel,
+    double sample_rate_per_channel, uint32_t options)
 {
     int result;
     uint8_t num_channels;
     uint8_t channel;
+    uint8_t index;
     double adc_rate;
     struct mcc128Device* dev;
     struct mcc128ScanThreadInfo* info;
-    uint8_t buffer[10];
-    uint32_t period;
+    uint8_t buffer[8 + NUM_CHANNELS];
+    uint16_t period;
+    uint8_t divider;
     uint32_t scan_count;
     uint8_t scan_options;
 
-
     if (!_check_addr(address) ||
-        (channel_mask == 0) ||
+        (queue_count == 0) || (queue_count > NUM_CHANNELS) || (queue = NULL) ||
         ((samples_per_channel == 0) && ((options & OPTS_CONTINUOUS) == 0)))
     {
         return RESULT_BAD_PARAMETER;
@@ -1547,22 +1754,23 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     info = dev->scan_info;
     info->options = (uint16_t)options;
 
-    num_channels = 0;
-    for (channel = 0; channel < NUM_CHANNELS; channel++)
-    {
-        if (channel_mask & (1 << channel))
-        {
-            // save the channel list and coefficients for calibrating the 
-            // incoming data
-            info->channels[num_channels] = channel;
-            info->slopes[num_channels] = dev->factory_data.slopes[channel];
-            info->offsets[num_channels] = dev->factory_data.offsets[channel];
-
-            num_channels++;
-        }
-    }
+    num_channels = queue_count;
     info->channel_count = num_channels;
-    info->channel_index = 0;
+
+    // save the mode / channel info for cal factor lookup
+    for (index = 0; index < queue_count; index++)
+    {
+        info->modes[index] =
+            (queue[index] & A_IN_MODE_BIT_MASK) >> A_IN_MODE_BIT_POS;
+        info->ranges[index] =
+            (queue[index] & A_IN_RANGE_BIT_MASK) >> A_IN_RANGE_BIT_POS;
+    }
+
+    // save the coefficients
+    memcpy(info->slopes, dev->factory_data.slopes,
+        NUM_AI_MODES*NUM_RANGES*sizeof(double));
+    memcpy(info->offsets, dev->factory_data.offsets,
+        NUM_AI_MODES*NUM_RANGES*sizeof(double));
 
     // Make sure the rate is within the board specs
     adc_rate = 0.0;
@@ -1619,7 +1827,7 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
     else
     {
-        // Finite scan - buffer size is the number of channels * 
+        // Finite scan - buffer size is the number of channels *
         // samples_per_channel,
         info->buffer_size = samples_per_channel;
     }
@@ -1646,7 +1854,297 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     else
     {
         info->read_threshold = (uint16_t)(adc_rate / 10);
-        info->read_threshold = COUNT_NORMALIZE(info->read_threshold, 
+        if (info->read_threshold > MAX_SAMPLES_READ)
+        {
+            info->read_threshold = MAX_SAMPLES_READ;
+        };
+        info->read_threshold = COUNT_NORMALIZE(info->read_threshold,
+            info->channel_count);
+        if (info->read_threshold == 0)
+        {
+            info->read_threshold = info->channel_count;
+        }
+    }
+
+    pthread_attr_t attr;
+    if ((result = pthread_attr_init(&attr)) != 0)
+    {
+        free(info->scan_buffer);
+        free(info);
+        dev->scan_info = NULL;
+        return RESULT_RESOURCE_UNAVAIL;
+    }
+
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    // Start the scan
+    scan_options = (queue_count - 1);
+    if (options & OPTS_EXTTRIGGER)
+    {
+        scan_options |= (0x08 | (dev->trigger_mode << 4));
+    }
+
+    if (options & OPTS_EXTCLOCK)
+    {
+        // ignore the specified frequency and use the external clock
+        period = 0;
+        divider = 0;
+    }
+    else
+    {
+        // calculate period value
+        _calc_scan_period(sample_rate_per_channel, &period, &divider);
+    }
+
+    if (options & OPTS_CONTINUOUS)
+    {
+        // set to 0 for continuous
+        scan_count = 0;
+    }
+    else
+    {
+        scan_count = samples_per_channel;
+    }
+
+    buffer[0] = (uint8_t)scan_count;
+    buffer[1] = (uint8_t)(scan_count >> 8);
+    buffer[2] = (uint8_t)(scan_count >> 16);
+    buffer[3] = (uint8_t)(scan_count >> 24);
+    buffer[4] = (uint8_t)period;
+    buffer[5] = (uint8_t)(period >> 8);
+    buffer[6] = divider;
+    buffer[7] = scan_options;
+    for (channel = 0; channel < queue_count; channel++)
+    {
+        buffer[channel + 8] = queue[channel];
+    }
+
+    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, queue_count + 8,
+        NULL, 0, 20*MSEC, 10);
+
+    if (result != RESULT_SUCCESS)
+    {
+        pthread_attr_destroy(&attr);
+        free(info->scan_buffer);
+        free(info);
+        dev->scan_info = NULL;
+        return result;
+    }
+
+    info->thread_started = false;
+
+    // create the scan data thread
+    uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
+    *temp_address = address;
+    if ((result = pthread_create(&info->handle, &attr, &_scan_thread,
+        temp_address)) != 0)
+    {
+        free(temp_address);
+        mcc128_a_in_scan_stop(address);
+        pthread_attr_destroy(&attr);
+        free(info->scan_buffer);
+        free(info);
+        dev->scan_info = NULL;
+        return RESULT_RESOURCE_UNAVAIL;
+    }
+
+    pthread_attr_destroy(&attr);
+
+    dev->scan_info->scan_running = true;
+
+    // Wait for thread to start to avoid race conditions reading thread status
+    bool running;
+    do
+    {
+        usleep(1);
+        pthread_mutex_lock(&dev->scan_mutex);
+        running = info->thread_started;
+        pthread_mutex_unlock(&dev->scan_mutex);
+    } while (!running);
+
+    return RESULT_SUCCESS;
+}
+
+/******************************************************************************
+  Start an analog input scan.  This function will allocate a scan thread info
+  structure and scan buffer, send the start command to the device, then start a
+  scan data thread that constantly reads the scan status and data.
+ *****************************************************************************/
+int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
+    uint32_t samples_per_channel, double sample_rate_per_channel,
+    uint32_t options)
+{
+    int result;
+    struct mcc128Device* dev;
+
+
+    if (!_check_addr(address) ||
+        (channel_mask == 0) ||
+        ((samples_per_channel == 0) && ((options & OPTS_CONTINUOUS) == 0)))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+    dev = _devices[address];
+
+    if ((dev->ain_mode == A_IN_MODE_DIFF) && (channel_mask > 0x0F))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
+#if 1
+    // use queue scan
+    uint8_t index;
+    uint8_t queue_count;
+    uint8_t queue[NUM_CHANNELS];
+
+    queue_count = 0;
+    for (index = 0; index < NUM_CHANNELS; index++)
+    {
+        if (channel_mask & (1 << index))
+        {
+            queue[queue_count] = (dev->ain_range << A_IN_RANGE_BIT_POS) |
+                (dev->ain_mode << A_IN_MODE_BIT_POS) |
+                index;
+            queue_count++;
+        }
+    }
+
+    result = mcc128_a_in_scan_queue_start(address, queue_count, queue,
+        samples_per_channel, sample_rate_per_channel, options);
+
+    return result;
+#else
+    uint8_t num_channels;
+    uint8_t channel;
+    double adc_rate;
+    struct mcc128ScanThreadInfo* info;
+    uint8_t buffer[10];
+    uint32_t period;
+    uint32_t scan_count;
+    uint8_t scan_options;
+
+    if (dev->scan_info != NULL)
+    {
+        // scan already running?
+        return RESULT_BUSY;
+    }
+
+    dev->scan_info = (struct mcc128ScanThreadInfo*)calloc(
+        sizeof(struct mcc128ScanThreadInfo), 1);
+    if (dev->scan_info == NULL)
+    {
+        return RESULT_RESOURCE_UNAVAIL;
+    }
+
+    info = dev->scan_info;
+    info->options = (uint16_t)options;
+
+    num_channels = 0;
+    for (channel = 0; channel < NUM_CHANNELS; channel++)
+    {
+        if (channel_mask & (1 << channel))
+        {
+            // save the channel list
+            info->channels[num_channels] = channel;
+
+            num_channels++;
+        }
+    }
+    info->channel_count = num_channels;
+    //info->channel_index = 0;
+
+    // save the correct coefficients
+    info->slope = dev->factory_data.slopes[dev->ain_mode][dev->ain_range];
+    info->offset = dev->factory_data.offsets[dev->ain_mode][dev->ain_range];
+
+    // Make sure the rate is within the board specs
+    adc_rate = 0.0;
+    if ((options & OPTS_EXTCLOCK) == 0)
+    {
+        // internal clock - we know our capabilities
+        adc_rate = num_channels * sample_rate_per_channel;
+        if (adc_rate > MAX_ADC_RATE)
+        {
+            free(info);
+            dev->scan_info = NULL;
+            return RESULT_BAD_PARAMETER;
+        }
+    }
+    else
+    {
+        // external clock - this is just a suggestion, so use it for read rate
+        adc_rate = num_channels * sample_rate_per_channel;
+    }
+
+    // Calculate the buffer size
+    if (options & OPTS_CONTINUOUS)
+    {
+        // Continuous scan - buffer size is set to the (samples_per_channel
+        // * number of channels) unless that value is less than:
+        //
+        // Rate         Buffer size
+        // ----         -----------
+        // None         10 kS per channel
+        // < 100 S/s    1 kS per channel
+        // < 10 kS/s    10 kS per channel
+        // < 100 kS/s   100 kS per channel
+        if (sample_rate_per_channel <= 100.0)
+        {
+            info->buffer_size = 1000;
+        }
+        else if (sample_rate_per_channel <= 10000.0)
+        {
+            info->buffer_size = 10000;
+        }
+        else if (sample_rate_per_channel <= 100000.0)
+        {
+            info->buffer_size = 100000;
+        }
+        else
+        {
+            info->buffer_size = 10000;
+        }
+
+        if (info->buffer_size < samples_per_channel)
+        {
+            info->buffer_size = samples_per_channel;
+        }
+    }
+    else
+    {
+        // Finite scan - buffer size is the number of channels *
+        // samples_per_channel,
+        info->buffer_size = samples_per_channel;
+    }
+
+    info->buffer_size *= num_channels;
+
+    // allocate the buffer
+    info->scan_buffer = (double*)calloc(1, info->buffer_size * sizeof(double));
+    if (info->scan_buffer == NULL)
+    {
+        // can't allocate memory
+        free(info);
+        dev->scan_info = NULL;
+        return RESULT_RESOURCE_UNAVAIL;
+    }
+
+    // Set the device read threshold based on the scan rate - read data
+    // every 100ms or faster.
+    if ((adc_rate == 0.0) ||    // rate not specified
+        (adc_rate > 2560.0))
+    {
+        info->read_threshold = COUNT_NORMALIZE(256, info->channel_count);
+    }
+    else
+    {
+        info->read_threshold = (uint16_t)(adc_rate / 10);
+        if (info->read_threshold > MAX_SAMPLES_READ)
+        {
+            info->read_threshold = MAX_SAMPLES_READ;
+        };
+        info->read_threshold = COUNT_NORMALIZE(info->read_threshold,
             info->channel_count);
         if (info->read_threshold == 0)
         {
@@ -1686,7 +2184,7 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         }
         else
         {
-            period = (uint32_t)(CLOCK_TIMEBASE / sample_rate_per_channel + 0.5) 
+            period = (uint32_t)(CLOCK_TIMEBASE / sample_rate_per_channel + 0.5)
                 - 1;
         }
     }
@@ -1701,7 +2199,6 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         scan_count = samples_per_channel;
     }
 
-
     buffer[0] = (uint8_t)scan_count;
     buffer[1] = (uint8_t)(scan_count >> 8);
     buffer[2] = (uint8_t)(scan_count >> 16);
@@ -1713,8 +2210,8 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     buffer[8] = channel_mask;
     buffer[9] = scan_options;
 
-    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 10, NULL, 0, 
-        20*MSEC, 0);
+    result = _spi_transfer(address, CMD_AINSCANSTART, buffer, 10, NULL, 0,
+        20*MSEC, 10);
 
     if (result != RESULT_SUCCESS)
     {
@@ -1730,7 +2227,7 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     // create the scan data thread
     uint8_t* temp_address = (uint8_t*)malloc(sizeof(uint8_t));
     *temp_address = address;
-    if ((result = pthread_create(&info->handle, &attr, &_scan_thread, 
+    if ((result = pthread_create(&info->handle, &attr, &_scan_thread,
         temp_address)) != 0)
     {
         free(temp_address);
@@ -1744,6 +2241,8 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
 
     pthread_attr_destroy(&attr);
 
+    dev->scan_info->scan_running = true;
+
     // Wait for thread to start to avoid race conditions reading thread status
     bool running;
     do
@@ -1754,13 +2253,12 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
         pthread_mutex_unlock(&dev->scan_mutex);
     } while (!running);
 
-    dev->scan_info->scan_running = true;
-
     return RESULT_SUCCESS;
+#endif
 }
 
 /******************************************************************************
-  Return the size of the internal scan buffer in samples (0 if scan is not 
+  Return the size of the internal scan buffer in samples (0 if scan is not
   running).
  *****************************************************************************/
 int mcc128_a_in_scan_buffer_size(uint8_t address, uint32_t* buffer_size_samples)
@@ -1797,7 +2295,7 @@ int mcc128_a_in_scan_channel_count(uint8_t address)
 /******************************************************************************
   Read the scan status and amount of data in the scan buffer.
  *****************************************************************************/
-int mcc128_a_in_scan_status(uint8_t address, uint16_t* status, 
+int mcc128_a_in_scan_status(uint8_t address, uint16_t* status,
     uint32_t* samples_per_channel)
 {
     struct mcc128ScanThreadInfo* info;
@@ -1868,7 +2366,7 @@ int mcc128_a_in_scan_status(uint8_t address, uint16_t* status,
   negative, wait indefinitely.  If it is 0,  return immediately with the
   available data.
  *****************************************************************************/
-int mcc128_a_in_scan_read(uint8_t address, uint16_t* status, 
+int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
     int32_t samples_per_channel, double timeout, double* buffer,
     uint32_t buffer_size_samples, uint32_t* samples_read_per_channel)
 {
@@ -1894,7 +2392,7 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
     if (!_check_addr(address) ||
         (status == NULL) ||
         ((samples_per_channel > 0) &&
-            ((buffer == NULL) || (buffer_size_samples == 0))))
+         ((buffer == NULL) || (buffer_size_samples == 0))))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1940,7 +2438,8 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
     if (samples_per_channel == -1)
     {
         // return all available, ignore timeout
-        samples_to_read = buffer_depth;
+        samples_to_read = COUNT_NORMALIZE(buffer_depth,
+            info->channel_count);
     }
     else
     {
@@ -1950,9 +2449,9 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
 
     if (buffer_size_samples < samples_to_read)
     {
-        // buffer is not large enough, so read the amount of samples that will 
+        // buffer is not large enough, so read the amount of samples that will
         // fit
-        samples_to_read = COUNT_NORMALIZE(buffer_size_samples, 
+        samples_to_read = COUNT_NORMALIZE(buffer_size_samples,
             info->channel_count);
     }
 
@@ -1977,7 +2476,7 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
             {
                 // read in increments of the number of channels in the scan
                 current_read = MIN(buffer_depth, samples_to_read);
-                current_read = COUNT_NORMALIZE(current_read, 
+                current_read = COUNT_NORMALIZE(current_read,
                     info->channel_count);
 
                 // check for a wrap at the end of the scan buffer
@@ -1985,20 +2484,18 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
                 if (max_read < current_read)
                 {
                     // when wrapping, perform two copies
-                    memcpy(&buffer[samples_read], 
-                        &info->scan_buffer[info->read_index],  
+                    memcpy(&buffer[samples_read],
+                        &info->scan_buffer[info->read_index],
                         max_read*sizeof(double));
-
                     samples_read += max_read;
                     memcpy(&buffer[samples_read], &info->scan_buffer[0],
                         (current_read - max_read)*sizeof(double));
-
                     samples_read += (current_read - max_read);
                     info->read_index = (current_read - max_read);
                 }
                 else
                 {
-                    memcpy(&buffer[samples_read], 
+                    memcpy(&buffer[samples_read],
                         &info->scan_buffer[info->read_index],
                         current_read*sizeof(double));
                     samples_read += current_read;
@@ -2008,7 +2505,6 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
                         info->read_index = 0;
                     }
                 }
-
                 samples_to_read -= current_read;
                 buffer_depth -= current_read;
                 pthread_mutex_lock(&_devices[address]->scan_mutex);
@@ -2020,7 +2516,7 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
             if (!no_timeout)
             {
                 clock_gettime(CLOCK_MONOTONIC, &current_time);
-                timed_out = (_difftime_us(&start_time, &current_time) >= 
+                timed_out = (_difftime_us(&start_time, &current_time) >=
                     timeout_us);
             }
 
@@ -2094,7 +2590,7 @@ int mcc128_a_in_scan_stop(uint8_t address)
     }
 
     // send scan stop command
-    int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC, 
+    int ret = _spi_transfer(address, CMD_AINSCANSTOP, NULL, 0, NULL, 0, 20*MSEC,
         10);
     return ret;
 }
@@ -2114,7 +2610,7 @@ int mcc128_a_in_scan_cleanup(uint8_t address)
     {
         if (_devices[address]->scan_info->handle != 0)
         {
-            // If the thread is running then tell it to stop and wait for it. 
+            // If the thread is running then tell it to stop and wait for it.
             // It will send the a_in_stop_scan command.
             pthread_mutex_lock(&_devices[address]->scan_mutex);
             _devices[address]->scan_info->stop_thread = true;
@@ -2127,8 +2623,8 @@ int mcc128_a_in_scan_cleanup(uint8_t address)
         free(_devices[address]->scan_info->scan_buffer);
         free(_devices[address]->scan_info);
         _devices[address]->scan_info = NULL;
-        
-        pthread_mutex_unlock(&_devices[address]->scan_mutex);        
+
+        pthread_mutex_unlock(&_devices[address]->scan_mutex);
     }
 
     return RESULT_SUCCESS;
@@ -2147,7 +2643,7 @@ int mcc128_test_clock(uint8_t address, uint8_t mode, uint8_t* pValue)
     }
 
     // send test clock command
-    int ret = _spi_transfer(address, CMD_TESTCLOCK, &mode, 1, pValue, 
+    int ret = _spi_transfer(address, CMD_TESTCLOCK, &mode, 1, pValue,
         pValue ? 1 : 0, 20*MSEC, 0);
 
     return ret;
@@ -2164,7 +2660,7 @@ int mcc128_test_trigger(uint8_t address, uint8_t* pState)
     }
 
     // send test trigger command
-    int ret = _spi_transfer(address, CMD_TESTTRIGGER, NULL, 0, pState, 
+    int ret = _spi_transfer(address, CMD_TESTTRIGGER, NULL, 0, pState,
         pState ? 1 : 0, 20*MSEC, 0);
 
     return ret;
@@ -2252,7 +2748,7 @@ int mcc128_open_for_update(uint8_t address)
             _set_defaults(&dev->factory_data);
         }
 
-        
+
         // ensure GPIO signals are initialized
         gpio_write(RESET_GPIO, 0);
         gpio_dir(RESET_GPIO, 0);
