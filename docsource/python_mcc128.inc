@@ -26,6 +26,10 @@ Methods
     :py:func:`mcc128.calibration_coefficient_read`      Read the calibration coefficients for a mode/range.
     :py:func:`mcc128.calibration_coefficient_write`     Write the calibration coefficients for a mode/range.
     :py:func:`mcc128.trigger_mode`                      Set the external trigger input mode.
+    :py:func:`mcc128.a_in_mode_read`                    Read the analog input mode.
+    :py:func:`mcc128.a_in_mode_write`                   Write the analog input mode.
+    :py:func:`mcc128.a_in_range_read`                   Read the analog input range.
+    :py:func:`mcc128.a_in_range_write`                  Write the analog input range.
     :py:func:`mcc128.a_in_read`                         Read an analog input channel.
     :py:func:`mcc128.a_in_scan_actual_rate`             Read the actual sample rate for a requested sample rate.
     :py:func:`mcc128.a_in_scan_start`                   Start a hardware-paced analog input scan.
@@ -48,7 +52,7 @@ Analog input modes
     :members:
 
 Analog input ranges
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 .. autoclass:: AnalogInputRange
     :members:
