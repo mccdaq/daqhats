@@ -1423,8 +1423,8 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc128_calibration_coefficient_read">
-<span class="target" id="mcc128_8h_1ae3f7e98f8dd4b2490e0ffa7eff2aa98f"></span>int <code class="descname">mcc128_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the MCC 128 calibration coefficients for a single channel. </p>
+<span class="target" id="mcc128_8h_1a15571407193cbed86d033773245381a9"></span>int <code class="descname">mcc128_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 128 calibration coefficients for a specified input mode and range. </p>
 <p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
 </div>
@@ -1435,7 +1435,6 @@ type of board.  The library may be used with C and C++.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
-<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 7). </li>
 <li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The input mode, one of the <a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ad"><span class="std std-ref">input mode</span></a> values. </li>
 <li><code class="docutils literal notranslate"><span class="pre">range</span></code>: The input range, one of the <a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2a"><span class="std std-ref">input range</span></a> values. </li>
 <li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: Receives the slope. </li>
@@ -1448,8 +1447,8 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc128_calibration_coefficient_write">
-<span class="target" id="mcc128_8h_1a1961b79e74e489a085bd03494b931d2c"></span>int <code class="descname">mcc128_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporarily write the MCC 128 calibration coefficients for a single channel. </p>
+<span class="target" id="mcc128_8h_1ac955e03e5a051cdc17b2681ee2eb79e1"></span>int <code class="descname">mcc128_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily write the MCC 128 calibration coefficients for a specified input mode and range. </p>
 <p>The user can apply their own calibration coefficients by writing to these values. The values will reset to the factory values from the EEPROM whenever <a class="reference internal" href="#mcc128_8h_1af6ef529a7d95fb196aec38f1bc42fb76"><span class="std std-ref">mcc128_open()</span></a> is called. This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
 <p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
@@ -1461,7 +1460,6 @@ type of board.  The library may be used with C and C++.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
-<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 7). </li>
 <li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The input mode (0 - 1). </li>
 <li><code class="docutils literal notranslate"><span class="pre">range</span></code>: The range number (0 - 3). </li>
 <li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: The new slope value. </li>
@@ -1474,7 +1472,7 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc128_a_in_mode_read">
-<span class="target" id="mcc128_8h_1a73b1ad277be3b4feb06f980b97269370"></span>int <code class="descname">mcc128_a_in_mode_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_a_in_mode_read" title="Permalink to this definition">¶</a></dt>
+<span class="target" id="mcc128_8h_1a72708b3fcd8897559ac62cf32d234ed7"></span>int <code class="descname">mcc128_a_in_mode_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t *<em>&nbsp;mode</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_a_in_mode_read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the analog input mode. </p>
 <p>Reads the current analog <a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ad"><span class="std std-ref">input mode</span></a>.</p>
 <p><dl class="docutils">
@@ -1495,8 +1493,8 @@ type of board.  The library may be used with C and C++.</p>
 <span class="target" id="mcc128_8h_1a08c74d97acefbf1b4f1c54fe2270be48"></span>int <code class="descname">mcc128_a_in_mode_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_a_in_mode_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the analog input mode. </p>
 <p>This sets the analog inputs to one of the valid values:<ul class="simple">
-<li><a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada1aa05d1fd8079b57d2c71bed9d72a877"><span class="std std-ref">AI_MODE_SE</span></a>: Single-ended (8 inputs relative to ground.)</li>
-<li><a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20adae5584fb5b02bf57bdccc47fdb8f9da6d"><span class="std std-ref">AI_MODE_DIFF</span></a>: Differential (4 channels with positive and negative inputs.)</li>
+<li><a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada5ba52dfe56a54ab78d90faaa15d167f0"><span class="std std-ref">A_IN_MODE_SE</span></a>: Single-ended (8 inputs relative to ground.)</li>
+<li><a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada5152a4c1606e17b1c18845e10e496714"><span class="std std-ref">A_IN_MODE_DIFF</span></a>: Differential (4 channels with positive and negative inputs.)</li>
 </ul>
 </p>
 <p>This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
@@ -1536,10 +1534,10 @@ type of board.  The library may be used with C and C++.</p>
 <span class="target" id="mcc128_8h_1ac710c8f81c9ac6ad78cd3bf2f142c2d9"></span>int <code class="descname">mcc128_a_in_range_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;range</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_a_in_range_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the analog input range. </p>
 <p>This sets the analog input range to one of the valid ranges:<ul class="simple">
-<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa12ff75b20c406419390cf0412efb29d5"><span class="std std-ref">AI_RANGE_BIP_10V</span></a>: +/- 10V</li>
-<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aad6163eab72d4dc040a3a92e918d39651"><span class="std std-ref">AI_RANGE_BIP_5V</span></a>: +/- 5V</li>
-<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa09c403dc2882e779cf53afe8c2372af6"><span class="std std-ref">AI_RANGE_BIP_2V</span></a>: +/- 2V</li>
-<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa1494f880d38e984dc5d7fcd962fdfa56"><span class="std std-ref">AI_RANGE_BIP_1V</span></a>: +/- 1V</li>
+<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa6e66d937462a38d8b2348d9d18d575ac"><span class="std std-ref">A_IN_RANGE_BIP_10V</span></a>: +/- 10V</li>
+<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa023b365538a1acce7d2624a7dec2ba97"><span class="std std-ref">A_IN_RANGE_BIP_5V</span></a>: +/- 5V</li>
+<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa222c74908da4838e9bbc96bee0cae5af"><span class="std std-ref">A_IN_RANGE_BIP_2V</span></a>: +/- 2V</li>
+<li><a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa56e5fb87b025f8b4bcf35ebb02235a57"><span class="std std-ref">A_IN_RANGE_BIP_1V</span></a>: +/- 1V</li>
 </ul>
 </p>
 <p>This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
@@ -1604,7 +1602,7 @@ type of board.  The library may be used with C and C++.</p>
 <dt id="c.mcc128_a_in_scan_actual_rate">
 <span class="target" id="mcc128_8h_1af93bd9fc62ae4d62850a2001fd03d32f"></span>int <code class="descname">mcc128_a_in_scan_actual_rate</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;channel_count</em>, double<em>&nbsp;sample_rate_per_channel</em>, double *<em>&nbsp;actual_sample_rate_per_channel</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_a_in_scan_actual_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the actual sample rate per channel for a requested sample rate. </p>
-<p>The internal scan clock is generated from a XX MHz clock source so only discrete frequency steps can be achieved. This function will return the actual rate for a requested channel count and rate. This function does not perform any actions with a board, it simply calculates the rate.</p>
+<p>The internal scan clock is generated from a 16 MHz clock source so only discrete frequency steps can be achieved. This function will return the actual rate for a requested channel count and rate. This function does not perform any actions with a board, it simply calculates the rate.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a140e9ae03c9465d0a1881b9dff30518a"><span class="std std-ref">RESULT_BAD_PARAMETER</span></a> if the scan parameters are not achievable on an MCC 128. </dd>
@@ -1884,14 +1882,14 @@ type of board.  The library may be used with C and C++.</p>
 <dd><p>Analog input modes. </p>
 <p><em>Values:</em></p>
 <dl class="enumvalue">
-<dt id="c.AI_MODE_SE">
-<span class="target" id="mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada1aa05d1fd8079b57d2c71bed9d72a877"></span><code class="descname">AI_MODE_SE</code> = 0<a class="headerlink" href="#c.AI_MODE_SE" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_MODE_SE">
+<span class="target" id="mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada5ba52dfe56a54ab78d90faaa15d167f0"></span><code class="descname">A_IN_MODE_SE</code> = 0<a class="headerlink" href="#c.A_IN_MODE_SE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Single-ended. </p>
 </dd></dl>
 
 <dl class="enumvalue">
-<dt id="c.AI_MODE_DIFF">
-<span class="target" id="mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20adae5584fb5b02bf57bdccc47fdb8f9da6d"></span><code class="descname">AI_MODE_DIFF</code> = 1<a class="headerlink" href="#c.AI_MODE_DIFF" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_MODE_DIFF">
+<span class="target" id="mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ada5152a4c1606e17b1c18845e10e496714"></span><code class="descname">A_IN_MODE_DIFF</code> = 1<a class="headerlink" href="#c.A_IN_MODE_DIFF" title="Permalink to this definition">¶</a></dt>
 <dd><p>Differential. </p>
 </dd></dl>
 
@@ -1906,26 +1904,26 @@ type of board.  The library may be used with C and C++.</p>
 <dd><p>Analog input ranges. </p>
 <p><em>Values:</em></p>
 <dl class="enumvalue">
-<dt id="c.AI_RANGE_BIP_10V">
-<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa12ff75b20c406419390cf0412efb29d5"></span><code class="descname">AI_RANGE_BIP_10V</code> = 0<a class="headerlink" href="#c.AI_RANGE_BIP_10V" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_RANGE_BIP_10V">
+<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa6e66d937462a38d8b2348d9d18d575ac"></span><code class="descname">A_IN_RANGE_BIP_10V</code> = 0<a class="headerlink" href="#c.A_IN_RANGE_BIP_10V" title="Permalink to this definition">¶</a></dt>
 <dd><p>+/- 10 V </p>
 </dd></dl>
 
 <dl class="enumvalue">
-<dt id="c.AI_RANGE_BIP_5V">
-<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aad6163eab72d4dc040a3a92e918d39651"></span><code class="descname">AI_RANGE_BIP_5V</code> = 1<a class="headerlink" href="#c.AI_RANGE_BIP_5V" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_RANGE_BIP_5V">
+<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa023b365538a1acce7d2624a7dec2ba97"></span><code class="descname">A_IN_RANGE_BIP_5V</code> = 1<a class="headerlink" href="#c.A_IN_RANGE_BIP_5V" title="Permalink to this definition">¶</a></dt>
 <dd><p>+/- 5 V </p>
 </dd></dl>
 
 <dl class="enumvalue">
-<dt id="c.AI_RANGE_BIP_2V">
-<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa09c403dc2882e779cf53afe8c2372af6"></span><code class="descname">AI_RANGE_BIP_2V</code> = 2<a class="headerlink" href="#c.AI_RANGE_BIP_2V" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_RANGE_BIP_2V">
+<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa222c74908da4838e9bbc96bee0cae5af"></span><code class="descname">A_IN_RANGE_BIP_2V</code> = 2<a class="headerlink" href="#c.A_IN_RANGE_BIP_2V" title="Permalink to this definition">¶</a></dt>
 <dd><p>+/- 2 V </p>
 </dd></dl>
 
 <dl class="enumvalue">
-<dt id="c.AI_RANGE_BIP_1V">
-<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa1494f880d38e984dc5d7fcd962fdfa56"></span><code class="descname">AI_RANGE_BIP_1V</code> = 3<a class="headerlink" href="#c.AI_RANGE_BIP_1V" title="Permalink to this definition">¶</a></dt>
+<dt id="c.A_IN_RANGE_BIP_1V">
+<span class="target" id="mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2aa56e5fb87b025f8b4bcf35ebb02235a57"></span><code class="descname">A_IN_RANGE_BIP_1V</code> = 3<a class="headerlink" href="#c.A_IN_RANGE_BIP_1V" title="Permalink to this definition">¶</a></dt>
 <dd><p>+/- 1 V </p>
 </dd></dl>
 
@@ -3102,6 +3100,12 @@ type of board.  The library may be used with C and C++.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#c.mcc172_iepe_config_write" title="mcc172_iepe_config_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_iepe_config_write()</span></code></a></td>
 <td>Write the IEPE configuration for a channel.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#c.mcc172_a_in_sensitivity_read" title="mcc172_a_in_sensitivity_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_sensitivity_read()</span></code></a></td>
+<td>Read the sensitivity scaling for a channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#c.mcc172_a_in_sensitivity_write" title="mcc172_a_in_sensitivity_write"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_sensitivity_write()</span></code></a></td>
+<td>Write the sensitivity scaling for a channel.</td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="#c.mcc172_a_in_clock_config_read" title="mcc172_a_in_clock_config_read"><code class="xref c c-func docutils literal notranslate"><span class="pre">mcc172_a_in_clock_config_read()</span></code></a></td>
 <td>Read the sampling clock configuration.</td>
 </tr>
@@ -3348,6 +3352,52 @@ type of board.  The library may be used with C and C++.</p>
 <li>1: IEPE power on </li>
 </ul>
 </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc172_a_in_sensitivity_read">
+<span class="target" id="mcc172_8h_1acb0c58072c6a81e0cc26fc2e99ac54b6"></span>int <code class="descname">mcc172_a_in_sensitivity_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double *<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_sensitivity_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 172 analog input sensitivity scaling factor for a single channel. </p>
+<p>The sensitivity is specified in mV / mechanical unit. The default value when opening the library is 1000, resulting in no scaling of the input voltage.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 1). </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: Receives the sensitivity for the specified channel </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="c.mcc172_a_in_sensitivity_write">
+<span class="target" id="mcc172_8h_1a38c5fd4b8a7be4e7053dd340d6fb8412"></span>int <code class="descname">mcc172_a_in_sensitivity_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;channel</em>, double<em>&nbsp;value</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc172_a_in_sensitivity_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the MCC 172 analog input sensitivity scaling factor for a single channel. </p>
+<p>This applies a scaling factor to the analog input data so it returns values that are meaningful for the connected sensor.</p>
+<p>The sensitivity is specified in mV / mechanical unit. The default value when opening the library is 1000, resulting in no scaling of the input voltage. Changing this value will not change the values reported by <a class="reference internal" href="#mcc172_8h_1a2063cd2d28a65eb05e0637a22909f65b"><span class="std std-ref">mcc172_info()</span></a> since it is simply sensor scaling applied to the data before returning it.</p>
+<p>Examples:</p>
+<p><ul class="simple">
+<li>A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to 10,000 and the returned data will be in units of g.</li>
+<li>A vibration sensor with a sensitivity of 100 mV/g. Set the sensitivity to 100 and the returned data will be in units of g.</li>
+</ul>
+</p>
+<p>This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4"><span class="std std-ref">Result code</span></a>, <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4af3d0d72febdcc6491554576ed31f686e"><span class="std std-ref">RESULT_SUCCESS</span></a> if successful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
+<li><code class="docutils literal notranslate"><span class="pre">channel</span></code>: The channel number (0 - 1). </li>
+<li><code class="docutils literal notranslate"><span class="pre">value</span></code>: The sensitivity for the specified channel. </li>
 </ul>
 </dd>
 </dl>

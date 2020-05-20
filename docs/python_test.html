@@ -193,7 +193,7 @@ testing the pin.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the value read at the CLK pin after applying the mode (0 or 1).</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value read at the CLK pin after applying the mode (0 or 1.)</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
@@ -219,7 +219,83 @@ responds incorrectly.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the value read at the TRIG pin (0 or 1).</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The value read at the TRIG pin (0 or 1.)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="mcc-128-test-methods">
+<h2>MCC 128 test methods<a class="headerlink" href="#mcc-128-test-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc128</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span></dt>
+<dd><p>The class for an MCC 128 board.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt>
+<code class="descname">test_clock</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span></dt>
+<dd><p>Test the sample clock pin (CLK).</p>
+<p>This function exercises the CLK pin in output mode and returns the value
+read at the pin for input testing.  Return the mode to input after
+testing the pin.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mode</strong> (<em>int</em>) – The CLK pin mode</p>
+<ul class="simple">
+<li>0 = input</li>
+<li>1 = output low</li>
+<li>2 = output high</li>
+<li>3 = output 1 kHz square wave</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value read at the CLK pin after applying the mode (0 or 1.)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – the mode is invalid.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">test_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dd><p>Test the external trigger pin (TRIG).</p>
+<p>This value read at the pin for input testing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The value read at the TRIG pin (0 or 1.)</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
 </tr>
@@ -262,7 +338,7 @@ will return the values present on those signals.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a namedtuple containing the following field names:<ul class="simple">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A namedtuple containing the following field names:<ul class="simple">
 <li><strong>clock</strong> (int): The current value of the clock signal (0 or 1).</li>
 <li><strong>sync</strong> (int): The current value of the sync signal (0 or 1).</li>
 <li><strong>trigger</strong> (int): The current value of the trigger signal
