@@ -36,19 +36,19 @@ enum TcTypes
     /// J type
     TC_TYPE_J = 0,
     /// K type
-    TC_TYPE_K,
+    TC_TYPE_K = 1,
     /// T type    
-    TC_TYPE_T,
+    TC_TYPE_T = 2,
     /// E type    
-    TC_TYPE_E,
+    TC_TYPE_E = 3,
     /// R type
-    TC_TYPE_R,
+    TC_TYPE_R = 4,
     /// S type
-    TC_TYPE_S,
+    TC_TYPE_S = 5,
     /// B type
-    TC_TYPE_B,
+    TC_TYPE_B = 6,
     /// N type
-    TC_TYPE_N,
+    TC_TYPE_N = 7,
     /// Input disabled
     TC_DISABLED = 0xFF
 };

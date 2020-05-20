@@ -10,3 +10,4 @@ type of board.  The library may be used with C and C++.
 .. include:: c_mcc118.inc
 .. include:: c_mcc134.inc
 .. include:: c_mcc152.inc
+.. include:: c_mcc172.inc

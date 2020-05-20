@@ -58,16 +58,3 @@ Device Info
 
 .. doxygenstruct:: MCC118DeviceInfo
     :members:
-
-Trigger Modes
-~~~~~~~~~~~~~
-
-.. doxygenenum:: TriggerMode
-
-Scan Status Flags
-~~~~~~~~~~~~~~~~~
-
-.. doxygendefine:: STATUS_HW_OVERRUN
-.. doxygendefine:: STATUS_BUFFER_OVERRUN
-.. doxygendefine:: STATUS_TRIGGERED
-.. doxygendefine:: STATUS_RUNNING

@@ -1,5 +1,5 @@
 CC = gcc
-INCLUDE_DIR = /usr/local/include
+INCLUDE_DIR = ../include
 LIB_DIR = ../lib
 CFLAGS = -I$(INCLUDE_DIR) -I$(LIB_DIR) -g
 OFLAGS = -ldaqhats 
@@ -11,6 +11,9 @@ APPS_DIR = /usr/share/mcc/daqhats
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+mcc172_firmware_update: mcc172_firmware_update.o
+	$(CC) -o $@ $^ $(OFLAGS)
+
 mcc118_firmware_update: mcc118_firmware_update.o
 	$(CC) -o $@ $^ $(OFLAGS)
 
@@ -19,9 +22,10 @@ daqhats_list_boards: daqhats_list_boards.o
     
 .PHONY: clean
 
-all: mcc118_firmware_update daqhats_list_boards
+all: mcc118_firmware_update daqhats_list_boards mcc172_firmware_update
 
 install:
+	@install -D mcc172_firmware_update $(INSTALL_DIR)
 	@install -D mcc118_firmware_update $(INSTALL_DIR)
 	@install -D daqhats_read_eeproms $(INSTALL_DIR)
 	@install -D daqhats_list_boards $(INSTALL_DIR)
@@ -32,6 +36,7 @@ install:
 	@install -D -m 0644 shortcuts/* $(SHORTCUT_DIR)
 
 uninstall:
+	@rm -f $(INSTALL_DIR)/mcc172_firmware_update
 	@rm -f $(INSTALL_DIR)/mcc118_firmware_update
 	@rm -f $(INSTALL_DIR)/daqhats_read_eeproms
 	@rm -f $(INSTALL_DIR)/daqhats_list_boards
@@ -42,4 +47,4 @@ uninstall:
 .DEFAULT_GOAL := all
 
 clean:
-	@rm -f *.o *~ core mcc118_firmware_update
+	@rm -f *.o *~ core mcc118_firmware_update mcc172_firmware_update

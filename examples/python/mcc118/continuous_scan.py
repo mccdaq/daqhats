@@ -2,19 +2,20 @@
 #  -*- coding: utf-8 -*-
 
 """
-	MCC 118 Functions Demonstrated:
-		mcc118.a_in_scan_start
-		mcc118.a_in_scan_read
-		mcc118.a_in_scan_stop
+    MCC 118 Functions Demonstrated:
+        mcc118.a_in_scan_start
+        mcc118.a_in_scan_read
+        mcc118.a_in_scan_stop
+        mcc118_a_in_scan_cleanup
 
-	Purpose:
-		Performa a finite acquisition on 1 or more channels.
+    Purpose:
+        Performa a continuous acquisition on 1 or more channels.
 
-	Description:
-		Continuously acquires blocks of analog input data for a
-		user-specified group of channels until the acquisition is
-		stopped by the user.  The last sample of data for each channel
-		is displayed for each block of data received from the device.
+    Description:
+        Continuously acquires blocks of analog input data for a
+        user-specified group of channels until the acquisition is
+        stopped by the user.  The last sample of data for each channel
+        is displayed for each block of data received from the device.
 """
 from __future__ import print_function
 from sys import stdout
@@ -94,6 +95,10 @@ def main():
         except KeyboardInterrupt:
             # Clear the '^C' from the display.
             print(CURSOR_BACK_2, ERASE_TO_END_OF_LINE, '\n')
+            print('Stopping')
+            hat.a_in_scan_stop()
+            hat.a_in_scan_cleanup()
+
     except (HatError, ValueError) as err:
         print('\n', err)
 

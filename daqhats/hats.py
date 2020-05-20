@@ -4,17 +4,20 @@ Wraps the global methods from the MCC Hat library for use in Python.
 from collections import namedtuple
 from ctypes import cdll, Structure, c_ubyte, c_ushort, c_char, c_int, POINTER, \
     CFUNCTYPE, c_void_p
-from enum import IntEnum
+from enum import IntEnum, unique
 
 _HAT_CALLBACK = None
 
+@unique
 class HatIDs(IntEnum):
     """Known MCC HAT IDs."""
     ANY = 0             #: Match any MCC ID in :py:func:`hat_list`
     MCC_118 = 0x0142    #: MCC 118 ID
     MCC_134 = 0x0143    #: MCC 134 ID
     MCC_152 = 0x0144    #: MCC 152 ID
+    MCC_172 = 0x0145    #: MCC 172 ID
 
+@unique
 class TriggerModes(IntEnum):
     """Scan trigger input modes."""
     RISING_EDGE = 0     #: Start the scan on a rising edge of TRIG.

@@ -12,6 +12,7 @@
 #include "mcc118.h"
 #include "mcc134.h"
 #include "mcc152.h"
+#include "mcc172.h"
 
 /// Known DAQ HAT IDs.
 enum HatIDs
@@ -25,7 +26,9 @@ enum HatIDs
     /// MCC 134 ID
     HAT_ID_MCC_134 = 0x0143,
     /// MCC 152 ID
-    HAT_ID_MCC_152 = 0x0144
+    HAT_ID_MCC_152 = 0x0144,
+    /// MCC 172 ID
+    HAT_ID_MCC_172 = 0x0145
 };
 
 /// Return values from the library functions.
@@ -82,6 +85,30 @@ struct HatInfo
     /// The product name
     char product_name[256];
 };
+
+/// Scan trigger input modes.
+enum TriggerMode
+{
+    /// Start the scan on a rising edge of TRIG.
+    TRIG_RISING_EDGE    = 0,
+    /// Start the scan on a falling edge of TRIG.
+    TRIG_FALLING_EDGE   = 1,
+    /// Start the scan any time TRIG is high.
+    TRIG_ACTIVE_HIGH    = 2,
+    /// Start the scan any time TRIG is low.
+    TRIG_ACTIVE_LOW     = 3
+};
+
+// Scan status bits
+
+/// A hardware overrun occurred.
+#define STATUS_HW_OVERRUN       (0x0001)
+/// A scan buffer overrun occurred.
+#define STATUS_BUFFER_OVERRUN   (0x0002)
+/// The trigger event occurred.
+#define STATUS_TRIGGERED        (0x0004)
+/// The scan is running (actively acquiring data.)
+#define STATUS_RUNNING          (0x0008)
 
 #ifdef __cplusplus
 extern "C" {

@@ -10,3 +10,4 @@ of board.  The Python package is named *daqhats*.
 .. include:: python_mcc118.inc
 .. include:: python_mcc134.inc
 .. include:: python_mcc152.inc
+.. include:: python_mcc172.inc
