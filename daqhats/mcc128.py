@@ -94,11 +94,11 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         self._lib.mcc128_calibration_date.restype = c_int
 
         self._lib.mcc128_calibration_coefficient_read.argtypes = [
-            c_ubyte, c_ubyte, c_ubyte, POINTER(c_double), POINTER(c_double)]
+            c_ubyte, c_ubyte, POINTER(c_double), POINTER(c_double)]
         self._lib.mcc128_calibration_coefficient_read.restype = c_int
 
         self._lib.mcc128_calibration_coefficient_write.argtypes = [
-            c_ubyte, c_ubyte, c_ubyte, c_double, c_double]
+            c_ubyte, c_ubyte, c_double, c_double]
         self._lib.mcc128_calibration_coefficient_write.restype = c_int
 
         self._lib.mcc128_trigger_mode.argtypes = [c_ubyte, c_ubyte]
@@ -285,16 +285,15 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         my_date = my_buffer.value.decode('ascii')
         return my_date
 
-    def calibration_coefficient_read(self, a_in_mode, a_in_range):
+    def calibration_coefficient_read(self, a_in_range):
         """
-        Read the calibration coefficients for a specified input mode and range.
+        Read the calibration coefficients for a specified input range.
 
         The coefficients are applied in the library as: ::
 
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
-            a_in_mode (:py:class:`AnalogInputMode`): The input mode.
             a_in_range (:py:class:`AnalogInputRange`): The input range.
 
         Returns:
@@ -312,7 +311,7 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         slope = c_double()
         offset = c_double()
         if (self._lib.mcc128_calibration_coefficient_read(
-                self._address, a_in_mode, a_in_range, byref(slope),
+                self._address, a_in_range, byref(slope),
                 byref(offset)) != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         cal_info = namedtuple('MCC128CalInfo', ['slope', 'offset'])
@@ -320,11 +319,10 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
             slope=slope.value,
             offset=offset.value)
 
-    def calibration_coefficient_write(self, a_in_mode, a_in_range, slope,
-                                      offset):
+    def calibration_coefficient_write(self, a_in_range, slope, offset):
         """
         Temporarily write the calibration coefficients for a specified input
-        mode and range.
+        range.
 
         The user can apply their own calibration coefficients by writing to
         these values. The values will reset to the factory values from the
@@ -336,7 +334,6 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
-            a_in_mode (:py:class:`AnalogInputMode`): The input mode.
             a_in_range (:py:class:`AnalogInputRange`): The input range.
             slope (float): The new slope value.
             offset (float): The new offset value.
@@ -348,7 +345,7 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
         if (self._lib.mcc128_calibration_coefficient_write(
-                self._address, a_in_mode, a_in_range, slope, offset)
+                self._address, a_in_range, slope, offset)
                 != self._RESULT_SUCCESS):
             raise HatError(self._address, "Incorrect response.")
         return
@@ -499,7 +496,7 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`OptionFlags.DEFAULT`: Return a calibrated voltage value.
           Any other flags will override DEFAULT behavior.
         * :py:const:`OptionFlags.NOSCALEDATA`: Return an ADC code (a value
-          between 0 and 4095) rather than voltage.
+          between 0 and 65535) rather than voltage.
         * :py:const:`OptionFlags.NOCALIBRATEDATA`: Return data without the
           calibration factors applied.
 
@@ -596,7 +593,7 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
           internal scan clock, no trigger, and finite operation. Any other flags
           will override DEFAULT behavior.
         * :py:const:`OptionFlags.NOSCALEDATA`: Return ADC codes (values between
-          0 and 4095) rather than voltage.
+          0 and 65535) rather than voltage.
         * :py:const:`OptionFlags.NOCALIBRATEDATA`: Return data without the
           calibration factors applied.
         * :py:const:`OptionFlags.EXTCLOCK`: Use an external 3.3V or 5V logic

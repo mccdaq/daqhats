@@ -36,6 +36,9 @@ int main(int argc, char* argv[])
         case HAT_ID_MCC_118:
             printf("Type: MCC 118\n");
             break;
+        case HAT_ID_MCC_128:
+            printf("Type: MCC 128\n");
+            break;
         case HAT_ID_MCC_134:
             printf("Type: MCC 134\n");
             break;
@@ -67,6 +70,25 @@ int main(int argc, char* argv[])
                     printf("Can't read firmware version\n");
                 }
                 mcc118_close(address);
+            }
+            else
+            {
+                printf("Can't open device\n");
+            }
+        }
+        else if (info_list[index].id == HAT_ID_MCC_128)
+        {
+            if (mcc128_open(address) == RESULT_SUCCESS)
+            {
+                if (mcc128_firmware_version(address, &version) == RESULT_SUCCESS)
+                {
+                    printf("Firmware version:   %X.%02X\n", (uint8_t)(version >> 8), (uint8_t)version);
+                }
+                else
+                {
+                    printf("Can't read firmware version\n");
+                }
+                mcc128_close(address);
             }
             else
             {

@@ -159,16 +159,14 @@ int mcc128_serial(uint8_t address, char* buffer);
 int mcc128_calibration_date(uint8_t address, char* buffer);
 
 /**
-*   @brief Read the MCC 128 calibration coefficients for a specified input mode
-*       and range.
+*   @brief Read the MCC 128 calibration coefficients for a specified input
+*       range.
 *
 *   The coefficients are applied in the library as:
 *
 *       calibrated_ADC_code = (raw_ADC_code * slope) + offset
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param mode     The input mode, one of the
-*                   [input mode](@ref AnalogInputMode) values.
 *   @param range    The input range, one of the
 *                   [input range](@ref AnalogInputRange) values.
 *   @param slope    Receives the slope.
@@ -176,12 +174,12 @@ int mcc128_calibration_date(uint8_t address, char* buffer);
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc128_calibration_coefficient_read(uint8_t address, uint8_t mode,
-    uint8_t range, double* slope, double* offset);
+int mcc128_calibration_coefficient_read(uint8_t address, uint8_t range,
+    double* slope, double* offset);
 
 /**
 *   @brief Temporarily write the MCC 128 calibration coefficients for a
-*       specified input mode and range.
+*       specified input range.
 *
 *   The user can apply their own calibration coefficients by writing to these
 *   values. The values will reset to the factory values from the EEPROM whenever
@@ -193,15 +191,15 @@ int mcc128_calibration_coefficient_read(uint8_t address, uint8_t mode,
 *       calibrated_ADC_code = (raw_ADC_code * slope) + offset
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
-*   @param mode     The input mode (0 - 1).
-*   @param range    The range number (0 - 3).
+*   @param range    The input range, one of the
+*                   [input range](@ref AnalogInputRange) values.
 *   @param slope    The new slope value.
 *   @param offset   The new offset value.
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc128_calibration_coefficient_write(uint8_t address, uint8_t mode,
-    uint8_t range, double slope, double offset);
+int mcc128_calibration_coefficient_write(uint8_t address, uint8_t range,
+    double slope, double offset);
 
 /**
 *   @brief Set the analog input mode.

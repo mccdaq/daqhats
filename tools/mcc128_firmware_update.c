@@ -12,7 +12,7 @@
 #include "gpio.h"
 #include "util.h"
 #include "daqhats.h"
-#include "mcc172_update.h"
+#include "mcc128_update.h"
 
 // allocated at run time to contain the entire file
 uint8_t* frame_file_buffer;
@@ -21,7 +21,7 @@ uint32_t frame_file_index;
 
 void print_usage(void)
 {
-    printf("Usage: mcc172_firmware_update <address> <file>\n");
+    printf("Usage: mcc128_firmware_update <address> <file>\n");
     printf("  address: the board address (0-7)\n");
     printf("  file: the name of the firmware file\n");
 }
@@ -139,10 +139,10 @@ int update_firmware(int address, char* filename)
     fclose(binfile);
     frame_file_index = 0;
 
-    ret = mcc172_open(address);
+    ret = mcc128_open(address);
     if (ret == RESULT_SUCCESS)
     {
-        if (mcc172_firmware_version(address, &fw_version) == RESULT_SUCCESS)
+        if (mcc128_firmware_version(address, &fw_version) == RESULT_SUCCESS)
         {
             printf("Checking existing version...\n");
 
@@ -152,16 +152,16 @@ int update_firmware(int address, char* filename)
     }
     else if (ret == RESULT_INVALID_DEVICE)
     {
-        printf("The device at address %d is not an MCC 172.\n", address);
+        printf("The device at address %d is not an MCC 128.\n", address);
         free(frame_file_buffer);
         return 1;
     }
     else
     {
-        ret = mcc172_open_for_update(address);
+        ret = mcc128_open_for_update(address);
         if (ret == RESULT_SUCCESS)
         {
-            printf("The device at address %d cannot be confirmed as an MCC 172.\n",
+            printf("The device at address %d cannot be confirmed as an MCC 128.\n",
                 address);
         }
         else
@@ -181,13 +181,13 @@ int update_firmware(int address, char* filename)
     {
         printf("Exiting\n");
         free(frame_file_buffer);
-        mcc172_close(address);
+        mcc128_close(address);
         return 1;
     }
 
     printf("Updating...\n");
 
-    mcc172_enter_bootloader(address);
+    mcc128_enter_bootloader(address);
 
     finished = false;
     error = false;
@@ -197,14 +197,14 @@ int update_firmware(int address, char* filename)
     {
          // wait for bootloader to be ready
         count = 0;
-        while (!mcc172_bl_ready() &&
+        while (!mcc128_bl_ready() &&
                (count < 1000*10))
         {
             usleep(100);
             count++;
         }
 
-        if (!mcc172_bl_ready())
+        if (!mcc128_bl_ready())
         {
             printf("Timeout waiting for NCHG\n");
             finished = true;
@@ -224,7 +224,7 @@ int update_firmware(int address, char* filename)
             tr_len = 1;
         }
 
-        if (mcc172_bl_transfer(address, tx_data, rx_data, tr_len) != RESULT_SUCCESS)
+        if (mcc128_bl_transfer(address, tx_data, rx_data, tr_len) != RESULT_SUCCESS)
         {
             printf("Error: ioctl failed\n");
         }
@@ -249,7 +249,7 @@ int update_firmware(int address, char* filename)
             tx_data[0] = 0xDC;
             tx_data[1] = 0xAA;
             tr_len = 2;
-            if (mcc172_bl_transfer(address, tx_data, NULL, tr_len) != RESULT_SUCCESS)
+            if (mcc128_bl_transfer(address, tx_data, NULL, tr_len) != RESULT_SUCCESS)
             {
                 printf("Error: ioctl failed\n");
             }
@@ -270,7 +270,7 @@ int update_firmware(int address, char* filename)
             else
             {
                 //printf("sending next frame\n");
-                if (mcc172_bl_transfer(address, ptr, NULL, length) != RESULT_SUCCESS)
+                if (mcc128_bl_transfer(address, ptr, NULL, length) != RESULT_SUCCESS)
                 {
                     printf("Error: ioctl failed\n");
                 }
@@ -284,7 +284,7 @@ int update_firmware(int address, char* filename)
             tr.tx_buf = (uintptr_t)tx_data;
             tr.rx_buf = (uintptr_t)NULL;
             tr_len = 2;
-            if (mcc172_bl_transfer(address, tx_data, NULL, tr_len) != RESULT_SUCCESS)
+            if (mcc128_bl_transfer(address, tx_data, NULL, tr_len) != RESULT_SUCCESS)
             {
                 printf("Error: ioctl failed\n");
             }
@@ -325,7 +325,7 @@ int update_firmware(int address, char* filename)
     }
 
     free(frame_file_buffer);
-    mcc172_close(address);
+    mcc128_close(address);
 
     if (error)
     {
@@ -372,12 +372,12 @@ int main(int argc, char* argv[])
     // wait for device to boot the new firmware
     sleep(2);
 
-    if (mcc172_open(address) != RESULT_SUCCESS)
+    if (mcc128_open(address) != RESULT_SUCCESS)
     {
         printf("error\n");
         return 1;
     }
-    if (mcc172_firmware_version(address, &fw_version) != RESULT_SUCCESS)
+    if (mcc128_firmware_version(address, &fw_version) != RESULT_SUCCESS)
     {
         printf("error\n");
         return 1;

@@ -185,10 +185,10 @@ struct mcc128FactoryData
     char serial[SERIAL_SIZE];
     // Calibration date in the format 2017-09-19
     char cal_date[CAL_DATE_SIZE];
-    // Calibration coefficients - per mode & range slopes
-    double slopes[NUM_AI_MODES][NUM_RANGES];
-    // Calibration coefficents - per mode & range offsets
-    double offsets[NUM_AI_MODES][NUM_RANGES];
+    // Calibration coefficients - per range slopes
+    double slopes[NUM_RANGES];
+    // Calibration coefficents - per range offsets
+    double offsets[NUM_RANGES];
 };
 
 // Local data for analog input scans
@@ -215,8 +215,8 @@ struct mcc128ScanThreadInfo
     uint8_t channel_index;
     uint8_t modes[NUM_CHANNELS];
     uint8_t ranges[NUM_CHANNELS];
-    double slopes[NUM_AI_MODES][NUM_RANGES];
-    double offsets[NUM_AI_MODES][NUM_RANGES];
+    double slopes[NUM_RANGES];
+    double offsets[NUM_RANGES];
 };
 
 // Local data for each open MCC 128 board.
@@ -600,20 +600,17 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
  *****************************************************************************/
 static void _set_defaults(struct mcc128FactoryData* data)
 {
-    int i, j;
+    int j;
 
     if (data)
     {
         strcpy(data->serial, "00000000");
         strcpy(data->cal_date, "1970-01-01");
 
-        for (i = 0; i < NUM_AI_MODES; i++)
+        for (j = 0; j < NUM_RANGES; j++)
         {
-            for (j = 0; j < NUM_RANGES; j++)
-            {
-                data->slopes[i][j] = 1.0;
-                data->offsets[i][j] = 0.0;
-            }
+            data->slopes[j] = 1.0;
+            data->offsets[j] = 0.0;
         }
     }
 }
@@ -630,39 +627,19 @@ static void _set_defaults(struct mcc128FactoryData* data)
         {
             "date": "2020-04-19",
             "slopes":
-            {
-                "se":
-                [
-                    1.000000,
-                    1.000000,
-                    1.000000,
-                    1.000000
-                ],
-                "diff":
-                [
-                    1.000000,
-                    1.000000,
-                    1.000000,
-                    1.000000
-                ]
-            },
+            [
+                1.000000,
+                1.000000,
+                1.000000,
+                1.000000
+            ],
             "offsets":
-            {
-                "se":
-                [
-                    0.000000,
-                    0.000000,
-                    0.000000,
-                    0.000000
-                ],
-                "diff":
-                [
-                    0.000000,
-                    0.000000,
-                    0.000000,
-                    0.000000
-                ]
-            }
+            [
+                0.000000,
+                0.000000,
+                0.000000,
+                0.000000
+            ]
         }
     }
 
@@ -672,13 +649,10 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
 {
     bool got_serial = false;
     bool got_date = false;
-    bool got_se_slopes = false;
-    bool got_se_offsets = false;
-    bool got_diff_slopes = false;
-    bool got_diff_offsets = false;
+    bool got_slopes = false;
+    bool got_offsets = false;
     cJSON* child;
     cJSON* calchild;
-    cJSON* coefchild;
     cJSON* subchild;
     int index;
 
@@ -725,132 +699,54 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
                     got_date = true;
                 }
                 else if (!strcmp(calchild->string, "slopes") &&
-                        (calchild->type == cJSON_Object))
+                        (calchild->type == cJSON_Array))
                 {
-                    // Found the slopes, must go down a level
-                    coefchild = calchild->child;
+                    // Found the slopes array, must go down a level
+                    subchild = calchild->child;
+                    index = 0;
 
-                    while (coefchild)
+                    while (subchild)
                     {
-                        if (!strcmp(coefchild->string, "se") &&
-                                (coefchild->type == cJSON_Array))
+                        // Iterate through the slopes array
+                        if ((subchild->type == cJSON_Number) &&
+                            (index < NUM_RANGES))
                         {
-                            // Found the SE slopes, must go down a level
-                            subchild = coefchild->child;
-                            index = 0;
-
-                            while (subchild)
-                            {
-                                // Get the slope for each range
-                                if ((subchild->type == cJSON_Number) &&
-                                    (index < NUM_RANGES))
-                                {
-                                    data->slopes[A_IN_MODE_SE][index] =
-                                        subchild->valuedouble;
-                                    index++;
-                                }
-                                subchild = subchild->next;
-                            }
-
-                            if (index == NUM_RANGES)
-                            {
-                                // Must have all ranges to be successful
-                                got_se_slopes = true;
-                            }
+                            data->slopes[index] = subchild->valuedouble;
+                            index++;
                         }
-                        else if (!strcmp(coefchild->string, "diff") &&
-                                (coefchild->type == cJSON_Array))
-                        {
-                            // Found the diff slopes array, must go down a level
-                            subchild = coefchild->child;
-                            index = 0;
+                        subchild = subchild->next;
+                    }
 
-                            while (subchild)
-                            {
-                                // Iterate through the slopes array
-                                if ((subchild->type == cJSON_Number) &&
-                                    (index < NUM_RANGES))
-                                {
-                                    data->slopes[A_IN_MODE_DIFF][index] =
-                                        subchild->valuedouble;
-                                    index++;
-                                }
-                                subchild = subchild->next;
-                            }
-
-                            if (index == NUM_RANGES)
-                            {
-                                // Must have all ranges to be successful
-                                got_diff_slopes = true;
-                            }
-                        }
-
-                        coefchild = coefchild->next;
+                    if (index == NUM_RANGES)
+                    {
+                        // Must have all ranges to be successful
+                        got_slopes = true;
                     }
                 }
                 else if (!strcmp(calchild->string, "offsets") &&
-                        (calchild->type == cJSON_Object))
+                        (calchild->type == cJSON_Array))
                 {
-                    // Found the offsets, must go down a level
-                    coefchild = calchild->child;
+                    // Found the offsets array, must go down a level
+                    subchild = calchild->child;
+                    index = 0;
 
-                    while (coefchild)
+                    while (subchild)
                     {
-                        if (!strcmp(coefchild->string, "se") &&
-                                (coefchild->type == cJSON_Array))
+                        // Iterate through the offsets array
+                        if ((subchild->type == cJSON_Number) &&
+                            (index < NUM_RANGES))
                         {
-                            // Found the SE offsets array, must go down a level
-                            subchild = coefchild->child;
-                            index = 0;
-
-                            while (subchild)
-                            {
-                                // Iterate through the array
-                                if ((subchild->type == cJSON_Number) &&
-                                    (index < NUM_RANGES))
-                                {
-                                    data->offsets[A_IN_MODE_SE][index] =
-                                        subchild->valuedouble;
-                                    index++;
-                                }
-                                subchild = subchild->next;
-                            }
-
-                            if (index == NUM_RANGES)
-                            {
-                                // Must have all ranges to be successful
-                                got_se_offsets = true;
-                            }
+                            data->offsets[index] = subchild->valuedouble;
+                            index++;
                         }
-                        else if (!strcmp(coefchild->string, "diff") &&
-                                (coefchild->type == cJSON_Array))
-                        {
-                            // Found the diff offsets array, must go down a level
-                            subchild = coefchild->child;
-                            index = 0;
+                        subchild = subchild->next;
+                    }
 
-                            while (subchild)
-                            {
-                                // Iterate through the array
-                                if ((subchild->type == cJSON_Number) &&
-                                    (index < NUM_RANGES))
-                                {
-                                    data->offsets[A_IN_MODE_DIFF][index] =
-                                        subchild->valuedouble;
-                                    index++;
-                                }
-                                subchild = subchild->next;
-                            }
-
-                            if (index == NUM_RANGES)
-                            {
-                                // Must have all ranges to be successful
-                                got_diff_offsets = true;
-                            }
-                        }
-
-                        coefchild = coefchild->next;
-                    };
+                    if (index == NUM_RANGES)
+                    {
+                        // Must have all ranges to be successful
+                        got_offsets = true;
+                    }
                 }
 
                 calchild = calchild->next;
@@ -859,8 +755,7 @@ static int _parse_factory_data(cJSON* root, struct mcc128FactoryData* data)
         child = child->next;
     }
 
-    if (got_serial && got_date &&
-        got_se_slopes && got_se_offsets && got_diff_slopes && got_diff_offsets)
+    if (got_serial && got_date && got_slopes && got_offsets)
     {
         // Report success if all required items were found
         return 1;
@@ -900,7 +795,6 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
     struct mcc128Device* dev;
     struct mcc128ScanThreadInfo* info;
     uint16_t* rx_data;
-    uint8_t mode;
     uint8_t range;
 
     if (!_check_addr(address) ||
@@ -933,26 +827,25 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
         return ret;
     }
 
+    range = info->ranges[info->channel_index];
+
     for (count = 0; count < sample_count; count++)
     {
         // convert raw values to double
-        buffer[count] = (double)rx_data[count];
-
-        mode = info->modes[info->channel_index];
-        range = info->ranges[info->channel_index];
+        buffer[count] = (double)(MAX_CODE - rx_data[count]);
 
         if (calibrated)
         {
             // apply the correct cal factor to each sample in the list
-            buffer[count] *= info->slopes[mode][range];
-            buffer[count] += info->offsets[mode][range];
+            buffer[count] *= info->slopes[range];
+            buffer[count] += info->offsets[range];
         }
 
         // convert to volts if desired
         if (scaled)
         {
             buffer[count] *= LSB_SIZES[range];
-            buffer[count] += RANGE_OFFSETS[range];
+            buffer[count] -= RANGE_OFFSETS[range];
         }
 
         info->channel_index++;
@@ -972,8 +865,8 @@ static int _a_in_read_scan_data(uint8_t address, uint16_t sample_count,
 static void* _scan_thread(void* arg)
 {
     bool done;
-    uint16_t available_samples;
-    uint16_t max_read_now;
+    uint32_t available_samples;
+    uint32_t max_read_now;
     uint16_t read_count;
     int error;
     uint32_t sleep_us;
@@ -983,7 +876,7 @@ static void* _scan_thread(void* arg)
     bool calibrated;
     bool scaled;
     bool stop_thread;
-    uint8_t rx_buffer[5];
+    uint8_t rx_buffer[7];
     bool scan_running;
 
     free(arg);
@@ -1028,11 +921,13 @@ static void* _scan_thread(void* arg)
     do
     {
         // read the scan status
-        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 5,
+        if (_spi_transfer(address, CMD_AINSCANSTATUS, NULL, 0, rx_buffer, 7,
             1*MSEC, 20) == RESULT_SUCCESS)
         {
-            available_samples = ((uint16_t)rx_buffer[2] << 8) + rx_buffer[1];
-            max_read_now = ((uint16_t)rx_buffer[4] << 8) + rx_buffer[3];
+            available_samples = ((uint32_t)rx_buffer[3] << 16) +
+                ((uint32_t)rx_buffer[2] << 8) + rx_buffer[1];
+            max_read_now = ((uint32_t)rx_buffer[6] << 16) +
+                ((uint32_t)rx_buffer[5] << 8) + rx_buffer[4];
             scan_running = (rx_buffer[0] & 0x01) == 0x01;
 
             pthread_mutex_lock(&_devices[address]->scan_mutex);
@@ -1061,15 +956,16 @@ static void* _scan_thread(void* arg)
                     (available_samples >= info->read_threshold) ||
                     (available_samples > max_read_now))
                 {
-                    read_count = available_samples;
-                    if (max_read_now < read_count)
+                    //read_count = available_samples;
+                    if (max_read_now < available_samples)
                     {
-                        read_count = max_read_now;
+                        available_samples = max_read_now;
                     }
-                    if (read_count > MAX_SAMPLES_READ)
+                    if (available_samples > MAX_SAMPLES_READ)
                     {
-                        read_count = MAX_SAMPLES_READ;
+                        available_samples = MAX_SAMPLES_READ;
                     }
+                    read_count = (uint16_t)available_samples;
                 }
                 else
                 {
@@ -1128,7 +1024,7 @@ static void* _scan_thread(void* arg)
                     status_count = 0;
                 }
 
-                if (!scan_running && (available_samples == read_count))
+                if (!scan_running && (available_samples == 0/*read_count*/))
                 {
                     done = true;
                     pthread_mutex_lock(&_devices[address]->scan_mutex);
@@ -1481,12 +1377,11 @@ int mcc128_calibration_date(uint8_t address, char* buffer)
 /******************************************************************************
   Read the calibration coefficients.
  *****************************************************************************/
-int mcc128_calibration_coefficient_read(uint8_t address, uint8_t mode,
-uint8_t range, double* slope, double* offset)
+int mcc128_calibration_coefficient_read(uint8_t address, uint8_t range,
+double* slope, double* offset)
 {
     // validate parameters
     if (!_check_addr(address) ||
-        (mode >= NUM_AI_MODES) ||
         (range >= NUM_RANGES) ||
         (slope == NULL) ||
         (offset == NULL))
@@ -1494,20 +1389,19 @@ uint8_t range, double* slope, double* offset)
         return RESULT_BAD_PARAMETER;
     }
 
-    *slope = _devices[address]->factory_data.slopes[mode][range];
-    *offset = _devices[address]->factory_data.offsets[mode][range];
+    *slope = _devices[address]->factory_data.slopes[range];
+    *offset = _devices[address]->factory_data.offsets[range];
     return RESULT_SUCCESS;
 }
 
 /******************************************************************************
   Write the calibration coefficients.
  *****************************************************************************/
-int mcc128_calibration_coefficient_write(uint8_t address, uint8_t mode,
-uint8_t range, double slope, double offset)
+int mcc128_calibration_coefficient_write(uint8_t address, uint8_t range,
+double slope, double offset)
 {
     // validate parameters
     if (!_check_addr(address) ||
-        (mode >= NUM_AI_MODES) ||
         (range >= NUM_RANGES))
     {
         return RESULT_BAD_PARAMETER;
@@ -1518,8 +1412,8 @@ uint8_t range, double slope, double offset)
         return RESULT_BUSY;
     }
 
-    _devices[address]->factory_data.slopes[mode][range] = slope;
-    _devices[address]->factory_data.offsets[mode][range] = offset;
+    _devices[address]->factory_data.slopes[range] = slope;
+    _devices[address]->factory_data.offsets[range] = offset;
     return RESULT_SUCCESS;
 }
 
@@ -1635,16 +1529,16 @@ int mcc128_a_in_read(uint8_t address, uint8_t channel, uint32_t options,
         return ret;
     }
 
+    val = (double)(MAX_CODE - code);
+
     // calibrate?
     if (options & OPTS_NOCALIBRATEDATA)
     {
-        val = (double)code;
     }
     else
     {
-        val = ((double)code *
-            _devices[address]->factory_data.slopes[mode][range]) +
-            _devices[address]->factory_data.offsets[mode][range];
+        val *= _devices[address]->factory_data.slopes[range];
+        val += _devices[address]->factory_data.offsets[range];
     }
 
     // calculate voltage?
@@ -1730,8 +1624,8 @@ int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
     uint8_t scan_options;
 
     if (!_check_addr(address) ||
-        (queue_count == 0) || (queue_count > NUM_CHANNELS) || (queue = NULL) ||
-        ((samples_per_channel == 0) && ((options & OPTS_CONTINUOUS) == 0)))
+        (0 == queue_count) || (queue_count > NUM_CHANNELS) || (NULL == queue) ||
+        ((0 == samples_per_channel) && (0 == (options & OPTS_CONTINUOUS))))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -1768,9 +1662,9 @@ int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
 
     // save the coefficients
     memcpy(info->slopes, dev->factory_data.slopes,
-        NUM_AI_MODES*NUM_RANGES*sizeof(double));
+        NUM_RANGES*sizeof(double));
     memcpy(info->offsets, dev->factory_data.offsets,
-        NUM_AI_MODES*NUM_RANGES*sizeof(double));
+        NUM_RANGES*sizeof(double));
 
     // Make sure the rate is within the board specs
     adc_rate = 0.0;
@@ -2055,8 +1949,8 @@ int mcc128_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     //info->channel_index = 0;
 
     // save the correct coefficients
-    info->slope = dev->factory_data.slopes[dev->ain_mode][dev->ain_range];
-    info->offset = dev->factory_data.offsets[dev->ain_mode][dev->ain_range];
+    info->slope = dev->factory_data.slopes[dev->ain_range];
+    info->offset = dev->factory_data.offsets[dev->ain_range];
 
     // Make sure the rate is within the board specs
     adc_rate = 0.0;
@@ -2394,6 +2288,10 @@ int mcc128_a_in_scan_read(uint8_t address, uint16_t* status,
         ((samples_per_channel > 0) &&
          ((buffer == NULL) || (buffer_size_samples == 0))))
     {
+        if (samples_read_per_channel)
+        {
+            *samples_read_per_channel = 0;
+        }
         return RESULT_BAD_PARAMETER;
     }
 

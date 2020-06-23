@@ -33,7 +33,8 @@ $(BUILD_DIR)/%.o : %.c
 
 install:
 	@cd ../include; make install; cd ../lib
-	@install -D $(BUILD_DIR)/$(TARGET_LIB) $(INSTALL_DIR)
+	@install -d $(INSTALL_DIR)
+	@install $(BUILD_DIR)/$(TARGET_LIB) $(INSTALL_DIR)
 	@ldconfig
 	@ln -frs $(INSTALL_DIR)/$(TARGET_LIB) $(INSTALL_DIR)/lib$(NAME).so
 
