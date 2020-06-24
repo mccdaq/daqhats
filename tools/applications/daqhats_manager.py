@@ -83,6 +83,8 @@ class ControlApp:
 
         self.mcc118_button = tkinter.Button(
             self.device_frame, text="MCC 118 App", command=self.pressed_118_button)
+        self.mcc128_button = tkinter.Button(
+            self.device_frame, text="MCC 128 App", command=self.pressed_128_button)
         self.mcc134_button = tkinter.Button(
             self.device_frame, text="MCC 134 App", command=self.pressed_134_button)
         self.mcc152_button = tkinter.Button(
@@ -91,6 +93,7 @@ class ControlApp:
             self.device_frame, text="MCC 172 App", command=self.pressed_172_button)
 
         self.mcc118_button.pack(fill=tkinter.X)
+        self.mcc128_button.pack(fill=tkinter.X)
         self.mcc134_button.pack(fill=tkinter.X)
         self.mcc152_button.pack(fill=tkinter.X)
         self.mcc172_button.pack(fill=tkinter.X)
@@ -119,6 +122,11 @@ class ControlApp:
     def pressed_118_button(self):
         """ MCC 118 button handler """
         result = Popen('/usr/share/mcc/daqhats/mcc118_control_panel.py')
+        self.app_list.append(result)
+
+    def pressed_128_button(self):
+        """ MCC 128 button handler """
+        result = Popen('/usr/share/mcc/daqhats/mcc128_control_panel.py')
         self.app_list.append(result)
 
     def pressed_134_button(self):
