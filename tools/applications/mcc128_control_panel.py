@@ -10,7 +10,7 @@
 """
 import tkinter
 import tkinter.font
-from daqhats import hat_list, mcc128, HatIDs, HatError
+from daqhats import hat_list, mcc128, HatIDs, HatError, AnalogInputMode, AnalogInputRange
 
 class ControlApp:
     """ Application class """
@@ -34,10 +34,13 @@ class ControlApp:
 
         # Create and organize frames
         self.top_frame = tkinter.LabelFrame(master, text="Select Device")
-        self.top_frame.pack(side=tkinter.TOP, expand=False, fill=tkinter.X)
+        self.top_frame.pack(expand=False, fill=tkinter.X)
 
+        self.mid_frame = tkinter.LabelFrame(master, text="Configuration")
+        self.mid_frame.pack(expand=False, fill=tkinter.X)
+        
         self.bottom_frame = tkinter.LabelFrame(master, text="Analog Inputs")
-        self.bottom_frame.pack(side=tkinter.BOTTOM, expand=True, fill=tkinter.BOTH)
+        self.bottom_frame.pack(expand=True, fill=tkinter.BOTH)
 
         # Create widgets
 
@@ -62,11 +65,48 @@ class ControlApp:
         self.device_lister.grid(row=0, column=1)
         self.open_button.grid(row=0, column=2)
 
+        label = tkinter.Label(self.mid_frame, text="Input mode")
+        label.grid(row=0, column=0)
+        label.grid_configure(sticky="E")
+        label = tkinter.Label(self.mid_frame, text="Input range")
+        label.grid(row=0, column=2)
+        label.grid_configure(sticky="E")
+
+        modes = ["Single Ended", "Differential"]
+        self.input_modes = {
+            "Single Ended": AnalogInputMode.SE,
+            "Differential": AnalogInputMode.DIFF}
+        self.input_modes_reversed = dict(map(reversed, self.input_modes.items()))
+        self.input_mode = AnalogInputMode.SE
+        self.input_mode_var = tkinter.StringVar(self.mid_frame)
+        self.input_mode_var.set(modes[0])
+        self.mode_option = tkinter.OptionMenu(
+            self.mid_frame, self.input_mode_var, *modes, command=self.pressed_mode)
+        self.mode_option.config(width=12)
+        self.mode_option.grid(row=0, column=1)
+        self.mode_option.grid_configure(sticky="EW")
+
+        ranges = ["10V", "5V", "2V", "1V"]
+        self.input_ranges = {
+            "10V": AnalogInputRange.BIP_10V,
+            "5V": AnalogInputRange.BIP_5V,
+            "2V": AnalogInputRange.BIP_2V,
+            "1V": AnalogInputRange.BIP_1V}
+        self.input_range = AnalogInputRange.BIP_10V
+        self.input_ranges_reversed = dict(map(reversed, self.input_ranges.items()))
+        self.input_range_var = tkinter.StringVar(self.mid_frame)
+        self.input_range_var.set(ranges[0])
+        self.range_option = tkinter.OptionMenu(
+            self.mid_frame, self.input_range_var, *ranges, command=self.pressed_range)
+        self.range_option.config(width=3)
+        self.range_option.grid(row=0, column=3)
+        self.range_option.grid_configure(sticky="EW")
+
         self.checkboxes = []
         self.check_values = []
         self.channel_labels = []
         self.voltages = []
-        for index in range(mcc128.info().NUM_AI_CHANNELS):
+        for index in range(mcc128.info().NUM_AI_CHANNELS[AnalogInputMode.SE]):
             # Checkboxes
             self.check_values.append(tkinter.IntVar())
             self.checkboxes.append(
@@ -83,11 +123,14 @@ class ControlApp:
             self.channel_labels[index].grid_configure(sticky="W")
             # Voltages
             self.voltages.append(tkinter.Label(
-                self.bottom_frame, text="0.000", font=self.bold_font))
+                self.bottom_frame, text="0.00000", font=self.bold_font))
             self.voltages[index].grid(row=index, column=2)
             self.voltages[index].grid_configure(sticky="E")
 
             self.bottom_frame.grid_rowconfigure(index, weight=1)
+
+        self.mid_frame.grid_columnconfigure(0, weight=1)
+        self.mid_frame.grid_columnconfigure(2, weight=1)
 
         self.bottom_frame.grid_columnconfigure(1, weight=1)
         self.bottom_frame.grid_columnconfigure(2, weight=1)
@@ -118,11 +161,36 @@ class ControlApp:
             self.channel_labels[index].config(state=tkinter.NORMAL)
             self.voltages[index].config(state=tkinter.NORMAL)
 
+    def pressed_mode(self, value):
+        self.input_mode = self.input_modes[value]
+        self.board.a_in_mode_write(self.input_mode)
+        
+        if self.input_mode == AnalogInputMode.DIFF:
+            state = tkinter.DISABLED
+        else:
+            state = tkinter.NORMAL
+            
+        for index in range(
+                           mcc128.info().NUM_AI_CHANNELS[AnalogInputMode.DIFF],
+                           mcc128.info().NUM_AI_CHANNELS[AnalogInputMode.SE]):
+            if state == tkinter.NORMAL and self.check_values[index].get() == 0:
+                pass
+            else:
+                self.checkboxes[index].config(state=state)
+                self.channel_labels[index].config(state=state)
+                self.voltages[index].config(state=state)
+    
+    def pressed_range(self, value):
+        self.input_range = self.input_ranges[value]
+        self.board.a_in_range_write(self.input_range)
+        
     def disable_controls(self):
         """ Disable controls when board closed """
         # Enable the address selector
         self.device_lister.config(state=tkinter.NORMAL)
         # Disable the board controls
+        for child in self.mid_frame.winfo_children():
+            child.config(state=tkinter.DISABLED)
         for child in self.bottom_frame.winfo_children():
             child.config(state=tkinter.DISABLED)
 
@@ -131,10 +199,12 @@ class ControlApp:
         # Disable the address selector
         self.device_lister.config(state=tkinter.DISABLED)
         # Enable the board controls
+        for child in self.mid_frame.winfo_children():
+            child.config(state=tkinter.NORMAL)
         for child in self.bottom_frame.winfo_children():
             child.config(state=tkinter.NORMAL)
         # Reset the channels to enabled
-        for index in range(mcc128.info().NUM_AI_CHANNELS):
+        for index in range(mcc128.info().NUM_AI_CHANNELS[AnalogInputMode.SE]):
             self.check_values[index].set(1)
 
     def list_devices(self):
@@ -147,6 +217,12 @@ class ControlApp:
         """ Open the selected device """
         try:
             self.board = mcc128(address)
+            
+            # get the mode and range
+            self.input_mode = self.board.a_in_mode_read()
+            self.input_range = self.board.a_in_range_read()
+            self.input_mode_var.set(self.input_modes_reversed[self.input_mode])
+            self.input_range_var.set(self.input_ranges_reversed[self.input_range])
         except HatError:
             return False
         else:
@@ -159,10 +235,10 @@ class ControlApp:
     def update_inputs(self):
         """ Periodically read inputs and display the values """
         if self.device_open:
-            for channel in range(mcc128.info().NUM_AI_CHANNELS):
+            for channel in range(mcc128.info().NUM_AI_CHANNELS[self.input_mode]):
                 if self.check_values[channel].get() == 1:
                     value = self.board.a_in_read(channel)
-                    self.voltages[channel].config(text="{:.3f}".format(value))
+                    self.voltages[channel].config(text="{:.5f}".format(value))
 
             # schedule another update in 200 ms
             self.master.after(200, self.update_inputs)

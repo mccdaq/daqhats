@@ -1,4 +1,5 @@
 *.o
 mcc118_firmware_update
+mcc128_firmware_update
 mcc172_firmware_update
 daqhats_list_boards
