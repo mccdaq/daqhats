@@ -12,15 +12,31 @@ The MCC 128 is an analog voltage input board with the following features:
 - Onboard sample buffers
 - Digital trigger input
 
+Single Ended Input configuration
+--------------------------------
 .. only:: html
 
-    .. image:: images/mcc118-web.jpg
+    .. image:: images/mcc128_se.jpg
         :align: center
         :alt: MCC 128 circuit board
 
 .. only:: latex
 
-    .. image:: images/mcc118.jpg
+    .. image:: images/mcc128_diff.jpg
+        :align: center
+        :alt: MCC 128 circuit board
+
+Differential Input Configuration
+--------------------------------
+.. only:: html
+
+    .. image:: images/mcc128_diff.jpg
+        :align: center
+        :alt: MCC 128 circuit board
+
+.. only:: latex
+
+    .. image:: images/mcc128_diff.jpg
         :align: center
         :alt: MCC 128 circuit board
 
@@ -28,7 +44,7 @@ Board components
 ----------------
 Screw terminals
 ^^^^^^^^^^^^^^^
-- **CH0+/CH0-** to **CH3+/CH3-** (CHx): Analog input terminals.
+- **CH0H/CH0L** to **CH3H/CH3L** (CHx): Analog input terminals.
 - **Clock** (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
   Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.
 - **Trigger** (TRIG): External digital trigger input terminal. The trigger mode is software
@@ -114,8 +130,8 @@ Specifications
 
 .. only:: html
 
-    `MCC 128 Electrical Specifications <_static/esmcc118.pdf>`_
+    `MCC 128 Electrical Specifications <_static/esmcc128.pdf>`_
 
 .. raw:: latex
 
-    \includepdf[pages=-]{../../specs/esmcc118.pdf}
+    \includepdf[pages=-]{../../specs/esmcc128.pdf}

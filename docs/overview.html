@@ -109,6 +109,8 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#mcc-128">MCC 128</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#single-ended-input-configuration">Single Ended Input configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#differential-input-configuration">Differential Input Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#id1">Board components</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#id2">Screw terminals</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#id3">Address jumpers</a></li>
@@ -365,13 +367,20 @@ Electrical Specifications for connector information.</p>
 <li>Onboard sample buffers</li>
 <li>Digital trigger input</li>
 </ul>
-<img alt="MCC 128 circuit board" class="align-center" src="_images/mcc118-web.jpg" />
+<div class="section" id="single-ended-input-configuration">
+<h3>Single Ended Input configuration<a class="headerlink" href="#single-ended-input-configuration" title="Permalink to this headline">¶</a></h3>
+<img alt="MCC 128 circuit board" class="align-center" src="_images/mcc128_se.jpg" />
+</div>
+<div class="section" id="differential-input-configuration">
+<h3>Differential Input Configuration<a class="headerlink" href="#differential-input-configuration" title="Permalink to this headline">¶</a></h3>
+<img alt="MCC 128 circuit board" class="align-center" src="_images/mcc128_diff.jpg" />
+</div>
 <div class="section" id="id1">
 <h3>Board components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="id2">
 <h4>Screw terminals<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
 <ul class="simple">
-<li><strong>CH0+/CH0-</strong> to <strong>CH3+/CH3-</strong> (CHx): Analog input terminals.</li>
+<li><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (CHx): Analog input terminals.</li>
 <li><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
 Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</li>
 <li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software
@@ -434,7 +443,7 @@ firmware on the MCC 128 that is installed at address 0:</p>
 </div>
 <div class="section" id="id11">
 <h3>Specifications<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference external" href="_static/esmcc118.pdf">MCC 128 Electrical Specifications</a></p>
+<p><a class="reference external" href="_static/esmcc128.pdf">MCC 128 Electrical Specifications</a></p>
 </div>
 </div>
 <div class="section" id="mcc-134">

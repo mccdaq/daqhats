@@ -1423,8 +1423,8 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc128_calibration_coefficient_read">
-<span class="target" id="mcc128_8h_1a15571407193cbed86d033773245381a9"></span>int <code class="descname">mcc128_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the MCC 128 calibration coefficients for a specified input mode and range. </p>
+<span class="target" id="mcc128_8h_1a0f71d51082db0561877e550e2ecd55d4"></span>int <code class="descname">mcc128_calibration_coefficient_read</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;range</em>, double *<em>&nbsp;slope</em>, double *<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the MCC 128 calibration coefficients for a specified input range. </p>
 <p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
 </div>
@@ -1435,7 +1435,6 @@ type of board.  The library may be used with C and C++.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
-<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The input mode, one of the <a class="reference internal" href="#mcc128_8h_1a72990e90fe7b6074f9431dae4b8e20ad"><span class="std std-ref">input mode</span></a> values. </li>
 <li><code class="docutils literal notranslate"><span class="pre">range</span></code>: The input range, one of the <a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2a"><span class="std std-ref">input range</span></a> values. </li>
 <li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: Receives the slope. </li>
 <li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: Receives the offset. </li>
@@ -1447,8 +1446,8 @@ type of board.  The library may be used with C and C++.</p>
 
 <dl class="function">
 <dt id="c.mcc128_calibration_coefficient_write">
-<span class="target" id="mcc128_8h_1ac955e03e5a051cdc17b2681ee2eb79e1"></span>int <code class="descname">mcc128_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;mode</em>, uint8_t<em>&nbsp;range</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporarily write the MCC 128 calibration coefficients for a specified input mode and range. </p>
+<span class="target" id="mcc128_8h_1a39e948b0ee81d7bfb4a3f5f8a2e7f772"></span>int <code class="descname">mcc128_calibration_coefficient_write</code><span class="sig-paren">(</span>uint8_t<em>&nbsp;address</em>, uint8_t<em>&nbsp;range</em>, double<em>&nbsp;slope</em>, double<em>&nbsp;offset</em><span class="sig-paren">)</span><a class="headerlink" href="#c.mcc128_calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Temporarily write the MCC 128 calibration coefficients for a specified input range. </p>
 <p>The user can apply their own calibration coefficients by writing to these values. The values will reset to the factory values from the EEPROM whenever <a class="reference internal" href="#mcc128_8h_1af6ef529a7d95fb196aec38f1bc42fb76"><span class="std std-ref">mcc128_open()</span></a> is called. This function will fail and return <a class="reference internal" href="#daqhats_8h_1ad8097859ab1bdd06be52a8421df152d4a67cf6a7b807c20e18dc78ab964b04911"><span class="std std-ref">RESULT_BUSY</span></a> if a scan is active when it is called.</p>
 <p>The coefficients are applied in the library as: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
@@ -1460,8 +1459,7 @@ type of board.  The library may be used with C and C++.</p>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal notranslate"><span class="pre">address</span></code>: The board address (0 - 7). Board must already be opened. </li>
-<li><code class="docutils literal notranslate"><span class="pre">mode</span></code>: The input mode (0 - 1). </li>
-<li><code class="docutils literal notranslate"><span class="pre">range</span></code>: The range number (0 - 3). </li>
+<li><code class="docutils literal notranslate"><span class="pre">range</span></code>: The input range, one of the <a class="reference internal" href="#mcc128_8h_1a3a0f69467f757289984a7e7d1bc7ab2a"><span class="std std-ref">input range</span></a> values. </li>
 <li><code class="docutils literal notranslate"><span class="pre">slope</span></code>: The new slope value. </li>
 <li><code class="docutils literal notranslate"><span class="pre">offset</span></code>: The new offset value. </li>
 </ul>

@@ -1471,8 +1471,8 @@ responds incorrectly.</td>
 
 <dl class="method">
 <dt id="daqhats.mcc128.calibration_coefficient_read">
-<code class="descname">calibration_coefficient_read</code><span class="sig-paren">(</span><em>a_in_mode</em>, <em>a_in_range</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the calibration coefficients for a specified input mode and range.</p>
+<code class="descname">calibration_coefficient_read</code><span class="sig-paren">(</span><em>a_in_range</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.calibration_coefficient_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the calibration coefficients for a specified input range.</p>
 <p>The coefficients are applied in the library as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">calibrated_ADC_code</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_ADC_code</span> <span class="o">*</span> <span class="n">slope</span><span class="p">)</span> <span class="o">+</span> <span class="n">offset</span>
 </pre></div>
@@ -1481,26 +1481,18 @@ responds incorrectly.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>a_in_mode</strong> (<a class="reference internal" href="#daqhats.AnalogInputMode" title="daqhats.AnalogInputMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogInputMode</span></code></a>) – The input mode.</li>
-<li><strong>a_in_range</strong> (<a class="reference internal" href="#daqhats.AnalogInputRange" title="daqhats.AnalogInputRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogInputRange</span></code></a>) – The input range.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a_in_range</strong> (<a class="reference internal" href="#daqhats.AnalogInputRange" title="daqhats.AnalogInputRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogInputRange</span></code></a>) – The input range.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A namedtuple containing the following field names:</p>
-<ul class="simple">
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A namedtuple containing the following field names:<ul class="simple">
 <li><strong>slope</strong> (float): The slope.</li>
 <li><strong>offset</strong> (float): The offset.</li>
 </ul>
-</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">namedtuple</p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</p>
-</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
+responds incorrectly.</td>
 </tr>
 </tbody>
 </table>
@@ -1508,9 +1500,9 @@ responds incorrectly.</p>
 
 <dl class="method">
 <dt id="daqhats.mcc128.calibration_coefficient_write">
-<code class="descname">calibration_coefficient_write</code><span class="sig-paren">(</span><em>a_in_mode</em>, <em>a_in_range</em>, <em>slope</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">calibration_coefficient_write</code><span class="sig-paren">(</span><em>a_in_range</em>, <em>slope</em>, <em>offset</em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.calibration_coefficient_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Temporarily write the calibration coefficients for a specified input
-mode and range.</p>
+range.</p>
 <p>The user can apply their own calibration coefficients by writing to
 these values. The values will reset to the factory values from the
 EEPROM whenever the class is initialized.  This function will fail and
@@ -1524,7 +1516,6 @@ raise a HatError exception if a scan is active when it is called.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>a_in_mode</strong> (<a class="reference internal" href="#daqhats.AnalogInputMode" title="daqhats.AnalogInputMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogInputMode</span></code></a>) – The input mode.</li>
 <li><strong>a_in_range</strong> (<a class="reference internal" href="#daqhats.AnalogInputRange" title="daqhats.AnalogInputRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalogInputRange</span></code></a>) – The input range.</li>
 <li><strong>slope</strong> (<em>float</em>) – The new slope value.</li>
 <li><strong>offset</strong> (<em>float</em>) – The new offset value.</li>
@@ -1664,7 +1655,7 @@ method are:</p>
 <li><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return a calibrated voltage value.
 Any other flags will override DEFAULT behavior.</li>
 <li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Return an ADC code (a value
-between 0 and 4095) rather than voltage.</li>
+between 0 and 65535) rather than voltage.</li>
 <li><a class="reference internal" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="daqhats.OptionFlags.NOCALIBRATEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOCALIBRATEDATA</span></code></a>: Return data without the
 calibration factors applied.</li>
 </ul>
@@ -1755,7 +1746,7 @@ because the device is busy.</li>
 internal scan clock, no trigger, and finite operation. Any other flags
 will override DEFAULT behavior.</li>
 <li><a class="reference internal" href="#daqhats.OptionFlags.NOSCALEDATA" title="daqhats.OptionFlags.NOSCALEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOSCALEDATA</span></code></a>: Return ADC codes (values between
-0 and 4095) rather than voltage.</li>
+0 and 65535) rather than voltage.</li>
 <li><a class="reference internal" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="daqhats.OptionFlags.NOCALIBRATEDATA"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.NOCALIBRATEDATA</span></code></a>: Return data without the
 calibration factors applied.</li>
 <li><a class="reference internal" href="#daqhats.OptionFlags.EXTCLOCK" title="daqhats.OptionFlags.EXTCLOCK"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.EXTCLOCK</span></code></a>: Use an external 3.3V or 5V logic
