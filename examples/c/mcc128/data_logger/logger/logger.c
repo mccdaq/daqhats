@@ -17,6 +17,9 @@ uint8_t g_hat_addr = 0;
 uint8_t g_chan_mask;
 uint32_t g_sample_count = 0;
 int g_num_samples = 2048;
+int g_input_range = A_IN_RANGE_BIP_10V;
+double g_range_min = -10.0;
+double g_range_max = 10.0;
 double g_zoom_level = 1.0;
 double g_sample_rate = 2048.0;
 gboolean g_done = TRUE;
@@ -25,7 +28,7 @@ const char *colors[8] = {"#DD3222", "#3482CB", "#75B54A", "#9966ff",
                          "#FFC000", "#FF6A00", "#808080", "#6E1911"};
 GtkWidget *labelFile, *dataBox, *rbContinuous, *rbFinite, *spinRate,
           *spinNumSamples, *btnSelectLogFile, *chkChan[MAX_CHANNELS],
-          *btnStart_Stop;
+          *btnStart_Stop, *comboInputRange;
 GMutex data_mutex;
 pthread_t threadh;
 pthread_mutex_t allocate_arrays_mutex;
@@ -180,6 +183,7 @@ static void set_enable_state_for_controls(gboolean state)
     {
         gtk_widget_set_sensitive (chkChan[i], state);
     }
+    gtk_widget_set_sensitive (comboInputRange, state);
     gtk_widget_set_sensitive (spinRate, state);
     gtk_widget_set_sensitive (spinNumSamples, state);
     gtk_widget_set_sensitive (rbFinite, state);
@@ -286,8 +290,8 @@ static gboolean refresh_graph()
     // Set the new limits on the time domain graph
     start = (gfloat)start_sample;
     end = (gfloat)(start_sample + g_num_samples - 1);
-    yMin = -10.0 * g_zoom_level;
-    yMax = 10.0 * g_zoom_level;
+    yMin = g_range_min * 1.1 * g_zoom_level;
+    yMax = g_range_max * 1.1 * g_zoom_level;
     gtk_databox_set_total_limits(GTK_DATABOX(dataBox), start, end, yMax, yMin);
 
     // Re-draw the graphs
@@ -481,6 +485,11 @@ static void start_stop_event_handler(GtkWidget *widget, gpointer data)
                                       actual_rate_per_channel);
         }
 
+        // Set the input range
+        mcc128_a_in_range_write(g_hat_addr, g_input_range);
+        // Set the input mode - use A_IN_MODE_DIFF for differential inputs
+        mcc128_a_in_mode_write(g_hat_addr, A_IN_MODE_SE);
+
         // Set the continuous option based on the UI setting.
         g_continuous = gtk_toggle_button_get_active(
                             GTK_TOGGLE_BUTTON(rbContinuous));
@@ -572,19 +581,47 @@ static void select_log_file_event_handler(GtkWidget* widget, char* user_data)
 }
 
 // Event handler for the time domain plot Y Zoom + button
-static void zoom_in_handler(GtkWidget* widget, gpointer user_dat)
+static void zoom_in_handler(GtkWidget* widget, gpointer user_data)
 {
     g_zoom_level *= 0.8;
     refresh_graph();
 }
 
 // Event handler for the time domain plot Y Zoom - button
-static void zoom_out_handler(GtkWidget* widget, gpointer user_dat)
+static void zoom_out_handler(GtkWidget* widget, gpointer user_data)
 {
     g_zoom_level /= 0.8;
     if(g_zoom_level > 1.0)
     {
         g_zoom_level = 1.0;
+    }
+    refresh_graph();
+}
+
+//Event handler for range selection
+static void input_range_handler(GtkWidget* widget, char* user_data)
+{
+    // Set the input range
+    g_input_range = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+    switch(g_input_range)
+    {
+        default:
+        case A_IN_RANGE_BIP_10V:
+            g_range_min = -10.0;
+            g_range_max = 10.0;
+            break;
+        case A_IN_RANGE_BIP_5V:
+            g_range_min = -5.0;
+            g_range_max = 5.0;
+            break;
+        case A_IN_RANGE_BIP_2V:
+            g_range_min = -2.0;
+            g_range_max = 2.0;
+            break;
+        case A_IN_RANGE_BIP_1V:
+            g_range_min = -1.0;
+            g_range_max = 1.0;
+            break;
     }
     refresh_graph();
 }
@@ -600,7 +637,8 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
               *hboxNumSamples2, *hboxLogFile, *hboxZoom, *vboxChannel,
               *vboxLegend, *acqSeparator, *logFileSeparator, *chanSeparator,
               *endSeparator, *dispSeparator, *dataTable, *btnZoomInY,
-              *btnZoomOutY, *separator;
+              *btnZoomOutY, *separator, *vboxInputRange, *hboxInputRange1,
+              *hboxInputRange2;
     GtkWidget *legend[MAX_CHANNELS];
     GtkDataboxRuler *rulerY, *rulerX;
     GdkRGBA background_color;
@@ -725,6 +763,25 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     label = gtk_label_new("Acquisition Settings");
     gtk_label_set_attributes (GTK_LABEL(label), titleAttrs);
     gtk_box_pack_start(GTK_BOX(vboxConfig), label, FALSE, FALSE, 0);
+    // Input Range
+    vboxInputRange = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_add(GTK_CONTAINER(vboxConfig), vboxInputRange);
+    hboxInputRange1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxInputRange), hboxInputRange1);
+    label = gtk_label_new("Range:");
+    gtk_box_pack_start(GTK_BOX(hboxInputRange1), label, FALSE, FALSE, 0);
+    hboxInputRange2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_container_add(GTK_CONTAINER(vboxInputRange), hboxInputRange2);
+    // Define Range options
+    comboInputRange = gtk_combo_box_text_new();
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboInputRange), NULL, "± 10V");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboInputRange), NULL, "± 5V");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboInputRange), NULL, "± 2V");
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(comboInputRange), NULL, "± 1V");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(comboInputRange), 0);
+    g_signal_connect(comboInputRange, "changed", G_CALLBACK(input_range_handler),
+                     NULL);
+    gtk_box_pack_start(GTK_BOX(hboxInputRange2), comboInputRange, FALSE, FALSE, 0);
     // Sample Rate
     vboxSampleRate = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(vboxConfig), vboxSampleRate);
@@ -802,7 +859,8 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_ruler_set_max_length(rulerX, 9);
     gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0Lf");
     // Set the default limits
-    gtk_databox_ruler_set_range(rulerY, 10.0, -10.0, 0.0);
+    gtk_databox_ruler_set_range(rulerY, (g_range_max * 1.1),
+                                (g_range_min * 1.1), 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 499.0, 0.0);
     gtk_databox_ruler_set_draw_subticks(rulerX, FALSE);
 
