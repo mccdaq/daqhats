@@ -27,8 +27,8 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-from daqhats import hat_list, mcc128, HatIDs, OptionFlags, AnalogInputMode, \
-    AnalogInputRange
+from daqhats import (hat_list, mcc128, HatIDs, OptionFlags, AnalogInputMode,
+                     AnalogInputRange)
 
 
 _app = Dash(__name__)   # pylint: disable=invalid-name,no-member
@@ -103,7 +103,7 @@ _app.layout = html.Div([
         html.Div(
             id='rightContent',
             children=[
-                dcc.Graph(id='stripChart'),
+                dcc.Graph(id='stripChart', style={'height': 500}),
                 html.Div(id='errorDisplay',
                          children='',
                          style={'font-weight': 'bold', 'color': 'red'})
@@ -115,6 +115,19 @@ _app.layout = html.Div([
             children=[
                 html.Label('Select a HAT...', style={'font-weight': 'bold'}),
                 create_hat_selector(),
+                html.Label('Range',
+                           style={'font-weight': 'bold',
+                                  'display': 'block', 'margin-top': 10}),
+                dcc.Dropdown(id='rangeSelector',
+                             options=[{'label': '± 10V',
+                                       'value': AnalogInputRange.BIP_10V},
+                                      {'label': '± 5V',
+                                       'value': AnalogInputRange.BIP_5V},
+                                      {'label': '± 2V',
+                                       'value': AnalogInputRange.BIP_2V},
+                                      {'label': '± 1V',
+                                       'value': AnalogInputRange.BIP_1V}],
+                             value=AnalogInputRange.BIP_10V, clearable=False),
                 html.Label('Sample Rate (Hz)',
                            style={'font-weight': 'bold', 'display': 'block',
                                   'margin-top': 10}),
@@ -185,10 +198,12 @@ _app.layout = html.Div([
      State('hatSelector', 'value'),
      State('sampleRate', 'value'),
      State('samplesToDisplay', 'value'),
+     State('rangeSelector', 'value'),
      State('channelSelections', 'value')]
 )   # pylint: disable=too-many-arguments
 def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
-                     sample_rate_val, samples_to_display, active_channels):
+                     sample_rate_val, samples_to_display, input_range,
+                     active_channels):
     """
     A callback function to change the application status when the Configure,
     Start or Stop button is clicked.
@@ -200,6 +215,7 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
             containing the descriptor for the selected MCC 128 DAQ HAT.
         sample_rate_val (float): The user specified sample rate value.
         samples_to_display (float): The number of samples to be displayed.
+        input_range (int): The analog input voltage range.
         active_channels ([int]): A list of integers corresponding to the user
             selected Active channel checkboxes.
 
@@ -221,8 +237,9 @@ def start_stop_click(n_clicks, button_label, hat_descriptor_json_str,
                     # other callbacks.
                     global _HAT     # pylint: disable=global-statement
                     _HAT = mcc128(hat_descriptor['address'])
-                    _HAT.a_in_mode_write(AnalogInputModes.SE)
-                    _HAT.a_in_range_write(AnalogInputRanges.BIP_10V)
+                    # Change to AnalogInputMode.DIFF for differential inputs.
+                    _HAT.a_in_mode_write(AnalogInputMode.SE)
+                    _HAT.a_in_range_write(input_range)
                     output = 'configured'
             else:
                 output = 'error'
@@ -306,6 +323,21 @@ def update_timer_interval(acq_state, chart_data_json_str, chart_info_json_str,
 def disable_hat_selector_dropdown(acq_state):
     """
     A callback function to disable the HAT selector dropdown when the
+    application status changes to configured or running.
+    """
+    disabled = False
+    if acq_state == 'configured' or acq_state == 'running':
+        disabled = True
+    return disabled
+
+
+@_app.callback(
+    Output('rangeSelector', 'disabled'),
+    [Input('status', 'children')]
+)
+def disable_range_selector_dropdown(acq_state):
+    """
+    A callback function to disable the range selector dropdown when the
     application status changes to configured or running.
     """
     disabled = False
