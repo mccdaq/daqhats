@@ -1,3 +1,6 @@
+1.3.0.6: 
+    - Fixed error where free(custom_data) was called twice in mcc172.c.
+
 1.3.0.5:
     - Fixed error when calling mcc172_a_in_clock_config_write() immediately after another
       function that communicates with the board.
