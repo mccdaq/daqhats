@@ -76,11 +76,4 @@ if [ $(raspi-config nonint get_spi) -eq 1 ]; then
    raspi-config nonint do_spi 0
 fi
 
-# Turn I2C on if needed (needed for MCC 152 at an address other than 0)
-if [ $(daqhats_check_152) -eq 1 ]; then
-   if [ $(raspi-config nonint get_i2c) -eq 1 ]; then
-      raspi-config nonint do_i2c 0
-   fi
-fi
-
 echo "Install complete"

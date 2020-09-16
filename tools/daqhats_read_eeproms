@@ -82,4 +82,11 @@ if [ "$overlay_loaded" -eq 1 ]; then
    dtoverlay -R i2c-gpio
 fi
 
+# If there is an MCC 152 at an address other than 0, enable the I2C bus.
+if [ $(daqhats_check_152) -eq 1 ]; then
+   if [ $(raspi-config nonint get_i2c) -eq 1 ]; then
+      raspi-config nonint do_i2c 0
+   fi
+fi
+
 echo "Done"

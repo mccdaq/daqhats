@@ -1,7 +1,8 @@
 1.3.0.6:
     - Fixed error where free(custom_data) was called twice in mcc172.c.
     - Fixed problem with the Python method interrupt_callback_enable().
-    - Changed the installer to automatically enable SPI (and I2C if needed.)
+    - Changed the installer to automatically enable SPI.
+    - Changed daqhats_read_eeproms to automatically enable I2C if needed.
     - Fixed trigger issue on MCC 172 (fix is in firmware version 1.01.)
 
 1.3.0.5:

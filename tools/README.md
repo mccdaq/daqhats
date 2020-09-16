@@ -16,7 +16,7 @@ This directory contains library tools, test applications, and firmware files.
    - Initial release.
 
 ### MCC 172
-1.00:
-   - Initial release.
 1.01:
    - Fixes issue with the first scan after changing the trigger mode.
+1.00:
+   - Initial release.
