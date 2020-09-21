@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include "daqhats/daqhats.h"
+#include "daqhats.h"
 #include "mcc118_update.h"
 
 // Flash address/size values are given in bytes
@@ -39,7 +39,7 @@ uint16_t hex_boot_version;
 void print_usage(void)
 {
     // don't advertise bootloader update option
-    printf("Usage: firmware_update <address> <hex file>\n");
+    printf("Usage: mcc118_firmware_update <address> <hex file>\n");
     printf("  address: the board address (0-7)\n");
     printf("  hex file: the name of the hex file containing the firmware\n");
 }

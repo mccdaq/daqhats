@@ -54,3 +54,16 @@ See individual function documentation for detailed usage information.
 .. doxygendefine:: OPTS_EXTCLOCK
 .. doxygendefine:: OPTS_EXTTRIGGER
 .. doxygendefine:: OPTS_CONTINUOUS
+
+Scan Status Flags
+~~~~~~~~~~~~~~~~~
+
+.. doxygendefine:: STATUS_HW_OVERRUN
+.. doxygendefine:: STATUS_BUFFER_OVERRUN
+.. doxygendefine:: STATUS_TRIGGERED
+.. doxygendefine:: STATUS_RUNNING
+
+Trigger Modes
+~~~~~~~~~~~~~
+
+.. doxygenenum:: TriggerMode

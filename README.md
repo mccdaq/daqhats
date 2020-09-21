@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>   
-    <tr><td>Library Version<td>1.2.0.4</td></tr>
+    <tr><td>Library Version<td>1.3.0.6</td></tr>
 </table>
 
 ## About
@@ -15,6 +15,7 @@ Hardware supported by this version of the MCC DAQ HAT Library:
 - [MCC 118](https://mccdaq.github.io/daqhats/overview.html#mcc-118)
 - [MCC 134](https://mccdaq.github.io/daqhats/overview.html#mcc-134)
 - [MCC 152](https://mccdaq.github.io/daqhats/overview.html#mcc-152)
+- [MCC 172](https://mccdaq.github.io/daqhats/overview.html#mcc-172)
 
 #### Hardware Compatibility
 The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
@@ -133,7 +134,10 @@ firmware on the MCC 118 that is installed at address 0.
 ```sh
 mcc118_firmware_update 0 ~/daqhats/tools/MCC_118.hex
 ```
-
+#### MCC 172
+```sh
+mcc172_firmware_update 0 ~/daqhats/tools/MCC_172.fw
+```
 ## Examples
 The daqhats library includes example programs developed with C/C++ and Python. 
 The examples are available under ~/daqhats/examples, and are provided in the 

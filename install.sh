@@ -59,7 +59,7 @@ if [ $(which python | wc -l) -ne 0 ]; then
       fi
    fi
 fi
-   
+
 if [ "$install_py2" == 1 ]; then
    echo "Installing library for Python 2"
    dpkg-query -l python-pip &> /dev/null
@@ -71,15 +71,9 @@ fi
 
 echo
 
-# Check for I2C device enabled
-if [ $(raspi-config nonint get_i2c) -eq 1 ]; then
-   echo "Some MCC DAQ HATs require the I2C interface to be enabled."
-   echo -n "Would you like to enable the I2C interface now? [y/n] "
-   read input
-   if [ "$input" == "y" ]; then
-      raspi-config nonint do_i2c 0
-   fi
-   echo
+# Turn SPI on (needed for some MCC 118s that had incorrectly programmed EEPROMs)
+if [ $(raspi-config nonint get_spi) -eq 1 ]; then
+   raspi-config nonint do_spi 0
 fi
 
 echo "Install complete"

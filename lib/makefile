@@ -1,6 +1,6 @@
 MAJOR = 1
-MINOR = 2
-SUB   = 0.4
+MINOR = 3
+SUB   = 0.6
 NAME = daqhats
 VERSION = $(MAJOR).$(MINOR).$(SUB)
 INSTALL_DIR = /usr/local/lib
@@ -12,7 +12,7 @@ LDFLAGS = -L/opt/vc/lib -shared -pthread -lm -lbcm_host -Wl,-soname,lib$(NAME).s
 RM = rm -f
 TARGET_LIB = lib$(NAME).so.$(VERSION)
 
-SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c mcc134.c mcc134_adc.c nist.c
+SRCS = util.c mcc118.c mcc152.c mcc152_dac.c mcc152_dio.c gpio.c cJSON.c mcc134.c mcc134_adc.c nist.c mcc172.c
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
 DEPS = $(OBJS:%.o=%.d)
 

@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <time.h>
+#include "daqhats.h"
 
 enum SpiBus
 {

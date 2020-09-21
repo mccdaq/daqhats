@@ -56,9 +56,6 @@ class mcc118(Hat): # pylint: disable=invalid-name
         self._lib.mcc118_close.argtypes = [c_ubyte]
         self._lib.mcc118_close.restype = c_int
 
-        self._lib.mcc118_close.argtypes = [c_ubyte]
-        self._lib.mcc118_close.restype = c_int
-
         self._lib.mcc118_blink_led.argtypes = [c_ubyte, c_ubyte]
         self._lib.mcc118_blink_led.restype = c_int
 
