@@ -1192,7 +1192,6 @@ int mcc128_open(uint8_t address)
         dev->spi_fd = open(spi_device, O_RDWR);
         if (dev->spi_fd < 0)
         {
-            free(custom_data);
             free(dev);
             _devices[address] = NULL;
             return RESULT_RESOURCE_UNAVAIL;
