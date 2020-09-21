@@ -1,8 +1,8 @@
 # MCC DAQ HAT Library for Raspberry Pi
 <table>
-    <tr><td>Info</td><td>Contains C and Python Libraries for interacting with 
+    <tr><td>Info</td><td>Contains C and Python Libraries for interacting with
     Measurement Computing DAQ HAT boards.</td></tr>
-    <tr><td>Author</td><td>Measurement Computing</td></tr>   
+    <tr><td>Author</td><td>Measurement Computing</td></tr>
     <tr><td>Library Version<td>1.4.0.0</td></tr>
 </table>
 
@@ -20,10 +20,10 @@ Hardware supported by this version of the MCC DAQ HAT Library:
 
 #### Hardware Compatibility
 The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
-GPIO header (not the original Pi 1 A or B with the 26-pin header.) They are 
-generally not compatible with any other brand of Raspberry Pi HAT or add-on 
-board that attaches to the GPIO header, or devices that use the Raspberry Pi 
-SPI interface. 
+GPIO header (not the original Pi 1 A or B with the 26-pin header.) They are
+generally not compatible with any other brand of Raspberry Pi HAT or add-on
+board that attaches to the GPIO header, or devices that use the Raspberry Pi
+SPI interface.
 
 In particular, LCD displays that use the GPIO header (not HDMI) usually use the
 SPI interface and will prevent the DAQ HATs from working. Even if the display is
@@ -44,11 +44,11 @@ specifications for that device.
 Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Raspberry Pi.
 
 ## Install Instructions
-1. Power off the Raspberry Pi and attach one or more DAQ HAT boards, using unique 
-   address settings for each. Refer to 
-   [Installing the HAT board](https://mccdaq.github.io/daqhats/hardware.html) 
+1. Power off the Raspberry Pi and attach one or more DAQ HAT boards, using unique
+   address settings for each. Refer to
+   [Installing the HAT board](https://nwright-mcc.github.io/daqhats/hardware.html)
    for detailed information.
-   When using a single board, leave it at address 0 (all address jumpers removed.) 
+   When using a single board, leave it at address 0 (all address jumpers removed.)
    One board must always be at address 0 to ensure that the OS reads a HAT EEPROM
    and initializes the hardware correctly.
 2. Power on the Pi, log in, and open a terminal window (if using the graphical interface.)
@@ -74,7 +74,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    cd ~
    git clone https://github.com/nwright-mcc/daqhats.git
    ```
-7. Build and install the shared library, tools, and optional Python support. The 
+7. Build and install the shared library, tools, and optional Python support. The
    installer will install Python 3 support by default and ask if you want to install
    Python 2 support. It will also detect the HAT board EEPROMs and save the contents,
    if needed.
@@ -82,12 +82,12 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    ```sh
    cd ~/daqhats
    sudo ./install.sh
-   ```   
+   ```
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
-library (if installed), go back to step 4, update your installed packages and reboot, 
+library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.
-   
-You can now run the example programs under ~/daqhats/examples and create your own 
+
+You can now run the example programs under ~/daqhats/examples and create your own
 programs. Refer to the [Examples](#examples) section below for more information.
 
 If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
@@ -103,7 +103,7 @@ it will not be correct if you change the board stack without updating the EEPROM
 images (see below.)
 
 #### Update the EEPROM images
-If you change your board stack, you must update the saved EEPROM images so that 
+If you change your board stack, you must update the saved EEPROM images so that
 the library has the correct board information. You can use the DAQ HAT Manager or the
 command:
 
@@ -144,8 +144,8 @@ mcc128_firmware_update 0 ~/daqhats/tools/MCC_128.fw
 mcc172_firmware_update 0 ~/daqhats/tools/MCC_172.fw
 ```
 ## Examples
-The daqhats library includes example programs developed with C/C++ and Python. 
-The examples are available under ~/daqhats/examples, and are provided in the 
+The daqhats library includes example programs developed with C/C++ and Python.
+The examples are available under ~/daqhats/examples, and are provided in the
 following formats:
 
 - console-based (C/C++ and Python)
@@ -157,7 +157,7 @@ following formats:
 Refer to the README.md file in each example folder for more information.
 
 ## Usage
-The following is a basic Python example demonstrating how to read MCC 118 voltage 
+The following is a basic Python example demonstrating how to read MCC 118 voltage
 inputs and display channel values.
 
 ```python
@@ -176,19 +176,19 @@ if not board_list:
     sys.exit()
 
 # Read and display every channel
-for entry in board_list: 
+for entry in board_list:
     if entry.id == HatIDs.MCC_118:
         print("Board {}: MCC 118".format(entry.address))
         board = mcc118(entry.address)
         for channel in range(board.info().NUM_AI_CHANNELS):
             value = board.a_in_read(channel)
-            print("Ch {0}: {1:.3f}".format(channel, value))	
+            print("Ch {0}: {1:.3f}".format(channel, value))
 ```
-    
+
 ## Support/Feedback
-The **daqhats** library is supported by MCC. Contact technical support through 
+The **daqhats** library is supported by MCC. Contact technical support through
 our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
-## Documentation 
-Documentation for the daqhats library is available at 
+## Documentation
+Documentation for the daqhats library is available at
 https://nwright-mcc.github.io/daqhats/index.html.

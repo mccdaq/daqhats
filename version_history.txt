@@ -1,5 +1,12 @@
-1.4.0.0:
-    - Added support for the MCC 172
+1.4.0:
+    - Added support for the MCC 128.
+
+1.3.0.6:
+    - Fixed error where free(custom_data) was called twice in mcc172.c.
+    - Fixed problem with the Python method interrupt_callback_enable().
+    - Changed the installer to automatically enable SPI.
+    - Changed daqhats_read_eeproms to automatically enable I2C if needed.
+    - Fixed trigger issue on MCC 172 (fix is in firmware version 1.01.)
 
 1.3.0.5:
     - Fixed error when calling mcc172_a_in_clock_config_write() immediately after another
@@ -48,8 +55,8 @@
 
 1.1.0.3:
     - Cleared up some memory allocation errors reported by valgrind.
-    - Set the value returned by open functions when trying to open the 
-    wrong type of board to RESULT_INVALID_DEVICE (or an appropriate 
+    - Set the value returned by open functions when trying to open the
+    wrong type of board to RESULT_INVALID_DEVICE (or an appropriate
     exception message in Python.)
     - Fixed an issue with dash dependency in the MCC 118 web_server Python
     example.
@@ -59,16 +66,16 @@
 1.1.0.2:
     - Fixed an issue with high CPU usage when waiting for a trigger on the
     MCC 118 - updated both library and trigger examples.
-    - Lowered the max SPI clock rate for the MCC 118 to fix communications 
+    - Lowered the max SPI clock rate for the MCC 118 to fix communications
     issues on some systems.
     - Fixed an issue with MCC 152 DIO interrupt callbacks in Python when
     running a scan on a separate MCC 118
-    
-1.1.0.1: 
+
+1.1.0.1:
     - Fixed an issue with resource conflicts when using multiple threads in
     the same process (such as using multiple MCC 118s.)
 
-1.1.0: 
+1.1.0:
     - Added support for the MCC 152.
 
 1.0.0:

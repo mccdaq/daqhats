@@ -25,9 +25,12 @@ mcc118_firmware_update: mcc118_firmware_update.o
 daqhats_list_boards: daqhats_list_boards.o
 	$(CC) -o $@ $^ $(OFLAGS)
 
+daqhats_check_152: daqhats_check_152.o
+	$(CC) -o $@ $^ $(OFLAGS)
+
 .PHONY: clean
 
-all: mcc118_firmware_update daqhats_list_boards mcc172_firmware_update mcc128_firmware_update
+all: mcc118_firmware_update daqhats_list_boards mcc172_firmware_update daqhats_check_152 mcc128_firmware_update
 
 install:
 	@install -d $(INSTALL_DIR)
@@ -37,6 +40,7 @@ install:
 	@install daqhats_read_eeproms $(INSTALL_DIR)
 	@install daqhats_list_boards $(INSTALL_DIR)
 	@install daqhats_version $(INSTALL_DIR)
+	@install daqhats_check_152 $(INSTALL_DIR)
 	@install -d $(APPS_DIR)
 	@install applications/*.py $(APPS_DIR)
 	@install -m 0644 applications/*.png $(APPS_DIR)
@@ -50,10 +54,12 @@ uninstall:
 	@rm -f $(INSTALL_DIR)/daqhats_read_eeproms
 	@rm -f $(INSTALL_DIR)/daqhats_list_boards
 	@rm -f $(INSTALL_DIR)/daqhats_version
-	@rm -rf $(APPS_DIR)
+	@rm -f $(INSTALL_DIR)/daqhats_check_152
+	@rm -f $(SHORTCUT_DIR)/mcc_*_control_panel.desktop
 	@rm -f $(SHORTCUT_DIR)/mcc_daqhats_manager.desktop
+	@rm -rf $(APPS_DIR)
 
 .DEFAULT_GOAL := all
 
 clean:
-	@rm -f *.o *~ core mcc118_firmware_update mcc172_firmware_update mcc128_firmware_update
+	@rm -f *.o *~ core mcc118_firmware_update mcc172_firmware_update daqhats_list_boards daqhats_check_152 mcc128_firmware_update

@@ -312,10 +312,10 @@ def interrupt_callback_enable(callback, user_data):
     _libc.hat_interrupt_callback_enable.restype = c_int
 
     # save the user data in the HatCallback object
-    callback.user_data = user_data
+    my_callback.user_data = user_data
 
     # pass the callback class handler function and void * to the library
-    if (_libc.hat_interrupt_callback_enable(callback.get_callback_func(),
+    if (_libc.hat_interrupt_callback_enable(my_callback.get_callback_func(),
                                             None) != 0):
         raise Exception("Could not enable callback function.")
     # save reference so it isn't garbage collected
