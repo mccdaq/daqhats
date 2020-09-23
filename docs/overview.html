@@ -569,6 +569,11 @@ input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition
 may be rising edge, falling edge, high level, or low level.  The trigger may
 also be shared across the Raspberry Pi GPIO header to synchronize multiple
 MCC 172s.</p>
+<p>Due to the nature of the filtering in the A/D converters there is
+an input delay of 39 samples, so the data coming from the converters at any time
+is delayed by 39 samples from the current time.  This is most noticeable when
+using a trigger - there will be approximately 39 samples prior to the trigger
+event in the captured data.</p>
 </div>
 <div class="section" id="alias-rejection">
 <h4>Alias Rejection<a class="headerlink" href="#alias-rejection" title="Permalink to this headline">¶</a></h4>

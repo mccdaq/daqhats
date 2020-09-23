@@ -2746,6 +2746,7 @@ type of board.  The library may be used with C and C++.</p>
 <li><a class="reference internal" href="#daqhats_8h_1aa534ed76b07c3983382a53e00e53e94aa95176a26d99fad97d400764990a71c0b"><span class="std std-ref">TRIG_ACTIVE_LOW</span></a>: Start the scan any time TRIG is low.</li>
 </ul>
 </p>
+<p>Due to the nature of the filtering in the A/D converters there is an input delay of 39 samples, so the data coming from the converters at any time is delayed by 39 samples from the current time. This is most noticeable when using a trigger - there will be approximately 39 samples prior to the trigger event in the captured data.</p>
 <p>Care must be taken when using master / slave triggering; the input trigger signal on the master will be passed through to the slave(s), but the mode is set independently on each device. For example, it is possible for the master to trigger on the rising edge of the signal and the slave to trigger on the falling edge.</p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>

@@ -604,6 +604,12 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
         * :py:const:`TriggerModes.ACTIVE_LOW`: Start saving data when the
           trigger is low.
 
+        Due to the nature of the filtering in the A/D converters there is an
+        input delay of 39 samples, so the data coming from the converters at any
+        time is delayed by 39 samples from the current time.  This is most
+        noticeable when using a trigger - there will be approximately 39 samples
+        prior to the trigger event in the captured data.
+
         Care must be taken when using master / slave triggering; the input
         trigger signal on the master will be passed through to the slave(s), but
         the mode is set independently on each device. For example, it is
