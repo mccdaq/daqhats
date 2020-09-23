@@ -221,7 +221,7 @@ int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
 *       single channel.
 *
 *   This applies a scaling factor to the analog input data so it returns values
-*   that are meaningful for the connected sensor.  
+*   that are meaningful for the connected sensor.
 *
 *   The sensitivity is specified in mV / mechanical unit. The default value
 *   when opening the library is 1000, resulting in no scaling of the input
@@ -230,7 +230,7 @@ int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
 *   returning it.
 *
 *   Examples:
-*   
+*
 *   - A seismic sensor with a sensitivity of 10 V/g. Set the sensitivity to
 *     10,000 and the returned data will be in units of g.
 *   - A vibration sensor with a sensitivity of 100 mV/g.  Set the sensitivity to
@@ -245,7 +245,7 @@ int mcc172_a_in_sensitivity_read(uint8_t address, uint8_t channel,
 *   @return [Result code](@ref ResultCode),
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful.
 */
-int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel, 
+int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel,
     double value);
 
 /**
@@ -267,8 +267,8 @@ int mcc172_a_in_sensitivity_write(uint8_t address, uint8_t channel,
 *   - [SOURCE_SLAVE](@ref SOURCE_SLAVE): No clock is generated on this MCC
 *     172, it receives its clock from the master MCC 172.
 *
-*   The data rate will not be valid in slave mode if synced is equal to 0. 
-*   The device will not detect a loss of the master clock when in slave mode; 
+*   The data rate will not be valid in slave mode if synced is equal to 0.
+*   The device will not detect a loss of the master clock when in slave mode;
 *   it only monitors the clock when a sync is initiated.
 *
 *   @param address  The board address (0 - 7). Board must already be opened.
@@ -288,7 +288,7 @@ int mcc172_a_in_clock_config_read(uint8_t address, uint8_t* clock_source,
 *   @brief Write the sampling clock configuration.
 *
 *   This function will configure the ADC sampling clock. The default
-*   configuration after opening the device is local mode, 51.2 KHz data rate. 
+*   configuration after opening the device is local mode, 51.2 KHz data rate.
 *
 *   The clock_source must be one of:
 *
@@ -367,6 +367,12 @@ int mcc172_a_in_clock_config_write(uint8_t address, uint8_t clock_source,
 *     high.
 *   - [TRIG_ACTIVE_LOW](@ref TRIG_ACTIVE_LOW): Start the scan any time TRIG is
 *     low.
+*
+*   Due to the nature of the filtering in the A/D converters there is an input
+*   delay of 39 samples, so the data coming from the converters at any time is
+*   delayed by 39 samples from the current time.  This is most noticeable when
+*   using a trigger - there will be approximately 39 samples prior to the
+*   trigger event in the captured data.
 *
 *   Care must be taken when using master / slave triggering; the input trigger
 *   signal on the master will be passed through to the slave(s), but the mode
