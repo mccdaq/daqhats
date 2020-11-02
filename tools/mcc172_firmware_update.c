@@ -341,6 +341,8 @@ int update_firmware(int address, char* filename)
 int main(int argc, char* argv[])
 {
     int address;
+    int retry_count;
+    bool success;
     char* filename;
     uint16_t fw_version;
 
@@ -370,21 +372,30 @@ int main(int argc, char* argv[])
     printf("Checking device...\n");
 
     // wait for device to boot the new firmware
-    sleep(2);
-
-    if (mcc172_open(address) != RESULT_SUCCESS)
+    retry_count = 0;
+    success = false;
+    do
     {
-        printf("error\n");
+        sleep(1);
+
+        if (mcc172_open(address) == RESULT_SUCCESS)
+        {
+            if (mcc172_firmware_version(address, &fw_version) == RESULT_SUCCESS)
+            {
+                success = true;
+                printf("firmware version %X.%02X\n",
+                    (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
+            }
+        }
+    } while ((retry_count < 5) && !success);
+
+    if (!success)
+    {
+        printf("Error\n");
         return 1;
     }
-    if (mcc172_firmware_version(address, &fw_version) != RESULT_SUCCESS)
+    else
     {
-        printf("error\n");
-        return 1;
+        return 0;
     }
-
-    printf("firmware version %X.%02X\n",
-        (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
-
-    return 0;
 }
