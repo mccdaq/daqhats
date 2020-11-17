@@ -27,14 +27,14 @@ double calc_rms(double* data, uint8_t channel, uint8_t num_channels,
     double value;
     uint32_t i;
     uint32_t index;
-    
+
     value = 0.0;
     for (i = 0; i < num_samples_per_channel; i++)
     {
         index = (i * num_channels) + channel;
         value += (data[index] * data[index]) / num_samples_per_channel;
     }
-    
+
     return sqrt(value);
 }
 
@@ -54,11 +54,11 @@ int main(void)
     // character string for display purposes.
     uint8_t channel_mask = {CHAN0 | CHAN1};
     convert_chan_mask_to_string(channel_mask, channel_string);
-    
+
 
     int max_channel_array_length = mcc172_info()->NUM_AI_CHANNELS;
     int channel_array[max_channel_array_length];
-    uint8_t num_channels = convert_chan_mask_to_array(channel_mask, 
+    uint8_t num_channels = convert_chan_mask_to_array(channel_mask,
         channel_array);
 
     // When doing a continuous scan, the timeout value will be ignored in the
@@ -92,7 +92,7 @@ int main(void)
     // Open a connection to the device.
     result = mcc172_open(address);
     STOP_ON_ERROR(result);
-    
+
     // Turn on IEPE supply?
     printf("Enable IEPE power [y or n]?  ");
     scanf("%c", &c);
@@ -111,18 +111,18 @@ int main(void)
         return 1;
     }
     flush_stdin();
-    
+
     for (i = 0; i < num_channels; i++)
     {
-        result = mcc172_iepe_config_write(address, channel_array[i], 
-            (i == 0) ? 0 : iepe_enable);
+        result = mcc172_iepe_config_write(address, channel_array[i],
+            iepe_enable);
         STOP_ON_ERROR(result);
     }
-    
+
     // Set the ADC clock to the desired rate.
     result = mcc172_a_in_clock_config_write(address, SOURCE_LOCAL, scan_rate);
     STOP_ON_ERROR(result);
-    
+
     // Wait for the ADCs to synchronize.
     do
     {
@@ -152,7 +152,7 @@ int main(void)
     scanf("%c", &c);
 
     // Configure and start the scan.
-    // Since the continuous option is being used, the samples_per_channel 
+    // Since the continuous option is being used, the samples_per_channel
     // parameter is ignored if the value is less than the default internal
     // buffer size (10000 * num_channels in this case). If a larger internal
     // buffer size is desired, set the value of this parameter accordingly.
@@ -173,7 +173,7 @@ int main(void)
     printf("%s", display_header);
 
     // Continuously update the display value until enter key is pressed
-    do 
+    do
     {
         // Since the read_request_size is set to -1 (READ_ALL_AVAILABLE), this
         // function returns immediately with whatever samples are available (up
@@ -212,9 +212,9 @@ int main(void)
         }
 
         usleep(100000);
-    } 
+    }
     while ((result == RESULT_SUCCESS) &&
-           ((read_status & STATUS_RUNNING) == STATUS_RUNNING) && 
+           ((read_status & STATUS_RUNNING) == STATUS_RUNNING) &&
            !enter_press());
 
     printf("\n");
@@ -222,14 +222,14 @@ int main(void)
 stop:
     print_error(mcc172_a_in_scan_stop(address));
     print_error(mcc172_a_in_scan_cleanup(address));
-    
+
     // Turn off IEPE supply
     for (i = 0; i < num_channels; i++)
     {
         result = mcc172_iepe_config_write(address, channel_array[i], 0);
         STOP_ON_ERROR(result);
     }
-        
+
     print_error(mcc172_close(address));
 
     return 0;
