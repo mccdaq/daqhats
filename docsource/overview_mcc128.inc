@@ -22,7 +22,7 @@ Single Ended Input configuration
 
 .. only:: latex
 
-    .. image:: images/mcc128_diff.jpg
+    .. image:: images/mcc128_se.jpg
         :align: center
         :alt: MCC 128 circuit board
 
@@ -124,6 +124,25 @@ MCC 128 address in your board stack. This example demonstrates how to update the
 firmware on the MCC 128 that is installed at address 0::
 
     mcc128_firmware_update 0 ~/daqhats/tools/MCC_128.fw
+
+MCC 128-OEM
+------------
+An OEM version is available that is designed with (unpopulated) header connectors
+instead of screw terminals. The board accepts 1x6 and 1x10 0.1” spacing header connectors.
+The MCC 128-OEM is functionally equivalent to the standard version. Refer to the
+Electrical Specifications for connector information.
+
+.. only:: html
+
+    .. image:: images/mcc128oem-web.jpg
+        :align: center
+        :alt: MCC 128-OEM circuit board
+
+.. only:: latex
+
+    .. image:: images/mcc128oem.jpg
+        :align: center
+        :alt: MCC 128-OEM circuit board
 
 Specifications
 --------------
