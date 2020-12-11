@@ -12,11 +12,11 @@ This is the development repository for Measurement Computing DAQ HAT boards. The
 
 #### Supported MCC DAQ HAT hardware
 Hardware supported by this version of the MCC DAQ HAT Library:
-- [MCC 118](https://nwright-mcc.github.io/daqhats/overview.html#mcc-118)
-- [MCC 128](https://nwright-mcc.github.io/daqhats/overview.html#mcc-128)
-- [MCC 134](https://nwright-mcc.github.io/daqhats/overview.html#mcc-134)
-- [MCC 152](https://nwright-mcc.github.io/daqhats/overview.html#mcc-152)
-- [MCC 172](https://nwright-mcc.github.io/daqhats/overview.html#mcc-172)
+- [MCC 118](https://mccdaq.github.io/daqhats/overview.html#mcc-118)
+- [MCC 128](https://mccdaq.github.io/daqhats/overview.html#mcc-128)
+- [MCC 134](https://mccdaq.github.io/daqhats/overview.html#mcc-134)
+- [MCC 152](https://mccdaq.github.io/daqhats/overview.html#mcc-152)
+- [MCC 172](https://mccdaq.github.io/daqhats/overview.html#mcc-172)
 
 #### Hardware Compatibility
 The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
@@ -46,7 +46,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 ## Install Instructions
 1. Power off the Raspberry Pi and attach one or more DAQ HAT boards, using unique
    address settings for each. Refer to
-   [Installing the HAT board](https://nwright-mcc.github.io/daqhats/hardware.html)
+   [Installing the HAT board](https://mccdaq.github.io/daqhats/hardware.html)
    for detailed information.
    When using a single board, leave it at address 0 (all address jumpers removed.)
    One board must always be at address 0 to ensure that the OS reads a HAT EEPROM
@@ -72,7 +72,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 
    ```sh
    cd ~
-   git clone https://github.com/nwright-mcc/daqhats.git
+   git clone https://github.com/mccdaq/daqhats.git
    ```
 7. Build and install the shared library, tools, and optional Python support. The
    installer will install Python 3 support by default and ask if you want to install
@@ -191,4 +191,4 @@ our [support page](https://www.mccdaq.com/support/support_form.aspx).
 
 ## Documentation
 Documentation for the daqhats library is available at
-https://nwright-mcc.github.io/daqhats/index.html.
+https://mccdaq.github.io/daqhats/index.html.
