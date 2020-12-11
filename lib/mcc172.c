@@ -351,7 +351,6 @@ static int _create_frame(uint8_t* buffer, uint8_t command, uint16_t count,
 
   Return: RESULT_SUCCESS if successful
  *****************************************************************************/
-
 static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     uint16_t tx_data_count, void* rx_data, uint16_t rx_data_count,
     uint32_t reply_timeout_us, uint32_t retry_us)
@@ -464,7 +463,6 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         diff = _difftime_us(&start_time, &current_time);
         timeout = (diff > reply_timeout_us);
     } while (!got_reply && !timeout);
-
 
     if (got_reply)
     {

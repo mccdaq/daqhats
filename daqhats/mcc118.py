@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """
 Wraps all of the methods from the MCC 118 library for use in Python.
 """
@@ -141,7 +142,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         Return constant information about this type of device.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **NUM_AI_CHANNELS** (int): The number of analog input channels
               (8.)
@@ -163,7 +164,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         Read the board firmware and bootloader versions.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **version** (string): The firmware version, i.e "1.03".
             * **bootloader_version** (string): The bootloader version,
@@ -262,8 +263,11 @@ class mcc118(Hat): # pylint: disable=invalid-name
 
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
+        Args:
+            channel (int): The analog input channel (0-7.)
+
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names.
 
             * **slope** (float): The slope.
             * **offset** (float): The offset.
@@ -299,6 +303,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
+            channel (int): The analog input channel (0-7.)
             slope (float): The new slope value.
             offset (float): The new offset value.
 
@@ -364,7 +369,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 :py:const:`OptionFlags.DEFAULT` if unspecified.
 
         Returns:
-            float: the read value
+            float: The read value.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -403,7 +408,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 internal sampling clock, max 100,000.0.
 
         Returns:
-            float: the actual sample rate
+            float: The actual sample rate.
 
         Raises:
             ValueError: a scan argument is invalid.
@@ -553,7 +558,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         size of that buffer in samples.
 
         Returns:
-            int: the buffer size in samples
+            int: The buffer size in samples.
 
         Raises:
             HatError: the board is not initialized or no scan buffer is
@@ -583,7 +588,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         the scan thread buffer.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -649,7 +654,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 samples and the timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -772,7 +777,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 timeout status set.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names:
+            namedtuple: A namedtuple containing the following field names:
 
             * **running** (bool): True if the scan is running, False if it has
               stopped or completed.
@@ -880,7 +885,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         Read the number of channels in the current analog input scan.
 
         Returns:
-            int: the number of channels (0 if no scan is active, 1-8 otherwise)
+            int: The number of channels (0 if no scan is active, 1-8 otherwise.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -951,7 +956,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
                 * 3 = output 1 kHz square wave
 
         Returns:
-            int: the value read at the CLK pin after applying the mode (0 or 1).
+            int: The value read at the CLK pin after applying the mode (0 or 1.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -981,7 +986,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
         This value read at the pin for input testing.
 
         Returns:
-            int: the value read at the TRIG pin (0 or 1).
+            int: The value read at the TRIG pin (0 or 1.)
 
         Raises:
             HatError: the board is not initialized, does not respond, or

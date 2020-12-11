@@ -13,6 +13,7 @@ class HatIDs(IntEnum):
     """Known MCC HAT IDs."""
     ANY = 0             #: Match any MCC ID in :py:func:`hat_list`
     MCC_118 = 0x0142    #: MCC 118 ID
+    MCC_128 = 0x0146    #: MCC 128 ID
     MCC_134 = 0x0143    #: MCC 134 ID
     MCC_152 = 0x0144    #: MCC 152 ID
     MCC_172 = 0x0145    #: MCC 172 ID
@@ -137,7 +138,7 @@ def hat_list(filter_by_id=0):
 
     Returns:
         list: A list of namedtuples, the number of elements match the number of
-        DAQ HATs found. Each namedtuple will contain the following field names
+        DAQ HATs found. Each namedtuple will contain the following field names:
 
         * **address** (int): device address
         * **id** (int): device product ID, identifies the type of DAQ HAT

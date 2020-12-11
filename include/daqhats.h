@@ -10,6 +10,7 @@
 
 // include files for DAQ HAT boards
 #include "mcc118.h"
+#include "mcc128.h"
 #include "mcc134.h"
 #include "mcc152.h"
 #include "mcc172.h"
@@ -23,12 +24,14 @@ enum HatIDs
     HAT_ID_MCC_118 = 0x0142,
     /// MCC 118 in firmware update mode ID
     HAT_ID_MCC_118_BOOTLOADER = 0x8142,
+    /// MCC 128 ID
+    HAT_ID_MCC_128 = 0x0146,
     /// MCC 134 ID
     HAT_ID_MCC_134 = 0x0143,
     /// MCC 152 ID
     HAT_ID_MCC_152 = 0x0144,
     /// MCC 172 ID
-    HAT_ID_MCC_172 = 0x0145
+    HAT_ID_MCC_172 = 0x0145    
 };
 
 /// Return values from the library functions.

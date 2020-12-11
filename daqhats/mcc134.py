@@ -133,7 +133,7 @@ class mcc134(Hat): # pylint: disable=invalid-name
         Return constant information about this type of device.
 
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **NUM_AI_CHANNELS** (int): The number of analog input channels
               (4.)
@@ -200,8 +200,11 @@ class mcc134(Hat): # pylint: disable=invalid-name
 
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
+        Args:
+            channel (int): The thermocouple channel (0-3.)
+
         Returns:
-            namedtuple: a namedtuple containing the following field names
+            namedtuple: A namedtuple containing the following field names:
 
             * **slope** (float): The slope.
             * **offset** (float): The offset.
@@ -236,6 +239,7 @@ class mcc134(Hat): # pylint: disable=invalid-name
             calibrated_ADC_code = (raw_ADC_code * slope) + offset
 
         Args:
+            channel (int): The thermocouple channel (0-3.)
             slope (float): The new slope value.
             offset (float): The new offset value.
 
@@ -434,7 +438,7 @@ class mcc134(Hat): # pylint: disable=invalid-name
                 :py:const:`OptionFlags.DEFAULT` if unspecified.
 
         Returns:
-            float: the read value
+            float: The read value.
 
         Raises:
             HatError: the board is not initialized, does not respond, or
@@ -473,7 +477,7 @@ class mcc134(Hat): # pylint: disable=invalid-name
             channel (int): The analog input channel number, 0-3.
 
         Returns:
-            float: the read value
+            float: The read value.
 
         Raises:
             HatError: the board is not initialized, does not respond, or

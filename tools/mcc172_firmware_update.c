@@ -30,7 +30,7 @@ char kbhit(void)
 {
     struct termios info, old_info;
     char c;
-    
+
     // set terminal to return after a single character
     tcgetattr(0, &info);
     memcpy(&old_info, &info, sizeof(info));
@@ -38,12 +38,12 @@ char kbhit(void)
     info.c_cc[VMIN] = 1;
     info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &info);
-    
+
     c = getchar();
-    
+
     // restore terminal
     tcsetattr(0, TCSANOW, &old_info);
-    
+
     return c;
 }
 
@@ -54,18 +54,18 @@ int get_next_frame(uint8_t** frame_ptr, bool* last_frame)
     uint32_t index;
     uint8_t* ptr;
     uint16_t len;
-    
+
     index = frame_file_index;
     ptr = &frame_file_buffer[index];
-    
+
     if (index >= frame_file_size)
     {
         // reached end of file
         return 0;
     }
-    
+
     // verify signature
-    if ((ptr[2] != 0x13) || (ptr[3] != 0x02) || 
+    if ((ptr[2] != 0x13) || (ptr[3] != 0x02) ||
         (ptr[4] != 0xFD) || (ptr[5] != 0x67))
     {
         // invalid signature
@@ -74,14 +74,14 @@ int get_next_frame(uint8_t** frame_ptr, bool* last_frame)
 
     // length
     len = ptr[1] + ((uint16_t)ptr[0] << 8);
-    
+
     if (frame_ptr)
     {
         *frame_ptr = ptr;
     }
-    
+
     frame_file_index += (len + 2);
-    
+
     if (last_frame)
     {
         if (frame_file_index >= frame_file_size)
@@ -124,7 +124,7 @@ int update_firmware(int address, char* filename)
         printf("Error opening %s.\n", filename);
         return 1;
     }
-    
+
     frame_file_size = st.st_size;
     frame_file_buffer = (uint8_t*)calloc(1, frame_file_size);
 
@@ -135,18 +135,18 @@ int update_firmware(int address, char* filename)
         fclose(binfile);
         return 1;
     }
-    
+
     fclose(binfile);
     frame_file_index = 0;
-    
+
     ret = mcc172_open(address);
     if (ret == RESULT_SUCCESS)
     {
         if (mcc172_firmware_version(address, &fw_version) == RESULT_SUCCESS)
         {
             printf("Checking existing version...\n");
-    
-            printf("Device firmware version %X.%02X\n", 
+
+            printf("Device firmware version %X.%02X\n",
                 (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
         }
     }
@@ -173,10 +173,10 @@ int update_firmware(int address, char* filename)
     }
     printf("Do you want to continue? Press Y to continue, any other key to "
         "exit. > ");
-    
+
     c = kbhit();
     printf("\n");
-    
+
     if (!((c == 'y') || (c == 'Y')))
     {
         printf("Exiting\n");
@@ -184,15 +184,15 @@ int update_firmware(int address, char* filename)
         mcc172_close(address);
         return 1;
     }
-    
+
     printf("Updating...\n");
-    
+
     mcc172_enter_bootloader(address);
-    
+
     finished = false;
     error = false;
     first_read = true;
-    
+
     while (!finished && !error)
     {
          // wait for bootloader to be ready
@@ -210,7 +210,7 @@ int update_firmware(int address, char* filename)
             finished = true;
             continue;
         }
-        
+
         // read the status
         tx_data[0] = 0xFF;
         if (first_read)
@@ -223,7 +223,7 @@ int update_firmware(int address, char* filename)
         {
             tr_len = 1;
         }
-        
+
         if (mcc172_bl_transfer(address, tx_data, rx_data, tr_len) != RESULT_SUCCESS)
         {
             printf("Error: ioctl failed\n");
@@ -236,10 +236,11 @@ int update_firmware(int address, char* filename)
                 (rx_data[1] != 0xC6))
             {
                 printf("\nUnexpected device ID 0x%02X\n", rx_data[1]);
+                error = true;
             }
             first_read = false;
         }
-        
+
         switch (rx_data[0] & 0xC0)
         {
         case 0xC0:  // WAITING_BOOTLOAD_CMD
@@ -301,7 +302,7 @@ int update_firmware(int address, char* filename)
                 break;
             case 0x04:  // FRAME_CRC_PASS
                 //printf("Status: FRAME_CRC_PASS\n");
-                
+
                 if (last_frame)
                 {
                     finished = true;
@@ -319,13 +320,13 @@ int update_firmware(int address, char* filename)
         default:
             break;
         }
-        
+
         usleep(2);
-    }    
-        
+    }
+
     free(frame_file_buffer);
     mcc172_close(address);
-    
+
     if (error)
     {
         return 1;
@@ -340,50 +341,61 @@ int update_firmware(int address, char* filename)
 int main(int argc, char* argv[])
 {
     int address;
+    int retry_count;
+    bool success;
     char* filename;
     uint16_t fw_version;
-    
+
     // validate arguments
     if (argc != 3)
     {
         print_usage();
         return 1;
     }
-    
+
     if ((sscanf(argv[1], "%u", &address) != 1) ||
         (address > 7))
     {
         print_usage();
         return 1;
     }
-    
+
     filename = argv[2];
-    
+
     // update the firmware
     if (update_firmware(address, filename) == 1)
     {
         return 1;
     }
-    
+
     // check the device
     printf("Checking device...\n");
-    
-    // wait for device to boot the new firmware
-    sleep(2);
-    
-    if (mcc172_open(address) != RESULT_SUCCESS)
-    {
-        printf("error\n");
-        return 1;
-    }
-    if (mcc172_firmware_version(address, &fw_version) != RESULT_SUCCESS)
-    {
-        printf("error\n");
-        return 1;
-    }
-    
-    printf("firmware version %X.%02X\n", 
-        (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
 
-    return 0;
+    // wait for device to boot the new firmware
+    retry_count = 0;
+    success = false;
+    do
+    {
+        sleep(1);
+
+        if (mcc172_open(address) == RESULT_SUCCESS)
+        {
+            if (mcc172_firmware_version(address, &fw_version) == RESULT_SUCCESS)
+            {
+                success = true;
+                printf("firmware version %X.%02X\n",
+                    (uint8_t)(fw_version >> 8), (uint8_t)fw_version);
+            }
+        }
+    } while ((retry_count < 5) && !success);
+
+    if (!success)
+    {
+        printf("Error\n");
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }

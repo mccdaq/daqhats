@@ -9,7 +9,7 @@
         mcc118_a_in_scan_cleanup
 
     Purpose:
-        Performa a continuous acquisition on 1 or more channels.
+        Perform a continuous acquisition on 1 or more channels.
 
     Description:
         Continuously acquires blocks of analog input data for a
