@@ -18,11 +18,13 @@ This directory contains library tools, test applications, and firmware files.
 ### MCC 128
 1.01:
    - Fix issue where continuous scans could have a hardware or buffer overrun after several minutes.
+
 1.00:
    - Initial release.
 
 ### MCC 172
 1.01:
    - Fixes issue with the first scan after changing the trigger mode.
+
 1.00:
    - Initial release.
