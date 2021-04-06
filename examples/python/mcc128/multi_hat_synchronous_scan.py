@@ -75,7 +75,7 @@ def main():
 
         # Validate the selected channels, set the modes and ranges.
         for i, hat in enumerate(hats):
-            validate_channels(chans[i], hat.info().NUM_AI_CHANNELS)
+            validate_channels(chans[i], hat.info().NUM_AI_CHANNELS[input_modes[i]])
             hat.a_in_mode_write(input_modes[i])
             hat.a_in_range_write(input_ranges[i])
 

@@ -70,7 +70,7 @@ int main(void)
     double data[DEVICE_COUNT][buffer_size];
     uint32_t samples_read[DEVICE_COUNT] = {0};
     int32_t samples_to_read = 500;
-    double timeout = 5;  //seconds
+    double timeout = 1;  //seconds
     uint32_t samples_available = 0;
 
     int result = 0;
@@ -205,6 +205,7 @@ int main(void)
     else
     {
         printf("Aborted\n\n");
+        is_running = 0;
     }
 
     while (is_running)
