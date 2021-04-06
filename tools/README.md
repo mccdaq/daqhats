@@ -19,6 +19,7 @@ This directory contains library tools, test applications, and firmware files.
 1.01:
    - Fixes issue where continuous scans could have a hardware or buffer overrun after 
      several minutes.
+
    - Fixes issue with a hang when stopping a scan on devices configured for external clock.
 
 1.00:
