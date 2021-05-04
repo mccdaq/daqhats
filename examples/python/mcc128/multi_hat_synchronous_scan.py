@@ -75,7 +75,7 @@ def main():
 
         # Validate the selected channels, set the modes and ranges.
         for i, hat in enumerate(hats):
-            validate_channels(chans[i], hat.info().NUM_AI_CHANNELS)
+            validate_channels(chans[i], hat.info().NUM_AI_CHANNELS[input_modes[i]])
             hat.a_in_mode_write(input_modes[i])
             hat.a_in_range_write(input_ranges[i])
 
@@ -235,9 +235,10 @@ def read_and_display_data(hats, chans):
 
             # Display the data for all selected channels
             for chan_idx in range(len(chans[i])):
-                sample_idx = ((samples_per_chan_read[i] * len(chans[i]))
-                              - len(chans[i]) + chan_idx)
-                print('{:>12.5f} V'.format(data[i][sample_idx]), end='')
+                if samples_per_chan_read[i] > 0:
+                    sample_idx = ((samples_per_chan_read[i] * len(chans[i]))
+                                  - len(chans[i]) + chan_idx)
+                    print(' {:>12.5f} V'.format(data[i][sample_idx]), end='')
             print('\n')
 
         stdout.flush()

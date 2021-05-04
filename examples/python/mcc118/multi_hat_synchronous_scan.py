@@ -213,9 +213,10 @@ def read_and_display_data(hats, chans):
 
             # Display the data for all selected channels
             for chan_idx in range(len(chans[i])):
-                sample_idx = ((samples_per_chan_read[i] * len(chans[i]))
-                              - len(chans[i]) + chan_idx)
-                print('{:>12.5f} V'.format(data[i][sample_idx]), end='')
+                if samples_per_chan_read[i] > 0:
+                    sample_idx = ((samples_per_chan_read[i] * len(chans[i]))
+                                - len(chans[i]) + chan_idx)
+                    print('{:>12.5f} V'.format(data[i][sample_idx]), end='')
             print('\n')
 
         stdout.flush()

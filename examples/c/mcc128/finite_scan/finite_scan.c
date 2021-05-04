@@ -35,7 +35,7 @@ int main(void)
     // mcc128_a_in_scan_start to specify the channels to acquire.
     // The functions below, will parse the channel mask into a
     // character string for display purposes.
-    uint8_t channel_mask = {CHAN0 | CHAN1 | CHAN2 };//| CHAN3 | CHAN4 | CHAN5 | CHAN6 | CHAN7};
+    uint8_t channel_mask = {CHAN0 | CHAN1 | CHAN2 | CHAN3};
     uint8_t input_mode = A_IN_MODE_SE;
     uint8_t input_range = A_IN_RANGE_BIP_10V;
 
@@ -44,12 +44,12 @@ int main(void)
     uint8_t num_channels = convert_chan_mask_to_array(channel_mask,
         channel_array);
 
-    uint32_t samples_per_channel = 10;
+    uint32_t samples_per_channel = 1000;
     uint32_t buffer_size = samples_per_channel * num_channels;
     double read_buf[buffer_size];
     int total_samples_read = 0;
 
-    int32_t read_request_size = 500;
+    int32_t read_request_size = 100;
     double timeout = 5.0;
 
     double scan_rate = 1000.0;
@@ -141,10 +141,11 @@ int main(void)
         total_samples_read += samples_read_per_channel;
 
         // Display the last sample for each channel.
-        printf("\r%12.0d    %10.0d ", samples_read_per_channel,
-            total_samples_read);
         if (samples_read_per_channel > 0)
         {
+            printf("\r%12.0d    %10.0d ", samples_read_per_channel,
+                total_samples_read);
+
             int index = samples_read_per_channel * num_channels - num_channels;
 
             for (i = 0; i < num_channels; i++)
