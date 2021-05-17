@@ -84,7 +84,7 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
         self._lib.mcc128_blink_led.restype = c_int
 
         self._lib.mcc128_firmware_version.argtypes = [
-            c_ubyte, POINTER(c_ushort), POINTER(c_ushort)]
+            c_ubyte, POINTER(c_ushort)]
         self._lib.mcc128_firmware_version.restype = c_int
 
         self._lib.mcc128_serial.argtypes = [c_ubyte, c_char_p]

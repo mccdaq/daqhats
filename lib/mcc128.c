@@ -224,7 +224,6 @@ struct mcc128Device
 {
     uint16_t handle_count;      // the number of handles open to this device
     uint16_t fw_version;        // firmware version
-    uint16_t boot_version;      // bootloader version
     int spi_fd;                 // SPI file descriptor
     uint8_t ain_mode;           // Analog input mode (SE / diff)
     uint8_t ain_range;          // Analog input range
