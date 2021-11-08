@@ -54,7 +54,7 @@ struct MCC152DeviceInfo mcc152_device_info =
 };
 
 // The maximum size of the serial number string, plus NULL.
-#define SERIAL_SIZE         (8+1)   
+#define SERIAL_SIZE         (8+1)
 
 #define MIN(a, b)           ((a < b) ? a : b)
 #define MAX(a, b)           ((a > b) ? a : b)
@@ -116,7 +116,7 @@ static void _set_defaults(struct mcc152FactoryData* data)
 }
 
 /******************************************************************************
-  Parse the factory data JSON structure. Does not recurse so we can support 
+  Parse the factory data JSON structure. Does not recurse so we can support
   multiple processes.
 
   Expects a JSON structure like:
@@ -128,7 +128,7 @@ static void _set_defaults(struct mcc152FactoryData* data)
   If it finds all of these keys it will return 1, otherwise will return 0.
  *****************************************************************************/
 static int _parse_factory_data(cJSON* root, struct mcc152FactoryData* data)
-{ 
+{
     bool got_serial = false;
     cJSON* child;
 
@@ -136,16 +136,16 @@ static int _parse_factory_data(cJSON* root, struct mcc152FactoryData* data)
     {
         return 0;
     }
-    
+
     // root should just have an object type and a child
     if ((root->type != cJSON_Object) ||
         (!root->child))
     {
         return 0;
     }
-    
+
     child = root->child;
-    
+
     // parse the structure
     while (child)
     {
@@ -159,7 +159,7 @@ static int _parse_factory_data(cJSON* root, struct mcc152FactoryData* data)
         }
         child = child->next;
     }
-    
+
     if (got_serial)
     {
         // Report success if all required items were found
@@ -177,14 +177,14 @@ static int _parse_factory_data(cJSON* root, struct mcc152FactoryData* data)
 static void _mcc152_lib_init(void)
 {
     int i;
-    
+
     if (!_mcc152_lib_initialized)
     {
         for (i = 0; i < MAX_NUMBER_HATS; i++)
         {
             _devices[i] = NULL;
         }
-        
+
         _mcc152_lib_initialized = true;
     }
 }
@@ -202,22 +202,22 @@ int mcc152_open(uint8_t address)
     uint16_t custom_size;
     struct mcc152Device* dev;
     int result;
-        
+
     custom_data = NULL;
-    
+
     _mcc152_lib_init();
-    
+
     // validate the parameters
     if ((address >= MAX_NUMBER_HATS))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     if (_devices[address] == NULL)
     {
         // this is either the first time this device is being opened or it is
         // not a 152
-    
+
         // read the EEPROM file(s), verify that it is an MCC 152, and get the
         // data
         if (_hat_info(address, &info, NULL, &custom_size) == RESULT_SUCCESS)
@@ -238,16 +238,16 @@ int mcc152_open(uint8_t address)
             // uninitialized EEPROM
             custom_size = 0;
         }
-        
+
         // create a struct to hold device instance data
         _devices[address] = (struct mcc152Device*)calloc(1,
             sizeof(struct mcc152Device));
         dev = _devices[address];
-        
+
         // initialize the struct elements
         dev->handle_count = 1;
         dev->spi_device = 0;
-        
+
         if (custom_size > 0)
         {
             // if the EEPROM is initialized then use the version to determine
@@ -289,13 +289,13 @@ int mcc152_open(uint8_t address)
         }
 
         // initialize the DAC
-        if ((result = _mcc152_dac_init(dev->spi_device, address)) != 
+        if ((result = _mcc152_dac_init(dev->spi_device, address)) !=
             RESULT_SUCCESS)
         {
             mcc152_close(address);
             return result;
         }
-        
+
         // initialize the DIO
         if ((result = _mcc152_dio_init(address)) != RESULT_SUCCESS)
         {
@@ -310,7 +310,7 @@ int mcc152_open(uint8_t address)
         dev = _devices[address];
         dev->handle_count++;
     }
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -347,7 +347,7 @@ int mcc152_close(uint8_t address)
         free(_devices[address]);
         _devices[address] = NULL;
     }
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -370,7 +370,7 @@ int mcc152_serial(uint8_t address, char* buffer)
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     strcpy(buffer, _devices[address]->factory_data.serial);
     return RESULT_SUCCESS;
 }
@@ -382,7 +382,7 @@ int mcc152_a_out_write(uint8_t address, uint8_t channel, uint32_t options,
     double value)
 {
     uint16_t code;
-    
+
     if (!_check_addr(address) ||
         (channel >= NUM_AO_CHANNELS))
     {
@@ -415,7 +415,7 @@ int mcc152_a_out_write(uint8_t address, uint8_t channel, uint32_t options,
         }
         code = (uint16_t)(value + 0.5);
     }
-    
+
     return _mcc152_dac_write(_devices[address]->spi_device, address, channel,
         code);
 }
@@ -427,7 +427,7 @@ int mcc152_a_out_write_all(uint8_t address, uint32_t options, double* values)
 {
     uint16_t codes[NUM_AO_CHANNELS];
     int i;
-    
+
     if (!_check_addr(address) ||
         (values == NULL))
     {
@@ -463,7 +463,7 @@ int mcc152_a_out_write_all(uint8_t address, uint32_t options, double* values)
             codes[i] = (uint16_t)(values[i] + 0.5);
         }
     }
-    
+
     return _mcc152_dac_write_both(_devices[address]->spi_device, address,
         codes[0], codes[1]);
 }
@@ -478,10 +478,10 @@ int mcc152_dio_reset(uint8_t address)
     if (!_check_addr(address))                // check address failed
     {
         return RESULT_BAD_PARAMETER;
-    }    
+    }
 
     // write the register values
-    
+
     // interrupt mask
     ret = _mcc152_dio_reg_write(address, DIO_REG_INT_MASK, DIO_CHANNEL_ALL,
         0xFF, false);
@@ -489,7 +489,7 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
+
     // switch to inputs
     ret = _mcc152_dio_reg_write(address, DIO_REG_CONFIG, DIO_CHANNEL_ALL, 0xFF,
         false);
@@ -497,7 +497,7 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
+
     // pull-up setting
     ret = _mcc152_dio_reg_write(address, DIO_REG_PULL_SELECT, DIO_CHANNEL_ALL,
         0xFF, false);
@@ -505,7 +505,7 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
+
     // pull-up enable
     ret = _mcc152_dio_reg_write(address, DIO_REG_PULL_ENABLE, DIO_CHANNEL_ALL,
         0xFF, false);
@@ -513,7 +513,7 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
+
     // input invert
     ret = _mcc152_dio_reg_write(address, DIO_REG_POLARITY, DIO_CHANNEL_ALL, 0,
         false);
@@ -529,7 +529,7 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
+
     // output type
     ret = _mcc152_dio_reg_write(address, DIO_REG_OUTPUT_CONFIG, DIO_CHANNEL_ALL,
         0, false);
@@ -545,8 +545,8 @@ int mcc152_dio_reset(uint8_t address)
     {
         return ret;
     }
-    
-    return RESULT_SUCCESS;    
+
+    return RESULT_SUCCESS;
 }
 
 /******************************************************************************
@@ -554,12 +554,13 @@ int mcc152_dio_reset(uint8_t address)
  *****************************************************************************/
 int mcc152_dio_input_read_bit(uint8_t address, uint8_t channel, uint8_t* value)
 {
-    if ((channel >= NUM_DIO_CHANNELS) ||
+    if (!_check_addr(address) ||
+        (channel >= NUM_DIO_CHANNELS) ||
         (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     return _mcc152_dio_reg_read(address, DIO_REG_INPUT_PORT, channel, value);
 }
 
@@ -568,11 +569,12 @@ int mcc152_dio_input_read_bit(uint8_t address, uint8_t channel, uint8_t* value)
  *****************************************************************************/
 int mcc152_dio_input_read_port(uint8_t address, uint8_t* values)
 {
-    if (values == NULL)
+    if (!_check_addr(address) ||
+        (values == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     return _mcc152_dio_reg_read(address, DIO_REG_INPUT_PORT, DIO_CHANNEL_ALL,
         values);
 }
@@ -582,11 +584,12 @@ int mcc152_dio_input_read_port(uint8_t address, uint8_t* values)
  *****************************************************************************/
 int mcc152_dio_output_write_bit(uint8_t address, uint8_t channel, uint8_t value)
 {
-    if (channel >= NUM_DIO_CHANNELS)
+    if (!_check_addr(address) ||
+        (channel >= NUM_DIO_CHANNELS))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     return _mcc152_dio_reg_write(address, DIO_REG_OUTPUT_PORT, channel, value,
         true);
 }
@@ -596,6 +599,11 @@ int mcc152_dio_output_write_bit(uint8_t address, uint8_t channel, uint8_t value)
  *****************************************************************************/
 int mcc152_dio_output_write_port(uint8_t address, uint8_t values)
 {
+    if (!_check_addr(address))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
     return _mcc152_dio_reg_write(address, DIO_REG_OUTPUT_PORT, DIO_CHANNEL_ALL,
         values, true);
 }
@@ -606,12 +614,13 @@ int mcc152_dio_output_write_port(uint8_t address, uint8_t values)
  *****************************************************************************/
 int mcc152_dio_output_read_bit(uint8_t address, uint8_t channel, uint8_t* value)
 {
-    if ((channel >= NUM_DIO_CHANNELS) ||
+    if (!_check_addr(address) ||
+        (channel >= NUM_DIO_CHANNELS) ||
         (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     return _mcc152_dio_reg_read(address, DIO_REG_OUTPUT_PORT, channel, value);
 }
 
@@ -620,11 +629,12 @@ int mcc152_dio_output_read_bit(uint8_t address, uint8_t channel, uint8_t* value)
  *****************************************************************************/
 int mcc152_dio_output_read_port(uint8_t address, uint8_t* values)
 {
-    if (values == NULL)
+    if (!_check_addr(address) ||
+        (values == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     return _mcc152_dio_reg_read(address, DIO_REG_OUTPUT_PORT, DIO_CHANNEL_ALL,
         values);
 }
@@ -635,7 +645,8 @@ int mcc152_dio_output_read_port(uint8_t address, uint8_t* values)
 int mcc152_dio_int_status_read_bit(uint8_t address, uint8_t channel,
     uint8_t* value)
 {
-    if ((channel >= NUM_DIO_CHANNELS) ||
+    if (!_check_addr(address) ||
+        (channel >= NUM_DIO_CHANNELS) ||
         (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
@@ -650,7 +661,8 @@ int mcc152_dio_int_status_read_bit(uint8_t address, uint8_t channel,
  *****************************************************************************/
 int mcc152_dio_int_status_read_port(uint8_t address, uint8_t* value)
 {
-    if (value == NULL)
+    if (!_check_addr(address) ||
+        (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
@@ -668,10 +680,15 @@ int mcc152_dio_config_write_bit(uint8_t address, uint8_t channel, uint8_t item,
     uint8_t reg;
     bool cache;
     uint8_t chan;
-    
+
+    if (!_check_addr(address))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
     cache = false;
     chan = channel;
-    
+
     switch (item)
     {
     case DIO_DIRECTION:
@@ -715,7 +732,12 @@ int mcc152_dio_config_write_bit(uint8_t address, uint8_t channel, uint8_t item,
 int mcc152_dio_config_write_port(uint8_t address, uint8_t item, uint8_t value)
 {
     uint8_t reg;
-    
+
+    if (!_check_addr(address))
+    {
+        return RESULT_BAD_PARAMETER;
+    }
+
     switch (item)
     {
     case DIO_DIRECTION:
@@ -759,14 +781,15 @@ int mcc152_dio_config_read_bit(uint8_t address, uint8_t channel, uint8_t item,
 {
     uint8_t reg;
     uint8_t chan;
-    
+
     chan = channel;
-    
-    if (value == NULL)
+
+    if (!_check_addr(address) ||
+        (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     switch (item)
     {
     case DIO_DIRECTION:
@@ -806,12 +829,13 @@ int mcc152_dio_config_read_port(uint8_t address, uint8_t item, uint8_t* value)
     uint8_t reg;
     uint8_t myval;
     int result;
-    
-    if (value == NULL)
+
+    if (!_check_addr(address) ||
+        (value == NULL))
     {
         return RESULT_BAD_PARAMETER;
     }
-    
+
     switch (item)
     {
     case DIO_DIRECTION:
@@ -844,7 +868,7 @@ int mcc152_dio_config_read_port(uint8_t address, uint8_t item, uint8_t* value)
     {
         return result;
     }
-    
+
     if (item == DIO_OUTPUT_TYPE)
     {
         if (myval == 0x00)
