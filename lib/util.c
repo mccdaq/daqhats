@@ -601,7 +601,7 @@ int hat_list(uint16_t filter_id, struct HatInfo* pList)
                 pList[count].address = address;
                 pList[count].id = vinf.pid;
                 pList[count].version = vinf.pver;
-                strncpy(pList[count].product_name, vinf.pstr, 256);
+                strncpy(pList[count].product_name, vinf.pstr, 256-1);
             }
             count++;
         }
@@ -777,7 +777,7 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
                                     entry->id = vinf.pid;
                                     entry->version = vinf.pver;
                                     strncpy(entry->product_name, vinf.pstr, 
-                                        256);
+                                        256-1);
                                 }
                                 found_vendor = true;
                             }

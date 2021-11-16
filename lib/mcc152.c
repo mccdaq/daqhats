@@ -154,7 +154,7 @@ static int _parse_factory_data(cJSON* root, struct mcc152FactoryData* data)
             child->valuestring)
         {
             // Found the serial number
-            strncpy(data->serial, child->valuestring, SERIAL_SIZE);
+            strncpy(data->serial, child->valuestring, SERIAL_SIZE-1);
             got_serial = true;
         }
         child = child->next;
