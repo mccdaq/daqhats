@@ -1,6 +1,7 @@
 1.4.0.3:
     - Added missing checks that mcc152_open() has been called in the MCC 152 DIO functions.
     - Fixed issues preventing library building in Bullseye.
+    - Fixed issues in the C data_logger examples.
 
 1.4.0.2:
     - Fixed issue with firmware_version() method in Python for the MCC 128.
