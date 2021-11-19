@@ -3,6 +3,10 @@
 #include "log_file.h"
 #include "errors.h"
 
+// Global variables
+FILE* log_file_ptr;
+char csv_filename[512];
+
 // Function Prototypes
 static void get_path_and_filename(char* full_path, char* path, char* filename);
 static void check_log_file_error (int status);

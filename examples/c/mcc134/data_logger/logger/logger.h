@@ -7,7 +7,7 @@
 #include "daqhats/daqhats.h"
 
 // Global Variables
-GtkWidget *window;
-GMainContext *context;
+extern GtkWidget *window;
+extern GMainContext *context;
 
 #endif // LOGGER_H_INCLUDED

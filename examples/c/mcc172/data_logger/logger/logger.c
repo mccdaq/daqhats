@@ -14,6 +14,8 @@
 #define READ_ALL_AVAILABLE  -1
 
 // Global Variables
+GtkWidget *window;
+GMainContext *context;
 uint8_t g_hat_addr = 0;
 uint8_t g_chan_mask;
 uint32_t g_sample_count = 0;
