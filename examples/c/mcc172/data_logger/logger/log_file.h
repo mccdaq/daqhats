@@ -5,8 +5,9 @@
 #include <string.h>
 #include "logger.h"
 
-FILE* log_file_ptr;
-char csv_filename[512];
+// Global variables
+extern FILE* log_file_ptr;
+extern char csv_filename[512];
 
 char* choose_log_file(GtkWidget *parent_window, char* default_file_name);
 FILE* open_log_file (char* filename);
