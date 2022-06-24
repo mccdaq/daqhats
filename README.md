@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>
-    <tr><td>Library Version<td>1.4.0.1</td></tr>
+    <tr><td>Library Version<td>1.4.0.3</td></tr>
 </table>
 
 ## About
@@ -36,7 +36,7 @@ The specific pins used by each DAQ HAT are documented in the electrical
 specifications for that device.
 
 ## Prerequisites
-- Raspbian or Raspbian Lite image (may work with other Raspberry Pi operating systems)
+- Raspberry Pi OS or Raspbian image (may work with other Raspberry Pi operating systems)
 - Raspberry Pi with 40-pin GPIO header
 - C, C++, Python 2.7 or Python 3.4
 
@@ -90,7 +90,7 @@ then repeat steps 5 - 7.
 You can now run the example programs under ~/daqhats/examples and create your own
 programs. Refer to the [Examples](#examples) section below for more information.
 
-If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
+If you are using the Raspberry Pi OS desktop interface, the DAQ HAT Manager utility will be
 available under the Accessories start menu. This utility will allow you to list the
 detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
 control applications for each DAQ HAT to perform simple operations. The code for these

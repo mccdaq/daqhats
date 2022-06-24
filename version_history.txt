@@ -1,3 +1,17 @@
+1.4.0.3:
+    - Added missing checks that mcc152_open() has been called in the MCC 152 DIO functions.
+    - Fixed issues preventing library building in Bullseye.
+    - Fixed issues in the C data_logger examples.
+
+1.4.0.2:
+    - Fixed issue with firmware_version() method in Python for the MCC 128.
+
+1.4.0.1:
+    - Fixed convert timing issue and hang on scan stop when set to external clock and no 
+      clock present on MCC 128.
+    - Fixed continuous scan overrun issue on MCC 128.
+    - Fixed issues in some MCC 128 examples.
+
 1.4.0:
     - Added support for the MCC 128.
 

@@ -29,12 +29,14 @@ rm -rf /etc/mcc/hats
 echo
 
 # Remove the Python packages
-
-num=$(pip2 show daqhats | wc -l)
-if [ "$num" -ne 0 ]; then
-    echo "Removing Python 2 package"
-    pip2 uninstall daqhats -y
-    echo
+command -v pip2 >/dev/null 2>&1
+if [ "$?" -eq 0 ]; then
+    num=$(pip2 show daqhats | wc -l)
+    if [ "$num" -ne 0 ]; then
+        echo "Removing Python 2 package"
+        pip2 uninstall daqhats -y
+        echo
+    fi
 fi
 
 num=$(pip3 show daqhats | wc -l)

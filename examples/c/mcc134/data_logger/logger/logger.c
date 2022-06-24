@@ -12,6 +12,8 @@
 #define MAX_CHANNELS 4  // MCC134 Channel Count
 
 // Global Variables
+GtkWidget *window;
+GMainContext *context;
 uint8_t g_hat_addr = 0;
 uint8_t g_chan_mask;
 int g_num_samples = 50;
