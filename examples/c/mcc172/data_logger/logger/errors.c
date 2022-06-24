@@ -35,7 +35,7 @@ gboolean show_error(int* error_code_ptr)
                 error_msg = "Unable to open the log file.";
                 break;
             case MAXIMUM_FILE_SIZE_EXCEEDED:
-                error_msg = "The maximum file size of 2GB has been exceeded.";
+                error_msg = "The maximum file size has been exceeded.";
                 break;
             case THREAD_ERROR:
                 error_msg = "Error creating worker thread.";

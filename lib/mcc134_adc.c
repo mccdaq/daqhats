@@ -22,9 +22,9 @@
                                     // isolators
 #define SPI_MODE    SPI_MODE_1
 #define SPI_DELAY   0
-#define SPI_BITS    8       
+#define SPI_BITS    8
 
-    
+
 //*****************************
 // Register definitions
 #define REG_ID          0x00
@@ -76,7 +76,7 @@
 // worst case timing.
 #ifdef GLOBAL_CHOP
 #define N_SETTLE    28
-static const uint32_t _conversion_times_us[] = 
+static const uint32_t _conversion_times_us[] =
 {
     (uint32_t)((813.008*1.015*1000 + N_SETTLE*16*1.015/4.096e3) + 0.5),
     (uint32_t)((413.008*1.015*1000 + N_SETTLE*16*1.015/4.096e3) + 0.5),
@@ -95,7 +95,7 @@ static const uint32_t _conversion_times_us[] =
 };
 #else
 #define N_SETTLE    14
-static const uint32_t _conversion_times_us[] = 
+static const uint32_t _conversion_times_us[] =
 {
     (uint32_t)((406.504*1.015*1000 + N_SETTLE*16*1.015/4.096e3) + 0.5),
     (uint32_t)((206.504*1.015*1000 + N_SETTLE*16*1.015/4.096e3) + 0.5),
@@ -145,9 +145,9 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
         // could not get a lock within 5 seconds, report as a timeout
         return RESULT_LOCK_TIMEOUT;
     }
-    
+
     _set_address(address);
-    
+
     // check spi mode and change if necessary
     ret = ioctl(spi_fd, SPI_IOC_RD_MODE, &temp);
     if (ret == -1)
@@ -165,7 +165,7 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
             return RESULT_COMMS_FAILURE;
         }
     }
-    
+
     // Init the spi ioctl structure
     struct spi_ioc_transfer tr = {
         .tx_buf = (uintptr_t)tx_data,
@@ -184,14 +184,14 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
     {
         ret = RESULT_SUCCESS;
     }
-    
+
     // clear the SPI lock
     _release_lock(lock_fd);
-    
+
     return ret;
 }
 
-    
+
 int _mcc134_adc_init(uint8_t address)
 {
     uint8_t buffer[10];
@@ -200,51 +200,51 @@ int _mcc134_adc_init(uint8_t address)
     if (address >= MAX_NUMBER_HATS)         // check address failed
     {
         return RESULT_BAD_PARAMETER;
-    }    
+    }
 
     if (spi_fd == -1)
     {
         // SPI device has not been opened yet.
         spi_fd = open(SPI_DEVICE_0, O_RDWR);
-        
+
         if (spi_fd < 0)
         {
             return RESULT_RESOURCE_UNAVAIL;
         }
     }
-    
+
     // lock the board
     if (_obtain_board_lock(address) != RESULT_SUCCESS)
     {
         // could not get a lock within 5 seconds, report as a timeout
         return RESULT_LOCK_TIMEOUT;
     }
-    
+
     // reset the ADC to defaults
     buffer[0] = CMD_RESET;
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 1)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 1)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
         return result;
     }
-    
+
     // wait 4096 clocks (1ms) before using the ADC
     usleep(1000);
-    
+
     // check ID and device ready
     buffer[0] = CMD_RREG | REG_ID;
     buffer[1] = 2 - 1;  // count - 1
     buffer[2] = CMD_NOP;
     buffer[3] = CMD_NOP;
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 4)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, buffer, 4)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
         return result;
     }
-    
-    if ((buffer[2] & 0x0E) != 0x000)
+
+    if ((buffer[2] & 0x07) != 0x000)
     {
         // incorrect ID
         _release_board_lock(address);
@@ -255,7 +255,7 @@ int _mcc134_adc_init(uint8_t address)
         _release_board_lock(address);
         return RESULT_BUSY;
     }
-    
+
     // Initialize the registers that don't use default values
     buffer[0] = CMD_WREG | REG_INPMUX;
     buffer[1] = 8-1;        // count - 1
@@ -263,33 +263,33 @@ int _mcc134_adc_init(uint8_t address)
     buffer[3] = 0x08 + TC_PGA_GAIN_INDEX;    // PGA
 #ifdef GLOBAL_CHOP
     buffer[4] = 0x90 + DATA_RATE_INDEX;      // DATARATE
-#else    
+#else
     buffer[4] = 0x10 + DATA_RATE_INDEX;      // DATARATE
-#endif    
+#endif
     buffer[5] = 0x3A;       // REF
     buffer[6] = 0x80;       // IDACMAG
     buffer[7] = 0xFF;       // IDACMUX
     buffer[8] = 0x00;       // VBIAS
     buffer[9] = 0x01;       // SYS
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 10)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 10)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
         return result;
     }
-        
+
     buffer[0] = CMD_START;
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 1)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 1)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
         return result;
     }
-    
+
     usleep(1000);
-    
+
     _release_board_lock(address);
-    
+
     return RESULT_SUCCESS;
 }
 
@@ -308,14 +308,14 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
         // could not get a lock within 5 seconds, report as a timeout
         return RESULT_LOCK_TIMEOUT;
     }
-    
+
     // change the mux before the pga in case we are on a CJC channel
     regval = (hi_input << 4) | (lo_input);
     buffer[0] = CMD_WREG | REG_INPMUX;
     buffer[1] = 2-1;
     buffer[2] = regval; // INPMUX: select positive and negative ADC inputs
     buffer[3] = 0x08 + TC_PGA_GAIN_INDEX;  // PGA
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 4)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 4)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
@@ -324,16 +324,16 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
 
     // wait for conversion
     usleep(_conversion_times_us[DATA_RATE_INDEX]);
-    
+
     buffer[0] = CMD_RDATA;
     buffer[1] = CMD_NOP;
     buffer[2] = CMD_NOP;
     buffer[3] = CMD_NOP;
     buffer[4] = CMD_NOP;
-    
+
     memset(rbuffer, 0, 5);
 
-    if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
@@ -352,7 +352,7 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
         buffer[0] = CMD_WREG | REG_INPMUX;
         buffer[1] = 1-1;
         buffer[2] = 0x88; // INPMUX: select positive and negative ADC inputs
-        if ((result = _mcc134_spi_transfer(address, buffer, NULL, 3)) != 
+        if ((result = _mcc134_spi_transfer(address, buffer, NULL, 3)) !=
             RESULT_SUCCESS)
         {
             _release_board_lock(address);
@@ -361,16 +361,16 @@ int _mcc134_adc_read_tc_code(uint8_t address, uint8_t hi_input,
     }
 
     _release_board_lock(address);
-    
+
     if (code)
     {
         *code = mycode;
     }
-    
+
     return RESULT_SUCCESS;
 }
 
-int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input, 
+int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input,
     uint8_t lo_input, uint32_t* code)
 {
     int32_t mycode;
@@ -385,13 +385,13 @@ int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input,
         // could not get a lock within 5 seconds, report as a timeout
         return RESULT_LOCK_TIMEOUT;
     }
-    
+
     buffer[0] = CMD_WREG | REG_INPMUX;
     buffer[1] = 2-1;
     regval = (hi_input << 4) | (lo_input);
     buffer[2] = regval; // INPMUX: select positive and negative ADC inputs
     buffer[3] = 0x08 + CJC_PGA_GAIN_INDEX;  // PGA
-    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 4)) != 
+    if ((result = _mcc134_spi_transfer(address, buffer, NULL, 4)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
@@ -400,16 +400,16 @@ int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input,
 
     // wait for conversion
     usleep(_conversion_times_us[DATA_RATE_INDEX]);
-    
+
     buffer[0] = CMD_RDATA;
     buffer[1] = CMD_NOP;
     buffer[2] = CMD_NOP;
     buffer[3] = CMD_NOP;
     buffer[4] = CMD_NOP;
-    
+
     memset(rbuffer, 0, 5);
-    
-    if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) != 
+
+    if ((result = _mcc134_spi_transfer(address, buffer, rbuffer, 5)) !=
         RESULT_SUCCESS)
     {
         _release_board_lock(address);
@@ -419,20 +419,20 @@ int _mcc134_adc_read_cjc_code(uint8_t address, uint8_t hi_input,
     mycode = (int32_t)rbuffer[2] << 16 |
              (int32_t)rbuffer[3] << 8  |
              rbuffer[4];
-    
+
     _release_board_lock(address);
-    
+
     // check sign - should never be negative
     if (mycode & 0x00800000)
     {
         return RESULT_UNDEFINED;
     }
-    
+
     if (code)
     {
         *code = (uint32_t)mycode;
     }
-    
+
     return RESULT_SUCCESS;
 }
 
