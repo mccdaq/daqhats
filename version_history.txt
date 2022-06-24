@@ -1,3 +1,7 @@
+1.4.0.4:
+    - Fixed reading the ID register when initializing MCC 134.
+    - Removed 2GB file size limit from data logger applications.
+
 1.4.0.3:
     - Added missing checks that mcc152_open() has been called in the MCC 152 DIO functions.
     - Fixed issues preventing library building in Bullseye.
