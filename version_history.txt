@@ -1,3 +1,6 @@
+1.4.0.5:
+    - Fixed error when calling hat_interrupt_callback_enable().
+
 1.4.0.4:
     - Fixed reading the ID register when initializing MCC 134.
     - Removed 2GB file size limit from data logger applications.

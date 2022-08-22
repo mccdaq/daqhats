@@ -24,7 +24,7 @@
 
 #define GPIO_OFFSET       0x00200000
 
-// GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or 
+// GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or
 // SET_GPIO_ALT(x,y)
 #define INP_GPIO(g) *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
 #define OUT_GPIO(g) *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
@@ -44,7 +44,7 @@ static volatile unsigned* gpio;
 // Variables for GPIO interrupt threads
 #define NUM_GPIO            32          // max number of GPIO pins we handle for
                                         // interrupts
-static int gpio_int_read_fds[NUM_GPIO] = 
+static int gpio_int_read_fds[NUM_GPIO] =
 {
     -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1,
@@ -60,9 +60,9 @@ static int gpio_int_thread_signal[NUM_GPIO] =
 };
 static void* gpio_callback_data[NUM_GPIO] =
 {
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 static pthread_t gpio_int_threads[NUM_GPIO];
@@ -78,8 +78,8 @@ static void gpio_init(void)
 
     // Determine which base address to use.
     gpio_base = bcm_host_get_peripheral_address() + GPIO_OFFSET;
-    
-    // Try to use /dev/mem in case we are not running in a recent version of 
+
+    // Try to use /dev/mem in case we are not running in a recent version of
     // Raspbian.  Must be root for this to work.
     if ((fd = open("/dev/mem", O_RDWR | O_SYNC)) >= 0)
     {
@@ -177,34 +177,34 @@ static void *gpio_interrupt_thread(void* arg)
     int ret;
     uint8_t c;
     int pin;
-    
+
     pin = *(int*)arg;
     free(arg);
     if (pin >= NUM_GPIO)
     {
         return NULL;
     }
-    
+
     while (gpio_int_thread_signal[pin] == 0)
     {
         poll_data.fd = gpio_int_read_fds[pin];
         poll_data.events = POLLPRI | POLLERR;
         poll_data.revents = 0;
-        
+
         // timeout after 1ms
         ret = poll(&poll_data, 1, 1);
-        
+
         if (ret > 0)
         {
             // read to clear the interrupt
             lseek(gpio_int_read_fds[pin], 0, SEEK_SET);
             read(gpio_int_read_fds[pin], &c, 1);
-            
+
             // call the callback
             gpio_callback_functions[pin](gpio_callback_data[pin]);
         }
     }
-    
+
     return NULL;
 }
 
@@ -221,33 +221,33 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
     int count;
     int i;
     struct stat sb;
-    
+
     if (pin >= NUM_GPIO)
     {
 #ifdef DEBUG
         syslog(LOG_ERR, "gpio error 1");
-#endif        
+#endif
         return -1;
     }
-    
+
     // make sure gpio has been exported
     sprintf(basename, "/sys/class/gpio/gpio%d", (uint8_t)pin);
     sprintf(event_filename, "%s/edge", basename);
     if (stat(basename, &sb) != 0)
     {
         // export the interrupt pin
-        int fd = open("/sys/class/gpio/export", O_RDWR);
+        int fd = open("/sys/class/gpio/export", O_WRONLY);
         if (fd == -1)
         {
 #ifdef DEBUG
             syslog(LOG_ERR, "gpio error 2");
-#endif        
+#endif
             return -1;
         }
         sprintf(buffer, "%d", pin);
         write(fd, buffer, strlen(buffer));
         close(fd);
-        
+
         // wait for the edge file to appear with group write access
         do
         {
@@ -262,11 +262,11 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
     {
 #ifdef DEBUG
         syslog(LOG_ERR, "gpio error 3");
-#endif        
+#endif
         return -1;
     }
     read(event_fd, buffer, 32);
-    
+
     switch (mode)
     {
     case 0: // falling
@@ -283,7 +283,7 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
         lseek(event_fd, 0, SEEK_SET);
         write(event_fd, mode_string, strlen(mode_string));
         close(event_fd);
-        
+
         if (gpio_int_read_fds[pin] != -1)
         {
             // there is already an interrupt thread on this pin so signal the
@@ -314,7 +314,7 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
         close(gpio_int_read_fds[pin]);
         gpio_int_read_fds[pin] = -1;
     }
-    
+
     // clear any pending interrupts
     sprintf(value_filename, "%s/value", basename);
     value_fd = open(value_filename, O_RDONLY);
@@ -322,16 +322,16 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
     {
 #ifdef DEBUG
         syslog(LOG_ERR, "gpio error 4");
-#endif        
+#endif
         return -1;
     }
-    
+
     ioctl(value_fd, FIONREAD, &count);
     for (i = 0; i < count; i++)
     {
         read(value_fd, buffer, 1);
     }
-    
+
     // set the callback function
     gpio_callback_functions[pin] = function;
     gpio_callback_data[pin] = data;
@@ -339,10 +339,10 @@ int gpio_interrupt_callback(int pin, int mode, void (*function)(void*),
     gpio_int_thread_signal[pin] = 0;
     int* ppin = (int*)malloc(sizeof(int));
     *ppin = pin;
-    
+
     // start the interrupt thread
     pthread_create(&gpio_int_threads[pin], NULL, gpio_interrupt_thread, ppin);
-    
+
     return 0;
 }
 
@@ -357,7 +357,7 @@ int gpio_wait_for_low(int pin, int timeout)
     char buffer[32];
     int ret;
     struct stat sb;
-    
+
     // make sure gpio has been exported
     sprintf(basename, "/sys/class/gpio/gpio%d", (uint8_t)pin);
     sprintf(event_filename, "%s/edge", basename);
@@ -392,7 +392,7 @@ int gpio_wait_for_low(int pin, int timeout)
     {
         return 1;
     }
-    
+
     // make sure edge is set
     event_fd = open(event_filename, O_RDWR);
     if (event_fd == -1)
@@ -407,17 +407,17 @@ int gpio_wait_for_low(int pin, int timeout)
         write(event_fd, buffer, strlen(buffer));
     }
     close(event_fd);
-    
+
     poll_data.fd = value_fd;
     poll_data.events = POLLPRI | POLLERR;
     poll_data.revents = 0;
-    
+
     read(value_fd, buffer, 1);
-    
+
     ret = poll(&poll_data, 1, timeout);
     lseek(value_fd, 0, SEEK_SET);
     read(value_fd, buffer, 1);
-    
+
     close(value_fd);
     if (ret == 0)
     {
