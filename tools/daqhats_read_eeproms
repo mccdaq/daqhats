@@ -8,7 +8,16 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 overlay_loaded=0
-modprobe i2c_dev
+count=$(lsmod | grep i2c_dev | wc -l)
+if [ $count -eq 0 ]; then
+   # wait for modprobe to finish before proceeding
+   modprobe i2c_dev
+   while [ $count -eq 0 ]
+   do
+      count=$(lsmod | grep i2c_dev | wc -l)
+   done
+fi
+
 if [ -e "/dev/i2c-0" ]; then
    BUS=0
 elif [ -e "/dev/i2c-3" ]; then
