@@ -1,3 +1,6 @@
+1.4.0.6:
+    - Fixed daqhats_read_eeproms issue under bullseye.
+
 1.4.0.5:
     - Fixed error when calling hat_interrupt_callback_enable().
 
