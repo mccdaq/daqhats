@@ -7,15 +7,18 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+module_loaded=0
 overlay_loaded=0
 count=$(lsmod | grep i2c_dev | wc -l)
 if [ $count -eq 0 ]; then
    # wait for modprobe to finish before proceeding
    modprobe i2c_dev
+   count=0
    while [ $count -eq 0 ]
    do
       count=$(lsmod | grep i2c_dev | wc -l)
    done
+   module_loaded=1
 fi
 
 if [ -e "/dev/i2c-0" ]; then
@@ -33,9 +36,16 @@ else
          exit $rc
       fi
    fi
+   # wait for dtoverlay to finish before proceeding
+   count=0
+   while [ $count -eq 0 ]
+   do
+      count=$(lsmod | grep i2c_gpio | wc -l)
+   done
+   overlay_loaded=1
+
    if [ -e "/dev/i2c-3" ]; then
       BUS=3
-      overlay_loaded=1
    else
       echo "Expected I2C bus (i2c-3) not found."
       exit 1
@@ -89,8 +99,15 @@ do
    index=$(($index + 1))
 done
 
+modprobe -r at24
+
 if [ "$overlay_loaded" -eq 1 ]; then
    dtoverlay -R i2c-gpio
+   modprobe -r i2c_gpio
+fi
+
+if [ "$module_loaded" -eq 1 ]; then
+   modprobe -r i2c_dev
 fi
 
 # If there is an MCC 152 at an address other than 0, enable the I2C bus.
