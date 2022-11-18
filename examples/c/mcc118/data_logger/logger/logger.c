@@ -802,7 +802,7 @@ static void app_activate_handler(GtkApplication *app, gpointer user_data)
     gtk_databox_ruler_set_max_length(rulerY, 7);
     rulerX = gtk_databox_get_ruler_x(GTK_DATABOX(dataBox));
     gtk_databox_ruler_set_max_length(rulerX, 9);
-    gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0Lf");
+    gtk_databox_ruler_set_linear_label_format(rulerX, "%%.0f");
     // Set the default limits
     gtk_databox_ruler_set_range(rulerY, 10.0, -10.0, 0.0);
     gtk_databox_ruler_set_range(rulerX, 0.0, 499.0, 0.0);

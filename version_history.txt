@@ -1,5 +1,6 @@
 1.4.0.6:
     - Fixed daqhats_read_eeproms issue under bullseye.
+    - Fixed x-axis display problem in data logger examples in the 64-bit OS
 
 1.4.0.5:
     - Fixed error when calling hat_interrupt_callback_enable().
