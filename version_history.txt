@@ -1,3 +1,7 @@
+1.4.0.7:
+    - Fixed error in the Python dio_output_write_dict() and dio_config_write_dict() 
+      methods for the MCC 152.
+
 1.4.0.6:
     - Fixed daqhats_read_eeproms issue under bullseye.
     - Fixed x-axis display problem in data logger examples in the 64-bit OS

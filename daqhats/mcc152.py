@@ -553,7 +553,7 @@ class mcc152(Hat): # pylint: disable=invalid-name,too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        orig_val = c_ubyte
+        orig_val = c_ubyte()
         result = self._lib.mcc152_dio_output_read_port(
             self._address, byref(orig_val))
         if result != self._RESULT_SUCCESS:
@@ -1094,7 +1094,7 @@ class mcc152(Hat): # pylint: disable=invalid-name,too-many-public-methods
         if not self._initialized:
             raise HatError(self._address, "Not initialized.")
 
-        orig_val = c_ubyte
+        orig_val = c_ubyte()
         result = self._lib.mcc152_dio_config_read_port(
             self._address, item, byref(orig_val))
         if result != self._RESULT_SUCCESS:
