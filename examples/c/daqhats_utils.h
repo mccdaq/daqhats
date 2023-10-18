@@ -208,7 +208,7 @@ void convert_tc_type_to_string(uint8_t tc_type,
 /* This function converts the mask of channels defined by the channel_mask
    parameter and sets the chans_str parameter, which is passed by reference,
    to a comma separated string respresentation of the channel numbers. */
-void convert_chan_mask_to_string(uint32_t channel_mask, char* chans_str)
+void convert_chan_mask_to_string(uint8_t channel_mask, char* chans_str)
 {
     int i = 0;
     char chan_string[8];
@@ -235,7 +235,7 @@ void convert_chan_mask_to_string(uint32_t channel_mask, char* chans_str)
    parameter and sets the chans parameter, which is passed by reference,
    to an array of channel numbers.
    The return value is an integer representing the number of channels. */
-int convert_chan_mask_to_array(uint32_t channel_mask, int chans[])
+int convert_chan_mask_to_array(uint8_t channel_mask, int chans[])
 {
     int i = 0;
     int chan_count = 0;
