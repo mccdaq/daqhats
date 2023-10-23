@@ -1,3 +1,8 @@
+1.4.0.8:
+    - Fixed install / uninstall scripts to allow installing the local Python library 
+      on a system running Bookworm.
+    - Fixed warning in gpio.c.
+
 1.4.0.7:
     - Fixed error in the Python dio_output_write_dict() and dio_config_write_dict() 
       methods for the MCC 152.
