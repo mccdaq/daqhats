@@ -34,7 +34,7 @@ if [ "$?" -eq 0 ]; then
     num=$(pip2 show daqhats | wc -l)
     if [ "$num" -ne 0 ]; then
         echo "Removing Python 2 package"
-        pip2 uninstall daqhats -y
+        pip2 uninstall daqhats -y --break-system-packages
         echo
     fi
 fi
@@ -42,6 +42,7 @@ fi
 num=$(pip3 show daqhats | wc -l)
 if [ "$num" -ne 0 ]; then
     echo "Removing Python 3 package"
+    export PIP_BREAK_SYSTEM_PACKAGES=1
     pip3 uninstall daqhats -y
     echo
 fi

@@ -108,7 +108,7 @@ static void gpio_init(void)
 
     if (gpio_map == MAP_FAILED)
     {
-        printf("mmap failed %d\n", (int)gpio_map);
+        printf("mmap failed %p\n", gpio_map);
         gpio = NULL;
         return;
     }
