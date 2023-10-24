@@ -42,7 +42,9 @@ dpkg-query -l python3-pip &> /dev/null
 if [ "$?" != "0" ]; then
    apt-get -qy install python3-pip
 fi
-pip3 install . --upgrade --break-system-packages
+# Allow installing local package under Python 3.11+
+export PIP_BREAK_SYSTEM_PACKAGES=1
+pip3 install . --upgrade
 
 echo
 

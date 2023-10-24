@@ -42,7 +42,8 @@ fi
 num=$(pip3 show daqhats | wc -l)
 if [ "$num" -ne 0 ]; then
     echo "Removing Python 3 package"
-    pip3 uninstall daqhats -y --break-system-packages
+    export PIP_BREAK_SYSTEM_PACKAGES=1
+    pip3 uninstall daqhats -y
     echo
 fi
 
