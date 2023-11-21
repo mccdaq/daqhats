@@ -1182,8 +1182,8 @@ int mcc128_open(uint8_t address)
         // ensure GPIO signals are initialized
         gpio_dir(IRQ_GPIO, 1);
 
-        gpio_write(RESET_GPIO, 0);
         gpio_dir(RESET_GPIO, 0);
+        gpio_write(RESET_GPIO, 0);
 
         pthread_mutex_init(&dev->scan_mutex, NULL);
 
@@ -2646,8 +2646,8 @@ int mcc128_open_for_update(uint8_t address)
 
 
         // ensure GPIO signals are initialized
-        gpio_write(RESET_GPIO, 0);
         gpio_dir(RESET_GPIO, 0);
+        gpio_write(RESET_GPIO, 0);
 
         gpio_dir(IRQ_GPIO, 1);
 
