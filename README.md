@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>
-    <tr><td>Library Version<td>1.4.0.8</td></tr>
+    <tr><td>Library Version<td>1.5.0.0</td></tr>
 </table>
 
 ## About
@@ -38,7 +38,7 @@ specifications for that device.
 ## Prerequisites
 - Raspberry Pi OS or Raspbian image (may work with other Raspberry Pi operating systems)
 - Raspberry Pi with 40-pin GPIO header
-- C, C++, Python 2.7 or Python 3.4
+- C, C++, Python 2.7 or Python 3.4+
 
 ## Raspberry Pi Configuration
 Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Raspberry Pi.
@@ -66,7 +66,7 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 5. Install git (if not installed):
 
    ```sh
-   sudo apt install git
+   sudo apt install git -y
    ```
 6. Download the daqhats library to the root of your home folder:
 
@@ -86,6 +86,11 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.
+
+If ioctl errors are seen when running on a Raspberry Pi 5, update the kernel with:
+```sh
+   sudo rpi-update
+```
 
 You can now run the example programs under ~/daqhats/examples and create your own
 programs. Refer to the [Examples](#examples) section below for more information.

@@ -5,6 +5,9 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Ensure libgpiod is installed
+apt satisfy gpiod libgpiod-dev -y
+
 # Build / install the C library and headers
 echo "Building and installing library"
 echo
@@ -40,7 +43,7 @@ echo
 echo "Installing library for Python 3"
 dpkg-query -l python3-pip &> /dev/null
 if [ "$?" != "0" ]; then
-   apt-get -qy install python3-pip
+   apt -qy install python3-pip
 fi
 # Allow installing local package under Python 3.11+
 export PIP_BREAK_SYSTEM_PACKAGES=1
@@ -53,6 +56,8 @@ install_py2=0
 if [ $(which python | wc -l) -ne 0 ]; then
    if [[ $1 == "-y" ]]; then
       install_py2=1
+   elif [[ $1 == "-n" ]]; then
+      install_py2=0
    else
       echo -n "Do you want to install support for Python 2? [y/n] "
       read input
@@ -66,7 +71,7 @@ if [ "$install_py2" == 1 ]; then
    echo "Installing library for Python 2"
    dpkg-query -l python-pip &> /dev/null
    if [ "$?" != "0" ]; then
-      apt-get -qy install python-pip
+      apt -qy install python-pip
    fi
    pip2 install . --upgrade --break-system-packages
 fi
