@@ -1,4 +1,4 @@
-1.5.0.0:
+1.4.1.0:
     - Added support for Raspberry Pi 5 by switching to libgpiod for the GPIO functions.
 
 1.4.0.8:
