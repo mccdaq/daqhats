@@ -1,2 +1,3 @@
-build/*
-daqhats.egg-info/*
+**/build/*
+**/daqhats.egg-info/*
+dist/*

@@ -74,15 +74,27 @@ Follow the instructions at https://www.raspberrypi.org/help/ for setting up a Ra
    cd ~
    git clone https://github.com/mccdaq/daqhats.git
    ```
-7. Build and install the shared library, tools, and optional Python support. The
-   installer will install Python 3 support by default and ask if you want to install
-   Python 2 support. It will also detect the HAT board EEPROMs and save the contents,
-   if needed.
+7. Build and install the shared library and tools. It will also detect the HAT board EEPROMs 
+and save the contents, if needed.
 
    ```sh
    cd ~/daqhats
    sudo ./install.sh
    ```
+8. To use the daqhats library with Python install the python library.  It may be 
+   installed system-wide with:
+   ```sh
+   sudo pip install daqhats
+   ```
+   Recent versions of Python discourage system-wide installation, so you may have
+   to append *--break-system-packages*.  To install in a virtual environment (venv),
+   create the venv and install the package (replace `<path_to_venv>` with the desired
+   location of the venv):
+   ```sh
+   python -m venv <path_to_venv>
+   <path_to_venv>/bin/pip install daqhats
+   ```
+   
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.
@@ -94,6 +106,7 @@ If ioctl errors are seen when running on a Raspberry Pi 5, update the kernel wit
 
 You can now run the example programs under ~/daqhats/examples and create your own
 programs. Refer to the [Examples](#examples) section below for more information.
+The Python library must be installed to run the Python examples.
 
 If you are using the Raspberry Pi OS desktop interface, the DAQ HAT Manager utility will be
 available under the Accessories start menu. This utility will allow you to list the
@@ -120,11 +133,23 @@ sudo daqhats_read_eeproms
 The command **daqhats_version** may be used to display the installed version number.
 
 #### Uninstall the daqhats library
-If you want to uninstall the the daqhats library, use the following commands:
+To uninstall the the daqhats library:
 
 ```sh
 cd ~/daqhats
 sudo ./uninstall.sh
+```
+
+To uninstall a system-wide Python library:
+
+```sh
+sudo pip uninstall daqhats
+```
+
+To uninstall the Python library from a venv (replace `<path_to_venv>` with the path of the venv):
+
+```sh
+<path_to_venv>/bin/pip uninstall daqhats
 ```
 
 ## Firmware Updates
