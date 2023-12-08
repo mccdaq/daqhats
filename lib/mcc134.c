@@ -18,7 +18,6 @@
 #include "daqhats.h"
 #include "util.h"
 #include "cJSON.h"
-#include "gpio.h"
 #include "mcc134_adc.h"
 #include "nist.h"
 

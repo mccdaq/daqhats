@@ -152,6 +152,7 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
     ret = ioctl(spi_fd, SPI_IOC_RD_MODE, &temp);
     if (ret == -1)
     {
+        _free_address();
         _release_lock(lock_fd);
         return RESULT_COMMS_FAILURE;
     }
@@ -161,6 +162,7 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
         ret = ioctl(spi_fd, SPI_IOC_WR_MODE, &spi_mode);
         if (ret == -1)
         {
+            _free_address();
             _release_lock(lock_fd);
             return RESULT_COMMS_FAILURE;
         }
@@ -185,6 +187,7 @@ int _mcc134_spi_transfer(uint8_t address, void* tx_data, void* rx_data,
         ret = RESULT_SUCCESS;
     }
 
+    _free_address();
     // clear the SPI lock
     _release_lock(lock_fd);
 

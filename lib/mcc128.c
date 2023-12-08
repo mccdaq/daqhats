@@ -437,6 +437,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     ret = ioctl(dev->spi_fd, SPI_IOC_RD_MODE, &temp);
     if (ret == -1)
     {
+        _free_address();
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
@@ -445,6 +446,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         ret = ioctl(dev->spi_fd, SPI_IOC_WR_MODE, &spi_mode);
         if (ret == -1)
         {
+            _free_address();
             _release_lock(lock_fd);
             return RESULT_UNDEFINED;
         }
@@ -465,6 +467,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
     // send the command
     if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) < 1)
     {
+        _free_address();
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
@@ -548,6 +551,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
 
     if (!got_reply)
     {
+        _free_address();
         // clear the SPI lock
         _release_lock(lock_fd);
         return RESULT_TIMEOUT;
@@ -589,6 +593,7 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         ret = RESULT_BAD_PARAMETER;
     }
 
+    _free_address();
     // clear the SPI lock
     _release_lock(lock_fd);
     return ret;
@@ -1178,12 +1183,6 @@ int mcc128_open(uint8_t address)
             printf("Warning - address %d using factory EEPROM default "
                 "values\n", address);
         }
-
-        // ensure GPIO signals are initialized
-        gpio_dir(IRQ_GPIO, 1);
-
-        gpio_dir(RESET_GPIO, 0);
-        gpio_write(RESET_GPIO, 0);
 
         pthread_mutex_init(&dev->scan_mutex, NULL);
 
@@ -2644,13 +2643,6 @@ int mcc128_open_for_update(uint8_t address)
             _set_defaults(&dev->factory_data);
         }
 
-
-        // ensure GPIO signals are initialized
-        gpio_dir(RESET_GPIO, 0);
-        gpio_write(RESET_GPIO, 0);
-
-        gpio_dir(IRQ_GPIO, 1);
-
         // open the SPI device handle
         dev->spi_fd = open(spi_device, O_RDWR);
         if (dev->spi_fd < 0)
@@ -2691,9 +2683,12 @@ int mcc128_enter_bootloader(uint8_t address)
 
     _set_address(address);
 
+    gpio_set_output(RESET_GPIO, 0);
+    gpio_input(IRQ_GPIO);
+
     // toggle reset until irq goes low (indicating ready for commands)
     count = 0;
-    while (gpio_status(IRQ_GPIO) && (count < 20))
+    while ((1 == gpio_read(IRQ_GPIO)) && (count < 20))
     {
         gpio_write(RESET_GPIO, 1);
         usleep(1*1000ul);
@@ -2703,30 +2698,39 @@ int mcc128_enter_bootloader(uint8_t address)
     }
 
     // if irq is not low yet wait up to 100ms
-    if (gpio_status(IRQ_GPIO))
+    if (1 == gpio_read(IRQ_GPIO))
     {
         count = 0;
-        while (gpio_status(IRQ_GPIO) &&
+        while ((1 == gpio_read(IRQ_GPIO)) &&
                (count < 110))
         {
             usleep(1*1000);
             count += 10;
         }
 
-        if (gpio_status(IRQ_GPIO))
+        if (1 == gpio_read(IRQ_GPIO))
         {
+            gpio_release(IRQ_GPIO);
+            gpio_release(RESET_GPIO);
+            _free_address();
             _release_lock(lock_fd);
             return RESULT_TIMEOUT;
         }
     }
 
+    gpio_release(IRQ_GPIO);
+    gpio_release(RESET_GPIO);
+    _free_address();
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
 }
 
 int mcc128_bl_ready(void)
 {
-    return !gpio_status(IRQ_GPIO);
+    gpio_input(IRQ_GPIO);
+    bool val = (gpio_read(IRQ_GPIO) == 1);
+    gpio_release(IRQ_GPIO);
+    return (int)(!val);
 }
 
 int mcc128_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
@@ -2755,6 +2759,7 @@ int mcc128_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
     ret = ioctl(dev->spi_fd, SPI_IOC_RD_MODE, &temp);
     if (ret == -1)
     {
+        _free_address();
         _release_lock(lock_fd);
         return RESULT_UNDEFINED;
     }
@@ -2763,6 +2768,7 @@ int mcc128_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         ret = ioctl(dev->spi_fd, SPI_IOC_WR_MODE, &spi_mode);
         if (ret == -1)
         {
+            _free_address();
             _release_lock(lock_fd);
             return RESULT_UNDEFINED;
         }
@@ -2784,6 +2790,7 @@ int mcc128_bl_transfer(uint8_t address, void* tx_data, void* rx_data,
         return RESULT_UNDEFINED;
     }
 
+    _free_address();
     _release_lock(lock_fd);
     return RESULT_SUCCESS;
 }
