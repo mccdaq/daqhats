@@ -21,10 +21,10 @@ enum SpiBus
 #define MAX_SPI_TRANSFER        4096        // Defined in the spidev driver
 
 // Delay / timeout constants
-#define MSEC                    1000UL      // Milliseconds multiplier, for 
-                                            // functions that take a microsecond 
+#define MSEC                    1000UL      // Milliseconds multiplier, for
+                                            // functions that take a microsecond
                                             // argument
-#define SEC                     1000*MSEC   // Seconds multiplier, for functions 
+#define SEC                     1000*MSEC   // Seconds multiplier, for functions
                                             // that take a microsecond argument
 
 /// \cond
@@ -51,7 +51,8 @@ uint32_t _difftime_us(struct timespec* start, struct timespec* end);
 uint32_t _difftime_ms(struct timespec* start, struct timespec* end);
 void _address_init(void);
 void _set_address(uint8_t address);
-int _hat_info(uint8_t address, struct HatInfo* pEntry, char* pData, 
+void _free_address(void);
+int _hat_info(uint8_t address, struct HatInfo* pEntry, char* pData,
     uint16_t* pSize);
 
 #ifdef __cplusplus

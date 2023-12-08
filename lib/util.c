@@ -5,6 +5,7 @@
 *
 *   date 06/29/2018
 */
+#include <errno.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -23,9 +24,10 @@
 // *****************************************************************************
 // Constants
 
-//#define SEMAPHORES
+//#define USE_SEMAPHORES
 
-#define LOCK_RETRY_TIME         5*SEC       // 5 seconds
+#define LOCK_RETRY_TIME_S       5       // 5 seconds
+#define LOCK_RETRY_TIME         (LOCK_RETRY_TIME_S*SEC)
 
 // Raspberry Pi HAT eeprom constants
 
@@ -96,6 +98,12 @@ struct _VendorInfo
     char* pstr;
 };
 
+#ifdef USE_SEMAPHORES
+// named semaphores
+static const char* const INIT_MUTEX = "/mcc_daqhats_init_mutex";
+// shared memory
+static const char* const SHARED_DATA = "/mcc_daqhats_mutex_shm";
+#else
 // lock files for synchronization
 static const char* const SPI_LOCKFILE = "/tmp/.mcc_spi_lockfile";
 
@@ -110,6 +118,7 @@ static const char* const BOARD_LOCKFILES[] =
     "/tmp/.mcc_hat_lockfile_6",
     "/tmp/.mcc_hat_lockfile_7",
 };
+#endif
 
 static const char* const HAT_SETTINGS_DIR = "/etc/mcc/hats";
 static const char* const SYS_HAT_DIR = "/proc/device-tree/hat";
@@ -133,10 +142,21 @@ static const char* HAT_ERROR_MESSAGES[] =
 // *****************************************************************************
 // Variables
 static bool _address_initialized = false;
+#ifdef USE_SEMAPHORES
+static int shm_fd = -1;
+typedef struct
+{
+    pthread_mutex_t spi_mutex;
+    pthread_mutex_t board_mutex[MAX_NUMBER_HATS];
+} shared_data_struct;
+
+static shared_data_struct* shared_data = NULL;
+#else
 static int spi_lockfile;
 static int board_lockfiles[MAX_NUMBER_HATS];
 static pthread_mutex_t spi_mutex;
 static pthread_mutex_t board_mutex[MAX_NUMBER_HATS];
+#endif
 
 // *****************************************************************************
 // Local Functions
@@ -146,13 +166,9 @@ static pthread_mutex_t board_mutex[MAX_NUMBER_HATS];
  *****************************************************************************/
 void _address_init(void)
 {
-    gpio_init();
-
     if (!_address_initialized)
     {
-        gpio_dir(ADDR0_GPIO, 0);
-        gpio_dir(ADDR1_GPIO, 0);
-        gpio_dir(ADDR2_GPIO, 0);
+        gpio_init();
         _address_initialized = true;
     }
 }
@@ -160,12 +176,121 @@ void _address_init(void)
 
 void _lock_init(void)
 {
-    mode_t mask;
     int i;
 
+#ifdef USE_SEMAPHORES
+    // Use a named semaphore to synchronize shared memory init.  The semaphore could get hung
+    // if a process is killed while it is open, so we only use it for a brief time during init.
+    sem_t* mutex = sem_open(INIT_MUTEX, O_CREAT, 0666, 1);
+    if (SEM_FAILED == mutex)
+    {
+        printf("_lock_init: mutex sem_open failed, errno %d\n", errno);
+        return;
+    }
+
+    // acquire lock
+    sem_wait(mutex);
+
+    // Use pthread_mutexes in shared memory for the SPI and board access synchronization. Set them
+    // to process shared and robust so they can be shared between different processes and can be
+    // cleaned up if the owning process dies without releasing it.  A posix named semaphore would
+    // be left locked if the owning process dies without releasing it.
+
+    // Open shared memory.  Try to open in exclusive mode first to see if already exists.
+    int mode = 0666;
+    // When creating it will use the umask of the program, so override those so the resulting
+    // file can be shared with different users, root, etc.
+    mode_t old_umask = umask(0);
+    shm_fd = shm_open(SHARED_DATA, O_CREAT | O_RDWR | O_EXCL, mode);
+    umask(old_umask);
+
+    if (shm_fd < 0)
+    {
+        // It already exists, so don't initialize it.
+        printf("_lock_init: shm exists\n");
+        shm_fd = shm_open(SHARED_DATA, O_RDWR, mode);
+        if (shm_fd < 0)
+        {
+            printf("_lock_init: shm_open failed, errno %d\n", errno);
+            sem_post(mutex);
+            sem_close(mutex);
+            sem_unlink(INIT_MUTEX);
+            return;
+        }
+
+        // mmap the data
+        shared_data = (shared_data_struct*)mmap(NULL,
+            sizeof(shared_data_struct),
+            PROT_READ | PROT_WRITE,
+            MAP_SHARED,
+            shm_fd,
+            0);
+        if (MAP_FAILED == shared_data)
+        {
+            printf("_lock_init: shared_data mmap failed\n");
+            close(shm_fd);
+            shm_fd = -1;
+            sem_post(mutex);
+            sem_close(mutex);
+            sem_unlink(INIT_MUTEX);
+            return;
+        }
+    }
+    else
+    {
+        // It did not exist so we need to initialize it.
+        printf("_lock_init: shm does not exist\n");
+        if (ftruncate(shm_fd, sizeof(shared_data_struct)) == -1)
+        {
+            printf("_lock_init: ftruncate failed\n");
+            close(shm_fd);
+            shm_fd = -1;
+            sem_post(mutex);
+            sem_close(mutex);
+            sem_unlink(INIT_MUTEX);
+            return;
+        }
+        shared_data = (shared_data_struct*)mmap(NULL,
+            sizeof(shared_data_struct),
+            PROT_READ | PROT_WRITE,
+            MAP_SHARED,
+            shm_fd,
+            0);
+        if (MAP_FAILED == shared_data)
+        {
+            printf("_lock_init: shared_data mmap failed\n");
+            close(shm_fd);
+            shm_fd = -1;
+            sem_post(mutex);
+            sem_close(mutex);
+            sem_unlink(INIT_MUTEX);
+            return ;
+        }
+
+        // init the mutexes
+        pthread_mutexattr_t mattr;
+        pthread_mutexattr_init(&mattr);
+        // set to process shared
+        pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
+        // set to robust
+        pthread_mutexattr_setrobust(&mattr, PTHREAD_MUTEX_ROBUST);
+        // apply to all mutexes
+        pthread_mutex_init(&shared_data->spi_mutex, &mattr);
+        for (i = 0; i < MAX_NUMBER_HATS; i++)
+        {
+            pthread_mutex_init(&shared_data->board_mutex[i], &mattr);
+        }
+        pthread_mutexattr_destroy(&mattr);
+    }
+
+    // release the init mutex
+    sem_post(mutex);
+    sem_close(mutex);
+    sem_unlink(INIT_MUTEX);
+#else
     // set umask so we can set permission to 0666; otherwise, if run as root it
     // will leave lockfiles that normal users cannot open
-    mask = umask(0111);
+    mode_t mask = umask(0111);
 
     // init spi lockfile
     spi_lockfile = open(SPI_LOCKFILE,
@@ -190,19 +315,39 @@ void _lock_init(void)
     {
         pthread_mutex_init(&board_mutex[i], NULL);
     }
+#endif
 }
 
 void _lock_fini(void)
 {
     int i;
 
+#ifdef USE_SEMAPHORES
+    if (NULL == shared_data)
+    {
+        return;
+    }
+    pthread_mutex_unlock(&shared_data->spi_mutex);
+    for (i = 0; i < MAX_NUMBER_HATS; i++)
+    {
+        pthread_mutex_unlock(&shared_data->board_mutex[i]);
+    }
+    munmap(shared_data, sizeof(shared_data_struct));
+    shared_data = NULL;
+    if (shm_fd > -1)
+    {
+        // close the shared memory
+        close(shm_fd);
+        shm_fd = -1;
+    }
+#else
     close(spi_lockfile);
     pthread_mutex_destroy(&spi_mutex);
-
     for (i = 0; i < MAX_NUMBER_HATS; i++)
     {
         pthread_mutex_destroy(&board_mutex[i]);
     }
+#endif
 }
 
 // *****************************************************************************
@@ -233,10 +378,17 @@ void _set_address(uint8_t address)
 {
     if (address < MAX_NUMBER_HATS)
     {
-        gpio_write(ADDR0_GPIO, address & 0x01);
-        gpio_write(ADDR1_GPIO, address & 0x02);
-        gpio_write(ADDR2_GPIO, address & 0x04);
+        gpio_set_output(ADDR0_GPIO, address & 0x01);
+        gpio_set_output(ADDR1_GPIO, address & 0x02);
+        gpio_set_output(ADDR2_GPIO, address & 0x04);
     }
+}
+
+void _free_address(void)
+{
+    gpio_release(ADDR0_GPIO);
+    gpio_release(ADDR1_GPIO);
+    gpio_release(ADDR2_GPIO);
 }
 
 /******************************************************************************
@@ -296,6 +448,34 @@ uint32_t _difftime_ms(struct timespec* start, struct timespec* end)
  *****************************************************************************/
 int _obtain_lock(void)
 {
+#ifdef USE_SEMAPHORES
+    struct timespec ts;
+
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += LOCK_RETRY_TIME_S;
+
+    int s = pthread_mutex_timedlock(&shared_data->spi_mutex, &ts);
+
+    switch (s)
+    {
+    case 0:
+        // success
+        return RESULT_SUCCESS;
+    case EOWNERDEAD:
+        // The process that was holding the mutex died.  Assume we can recover it.
+        printf("_obtain_lock: inconsistent spi_mutex reported\n");
+        pthread_mutex_consistent(&shared_data->spi_mutex);
+        return RESULT_SUCCESS;
+        break;
+    case ETIMEDOUT:
+        // Timeout
+        return RESULT_TIMEOUT;
+    default:
+        printf("_obtain_lock error %d\n", s);
+        return RESULT_TIMEOUT;
+    }
+
+#else
     bool locked;
     struct timespec start_time;
     struct timespec current_time;
@@ -333,6 +513,7 @@ int _obtain_lock(void)
     pthread_mutex_lock(&spi_mutex);
 
     return spi_lockfile;
+#endif
 }
 
 /******************************************************************************
@@ -353,6 +534,40 @@ int _obtain_lock(void)
  *****************************************************************************/
 int _obtain_board_lock(uint8_t address)
 {
+#ifdef USE_SEMAPHORES
+    if (address >= MAX_NUMBER_HATS)
+    {
+        printf("_obtain_board_lock: Invalid board address %d\n", address);
+        return RESULT_BAD_PARAMETER;
+    }
+
+    struct timespec ts;
+
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += LOCK_RETRY_TIME_S;
+
+    int s = pthread_mutex_timedlock(&shared_data->board_mutex[address], &ts);
+
+    switch (s)
+    {
+    case 0:
+        // success
+        return RESULT_SUCCESS;
+    case EOWNERDEAD:
+        // The process that was holding the mutex died.  Assume we can recover it.
+        printf("_obtain_board_lock %d: inconsistent spi_mutex reported\n", address);
+        pthread_mutex_consistent(&shared_data->spi_mutex);
+        return RESULT_SUCCESS;
+        break;
+    case ETIMEDOUT:
+        // Timeout
+        return RESULT_TIMEOUT;
+    default:
+        printf("_obtain_board_lock %d error %d\n", address, s);
+        return RESULT_TIMEOUT;
+    }
+
+#else
     bool locked;
     int lock_fd;
     struct timespec start_time;
@@ -427,6 +642,7 @@ int _obtain_board_lock(uint8_t address)
     pthread_mutex_lock(&board_mutex[address]);
 
     return RESULT_SUCCESS;
+#endif
 }
 
 /******************************************************************************
@@ -434,8 +650,19 @@ int _obtain_board_lock(uint8_t address)
  *****************************************************************************/
 void _release_lock(int lock_fd)
 {
+#ifdef USE_SEMAPHORES
+    if (NULL == shared_data)
+    {
+        return;
+    }
+
+    (void)(lock_fd);
+
+    pthread_mutex_unlock(&shared_data->spi_mutex);
+#else
     flock(lock_fd, LOCK_UN);
     pthread_mutex_unlock(&spi_mutex);
+#endif
 }
 
 
@@ -444,9 +671,19 @@ void _release_lock(int lock_fd)
  *****************************************************************************/
 void _release_board_lock(uint8_t address)
 {
+    if (address >= MAX_NUMBER_HATS)
+    {
+        printf("_release_board_lock: Invalid board address %d\n", address);
+        return;
+    }
+
+#ifdef USE_SEMAPHORES
+    pthread_mutex_unlock(&shared_data->board_mutex[address]);
+#else
     flock(board_lockfiles[address], LOCK_UN);
     close(board_lockfiles[address]);
     pthread_mutex_unlock(&board_mutex[address]);
+#endif
 }
 
 
@@ -455,7 +692,6 @@ void _release_board_lock(uint8_t address)
  *****************************************************************************/
 int hat_list(uint16_t filter_id, struct HatInfo* pList)
 {
-    //struct HatInfo* entry;
     uint8_t address;
     char filename[256];
     char temp[256];
@@ -880,7 +1116,10 @@ const char* hat_error_message(int result)
  *****************************************************************************/
 int hat_interrupt_state(void)
 {
-    if (gpio_status(IRQ_GPIO) == 0)
+    gpio_input(IRQ_GPIO);
+    int val = gpio_read(IRQ_GPIO);
+    gpio_release(IRQ_GPIO);
+    if (val == 0)
     {
         return 1;
     }
