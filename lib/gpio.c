@@ -19,7 +19,7 @@ const char* app_name = "daqhats";
 
 static bool gpio_initialized = false;
 static struct gpiod_chip* chip;
-static struct gpiod_line_bulk bulk_lines;
+static struct gpiod_line_bulk lines;
 
 // Variables for GPIO interrupt threads
 #define NUM_GPIO            32          // max number of GPIO pins we handle for interrupts
@@ -65,7 +65,7 @@ void gpio_init(void)
 #endif
 
     // get all the GPIO lines for the chip
-    if (-1 == gpiod_chip_get_all_lines(chip, &bulk_lines))
+    if (-1 == gpiod_chip_get_all_lines(chip, &lines))
     {
         printf("gpio_init: error getting lines\n");
         gpiod_chip_close(chip);
@@ -88,9 +88,9 @@ void gpio_close(void)
 #endif
 
     // release any lines
-    for (unsigned int i = 0; i < bulk_lines.num_lines; i++)
+    for (unsigned int i = 0; i < lines.num_lines; i++)
     {
-        gpiod_line_release(bulk_lines.lines[i]);
+        gpiod_line_release(lines.lines[i]);
     }
 
     gpiod_chip_close(chip);
@@ -108,14 +108,14 @@ void gpio_set_output(unsigned int pin, unsigned int value)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_set_output: pin %d invalid\n", pin);
         return;
     }
 
     // Set pin to output.
-    if (-1 == gpiod_line_request_output(bulk_lines.lines[pin], app_name, value))
+    if (-1 == gpiod_line_request_output(lines.lines[pin], app_name, value))
     {
         printf("gpio_set_output: gpiod_line_request_output failed\n");
     }
@@ -130,14 +130,14 @@ void gpio_write(unsigned int pin, unsigned int value)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_write: pin %d invalid\n", pin);
         return;
     }
 
     // Set pin value.
-    if (-1 == gpiod_line_set_value(bulk_lines.lines[pin], value))
+    if (-1 == gpiod_line_set_value(lines.lines[pin], value))
     {
         printf("gpio_write: gpiod_line_set_value failed\n");
     }
@@ -152,14 +152,14 @@ void gpio_input(unsigned int pin)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_input: pin %d invalid\n", pin);
         return;
     }
 
     // Set pin to input.
-    if (-1 == gpiod_line_request_input(bulk_lines.lines[pin], app_name))
+    if (-1 == gpiod_line_request_input(lines.lines[pin], app_name))
     {
         printf("gpio_input: gpiod_line_request_input failed\n");
     }
@@ -174,14 +174,14 @@ void gpio_release(unsigned int pin)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_release: pin %d invalid\n", pin);
         return;
     }
 
     // Release pin
-    gpiod_line_release(bulk_lines.lines[pin]);
+    gpiod_line_release(lines.lines[pin]);
 }
 
 int gpio_read(unsigned int pin)
@@ -190,14 +190,14 @@ int gpio_read(unsigned int pin)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_read: pin %d invalid\n", pin);
         return -1;
     }
 
     // get the value
-    int value = gpiod_line_get_value(bulk_lines.lines[pin]);
+    int value = gpiod_line_get_value(lines.lines[pin]);
     if (-1 == value)
     {
         printf("gpio_read gpiod_line_get_value failed\n");
@@ -214,7 +214,7 @@ static void *gpio_interrupt_thread(void* arg)
         .tv_sec = 0,
         .tv_nsec = 1000000,
     };
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_interrupt_thread: pin %d invalid\n", pin);
         return NULL;
@@ -222,7 +222,7 @@ static void *gpio_interrupt_thread(void* arg)
 
     while (0 == gpio_int_thread_signal[pin])
     {
-        int result = gpiod_line_event_wait(bulk_lines.lines[pin], &timeout);
+        int result = gpiod_line_event_wait(lines.lines[pin], &timeout);
         if (1 == result)
         {
             // call the callback
@@ -240,28 +240,28 @@ int gpio_interrupt_callback(unsigned int pin, unsigned int mode, void (*function
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_interrupt_callback: pin %d invalid\n", pin);
         return -1;
     }
 
     // temporarily release the line and request it with the desired event mode
-    gpiod_line_release(bulk_lines.lines[pin]);
+    gpiod_line_release(lines.lines[pin]);
     int result;
     switch (mode)
     {
     case 0: // falling
-        result = gpiod_line_request_falling_edge_events(bulk_lines.lines[pin], app_name);
+        result = gpiod_line_request_falling_edge_events(lines.lines[pin], app_name);
         break;
     case 1: // rising
-        result = gpiod_line_request_rising_edge_events(bulk_lines.lines[pin], app_name);
+        result = gpiod_line_request_rising_edge_events(lines.lines[pin], app_name);
         break;
     case 2: // both
-        result = gpiod_line_request_both_edges_events(bulk_lines.lines[pin], app_name);
+        result = gpiod_line_request_both_edges_events(lines.lines[pin], app_name);
         break;
     default: // disable events
-        result = gpiod_line_request_input(bulk_lines.lines[pin], app_name);
+        result = gpiod_line_request_input(lines.lines[pin], app_name);
         if (true == gpio_threads_running[pin])
         {
             // there is already an interrupt thread on this pin so signal the
@@ -298,7 +298,7 @@ int gpio_interrupt_callback(unsigned int pin, unsigned int mode, void (*function
         .tv_sec = 0,
         .tv_nsec = 0,
     };
-    while (1 == gpiod_line_event_wait(bulk_lines.lines[pin], &timeout))
+    while (1 == gpiod_line_event_wait(lines.lines[pin], &timeout))
         ;
 
     // set the callback function
@@ -321,7 +321,7 @@ int gpio_wait_for_low(unsigned int pin, unsigned int timeout)
     {
         gpio_init();
     }
-    if (pin >= bulk_lines.num_lines)
+    if (pin >= lines.num_lines)
     {
         printf("gpio_wait_for_low: pin %d invalid\n", pin);
         return -1;
@@ -342,7 +342,7 @@ int gpio_wait_for_low(unsigned int pin, unsigned int timeout)
     gpio_release(pin);
 
     // the line will not be available for any other processes / threads while this is waiting
-    if (0 != gpiod_line_request_falling_edge_events(bulk_lines.lines[pin], app_name))
+    if (0 != gpiod_line_request_falling_edge_events(lines.lines[pin], app_name))
     {
         // error
         printf("gpio_wait_for_low: gpiod_line_request_falling_edge_events failed\n");
@@ -355,7 +355,7 @@ int gpio_wait_for_low(unsigned int pin, unsigned int timeout)
         .tv_sec = 0,
         .tv_nsec = 0,
     };
-    while (1 == gpiod_line_event_wait(bulk_lines.lines[pin], &timeout_struct))
+    while (1 == gpiod_line_event_wait(lines.lines[pin], &timeout_struct))
         ;
 
     // wait for the next event
@@ -366,7 +366,7 @@ int gpio_wait_for_low(unsigned int pin, unsigned int timeout)
     }
     timeout_struct.tv_nsec = timeout * 1000000;
 
-    int result = gpiod_line_event_wait(bulk_lines.lines[pin], &timeout_struct);
+    int result = gpiod_line_event_wait(lines.lines[pin], &timeout_struct);
     gpio_release(pin);
 
     return result;
