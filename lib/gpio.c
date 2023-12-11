@@ -65,6 +65,8 @@ void gpio_init(void)
 #endif
 
     // get all the GPIO lines for the chip
+#if 0
+    // This isn't compatible with older versions of libgpiod
     if (-1 == gpiod_chip_get_all_lines(chip, &lines))
     {
         printf("gpio_init: error getting lines\n");
@@ -72,6 +74,22 @@ void gpio_init(void)
         chip = NULL;
         return;
     }
+#else
+    gpiod_line_bulk_init(&lines);
+    unsigned int count = gpiod_chip_num_lines(chip);
+    for (unsigned int i = 0; i < count; i++)
+    {
+        struct gpiod_line* line = gpiod_chip_get_line(chip, i);
+        if (NULL == line)
+        {
+            printf("gpio_init: gpiod_chip_get_line returned NULL\n");
+            gpiod_chip_close(chip);
+            chip = NULL;
+            return;
+        }
+        gpiod_line_bulk_add(&lines, line);
+    }
+#endif
 
     gpio_initialized = true;
 }
