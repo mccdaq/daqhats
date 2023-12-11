@@ -6,7 +6,14 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Ensure libgpiod is installed
-apt satisfy gpiod libgpiod-dev -y
+apt satisfy gpiod libgpiod-dev -y 2> /dev/null
+if [ $? -ne 0 ]; then
+   apt install gpiod libgpiod-dev -y
+   if [ $? -ne 0 ]; then
+      echo "Error installing libgpiod"
+      exit 1
+   fi
+fi
 
 # Build / install the C library and headers
 echo "Building and installing library"
