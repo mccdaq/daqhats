@@ -1,2 +1,7 @@
-*.pyc
-__pycache__
+*.o
+daqhats_manager
+mcc118_control_panel
+mcc128_control_panel
+mcc134_control_panel
+mcc152_control_panel
+mcc172_control_panel

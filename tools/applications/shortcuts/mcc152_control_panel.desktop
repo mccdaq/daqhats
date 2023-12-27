@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=MCC 152 Control Panel
+Comment=Test MCC 152
+Exec=/usr/share/mcc/daqhats/mcc152_control_panel
+Type=Application
+Categories=Utility
+StartupNotify=false
+Terminal=false
+Icon=mcc_daqhats
+NoDisplay=true

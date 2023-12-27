@@ -2,9 +2,9 @@
 Version=1.0
 Name=MCC DAQ HAT Manager
 Comment=Manage and control MCC DAQ HATs
-Exec=/usr/bin/python3 /usr/share/mcc/daqhats/daqhats_manager.py
+Exec=/usr/share/mcc/daqhats/daqhats_manager
 Type=Application
 Categories=Utility
 StartupNotify=false
 Terminal=false
-Icon=/usr/share/mcc/daqhats/icon.png
+Icon=mcc_daqhats
