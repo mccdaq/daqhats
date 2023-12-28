@@ -36,8 +36,8 @@ Installation
 
     sudo pip install daqhats
     
-   Recent versions of Python discourage system-wide installation, so you may have to append `--break-system-packages`. 
-   To install in a virtual environment (venv), create the venv and install the package (replace `<path_to_venv>` with the 
+   Recent versions of Python discourage system-wide installation, so you may have to append ``--break-system-packages``. 
+   To install in a virtual environment (venv), create the venv and install the package (replace ``<path_to_venv>`` with the 
    desired location of the venv)::
     
     python -m venv <path_to_venv>
