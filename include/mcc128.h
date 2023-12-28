@@ -389,16 +389,12 @@ int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
 *   \b samples_per_channel or the value in the following table, whichever is
 *   greater
 *
-*   \verbatim embed:rst:leading-asterisk
-*   ==============      =========================
-*   Sample Rate         Buffer Size (per channel)
-*   ==============      =========================
-*   Not specified       10 kS
-*   0-100 S/s           1 kS
-*   100-10k S/s         10 kS
-*   10k-100k S/s        100 kS
-*   ==============      =========================
-*   \endverbatim
+*   Sample Rate       | Buffer Size (per channel)
+*   ----------------- | -------------------------
+*   Not specified     | 10 kS
+*   0-100 S/s         | 1 kS
+*   100-10k S/s       | 10 kS
+*   10k-100k S/s      | 100 kS
 *
 *   Specifying a very large value for \b samples_per_channel could use too much
 *   of the Raspberry Pi memory. If the memory allocation fails, the function
@@ -413,7 +409,7 @@ int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
 *   @param channel_mask  A bit mask of the channels to be scanned. Set each bit
 *       to enable the associated channel (0x01 - 0xFF.)
 *   @param samples_per_channel  The number of samples to acquire for each
-*       channel in the scan (finite mode,) or can be used to set a larger scan
+*       channel in the scan (finite mode), or can be used to set a larger scan
 *       buffer size than the default value (continuous mode.)
 *   @param sample_rate_per_channel   The sampling rate in samples per second per
 *       channel, max 100,000. When using an external sample clock set this value

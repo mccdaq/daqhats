@@ -450,7 +450,8 @@ class mcc118(Hat): # pylint: disable=invalid-name
           data. Certain methods like :py:func:`a_in_read` will return an error
           because the device is busy.
 
-        The scan options that may be used are:
+        The scan options that may be used are below. Multiple options can be 
+        combined with OR (|).
 
         * :py:const:`OptionFlags.DEFAULT`: Return scaled and calibrated data,
           internal scan clock, no trigger, and finite operation. Any other flags
@@ -473,7 +474,7 @@ class mcc118(Hat): # pylint: disable=invalid-name
           circular buffer. The data must be read before being overwritten to
           avoid a buffer overrun error. **samples_per_channel** is only used for
           buffer sizing.
-
+        
         The scan buffer size will be allocated as follows:
 
         **Finite mode:** Total number of samples in the scan.

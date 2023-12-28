@@ -122,7 +122,7 @@ extern "C" {
 *
 *   It creates the list from the DAQ HAT EEPROM files that are currently on the
 *   system. In the case of a single DAQ HAT at address 0 this information is
-*   automatically provided by Raspbian. However, when you have a stack of
+*   automatically provided by the OS. However, when you have a stack of
 *   multiple boards you must extract the EEPROM images using the
 *   \b daqhats_read_eeproms tool.
 *

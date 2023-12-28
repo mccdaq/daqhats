@@ -281,16 +281,12 @@ int mcc118_a_in_scan_actual_rate(uint8_t channel_count,
 *   \b samples_per_channel or the value in the following table, whichever is 
 *   greater
 *
-*   \verbatim embed:rst:leading-asterisk
-*   ==============      =========================
-*   Sample Rate         Buffer Size (per channel)
-*   ==============      =========================
-*   Not specified       10 kS
-*   0-100 S/s           1 kS
-*   100-10k S/s         10 kS
-*   10k-100k S/s        100 kS
-*   ==============      =========================
-*   \endverbatim
+*   Sample Rate       | Buffer Size (per channel)
+*   ----------------- | -------------------------
+*   Not specified     | 10 kS
+*   0-100 S/s         | 1 kS
+*   100-10k S/s       | 10 kS
+*   10k-100k S/s      | 100 kS
 *
 *   Specifying a very large value for \b samples_per_channel could use too much 
 *   of the Raspberry Pi memory. If the memory allocation fails, the function 
@@ -384,7 +380,7 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 *       - [STATUS_TRIGGERED](@ref STATUS_TRIGGERED): The trigger conditions have 
 *           been met.
 *       - [STATUS_RUNNING](@ref STATUS_RUNNING): The scan is running.
-*   @param samples_per_channel  The number of samples per channel to read.  
+*   @param samples_per_channel  The number of samples per channel to read.
 *       Specify \b -1 to read all available samples in the scan thread buffer,
 *       ignoring \b timeout. If \b buffer does not contain enough space then the
 *       function will read as many samples per channel as will fit in \b buffer.
@@ -393,9 +389,9 @@ int mcc118_a_in_scan_status(uint8_t address, uint16_t* status,
 *       immediately with whatever samples are available (up to the value of
 *       \b samples_per_channel or \b buffer_size_samples.)
 *   @param buffer   The user data buffer that receives the samples.
-*   @param buffer_size_samples  The size of the buffer in samples. Each sample 
+*   @param buffer_size_samples  The size of the buffer in samples. Each sample
 *       is a \b double.
-*   @param samples_read_per_channel Returns the actual number of samples read 
+*   @param samples_read_per_channel Returns the actual number of samples read
 *       from each channel.
 *   @return [Result code](@ref ResultCode), 
 *       [RESULT_SUCCESS](@ref RESULT_SUCCESS) if successful,
