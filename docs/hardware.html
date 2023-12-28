@@ -1,91 +1,53 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Installing the DAQ HAT board &mdash; MCC DAQ HAT Library 1.4.0 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installing the DAQ HAT board &mdash; MCC DAQ HAT Library 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e0a75244"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installing and Using the Library" href="install.html" />
     <link rel="prev" title="Hardware Overview" href="overview.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            MCC DAQ HAT Library
           </a>
-
-          
-            
-            
               <div class="version">
-                1.4.0
+                1.5.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing the DAQ HAT board</a><ul>
@@ -98,247 +60,160 @@
 <li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MCC DAQ HAT Library</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Installing the DAQ HAT board</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installing the DAQ HAT board</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/hardware.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="installing-the-daq-hat-board">
-<span id="install"></span><h1>Installing the DAQ HAT board<a class="headerlink" href="#installing-the-daq-hat-board" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="installing-a-single-board">
-<h2>Installing a single board<a class="headerlink" href="#installing-a-single-board" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="installing-the-daq-hat-board">
+<span id="install"></span><h1>Installing the DAQ HAT board<a class="headerlink" href="#installing-the-daq-hat-board" title="Link to this heading"></a></h1>
+<section id="installing-a-single-board">
+<h2>Installing a single board<a class="headerlink" href="#installing-a-single-board" title="Link to this heading"></a></h2>
 <ol class="arabic">
-<li><p class="first">Power off the Raspberry Pi.</p>
-</li>
-<li><p class="first">Locate the 4 standoffs.  A typical standoff is shown here:</p>
+<li><p>Power off the Raspberry Pi.</p></li>
+<li><p>Locate the 4 standoffs.  A typical standoff is shown here:</p>
 <blockquote>
 <div><img alt="_images/standoff-web.jpg" src="_images/standoff-web.jpg" />
 </div></blockquote>
 </li>
-<li><p class="first">Attach the 4 standoffs to the Raspberry Pi by inserting the male threaded portion through the 4 corner holes on the Raspberry Pi from the top and securing them with the included nuts from the bottom.</p>
-</li>
-<li><p class="first">Install the 2x20 receptacle with extended leads (MCC provides a Samtec SSQ-120-03-T-D or equivalent) onto the Raspberry Pi GPIO header by pressing the female portion of the receptacle onto the header pins, being careful not to bend the leads of the receptacle.  The 2x20 receptacle looks like:</p>
+<li><p>Attach the 4 standoffs to the Raspberry Pi by inserting the male threaded portion through the 4 corner holes on the Raspberry Pi from the top and securing them with the included nuts from the bottom.</p></li>
+<li><p>Install the 2x20 receptacle with extended leads (MCC provides a Samtec SSQ-120-03-T-D or equivalent) onto the Raspberry Pi GPIO header by pressing the female portion of the receptacle onto the header pins, being careful not to bend the leads of the receptacle.  The 2x20 receptacle looks like:</p>
 <blockquote>
 <div><img alt="_images/connector-web.jpg" src="_images/connector-web.jpg" />
 </div></blockquote>
 </li>
-<li><p class="first"><strong>The HAT must be at address 0.</strong>  Remove any jumpers from the address header locations A0-A2 on the HAT board.</p>
-</li>
-<li><p class="first">Insert the HAT board onto the leads of the 2x20 receptacle so that the leads go into the holes on the bottom of the HAT board and come out through the 2x20 connector on the top of the HAT board.  The 4 mounting holes in the corners of the HAT board must line up with the standoffs.  Slide the HAT board down until it rests on the standoffs.</p>
-</li>
-<li><p class="first">Insert the included screws through the mounting holes on the HAT board into the threaded holes in the standoffs and lightly tighten them.</p>
-</li>
+<li><p><strong>The HAT must be at address 0.</strong>  Remove any jumpers from the address header locations A0-A2 on the HAT board.</p></li>
+<li><p>Insert the HAT board onto the leads of the 2x20 receptacle so that the leads go into the holes on the bottom of the HAT board and come out through the 2x20 connector on the top of the HAT board.  The 4 mounting holes in the corners of the HAT board must line up with the standoffs.  Slide the HAT board down until it rests on the standoffs.</p></li>
+<li><p>Insert the included screws through the mounting holes on the HAT board into the threaded holes in the standoffs and lightly tighten them.</p></li>
 </ol>
-</div>
-<div class="section" id="installing-multiple-boards">
-<span id="multiple"></span><h2>Installing multiple boards<a class="headerlink" href="#installing-multiple-boards" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="installing-multiple-boards">
+<span id="multiple"></span><h2>Installing multiple boards<a class="headerlink" href="#installing-multiple-boards" title="Link to this heading"></a></h2>
 <p>Follow steps 1-6 in the single board installation procedure for the first HAT board.</p>
 <ol class="arabic simple">
-<li><strong>Connect all desired field wiring to the installed board - the screw terminals will not be accessible once additional boards are installed above it.</strong></li>
-<li>Install the standoffs of the additional board by inserting the male threaded portions through the 4 corner holes of the installed HAT board and threading them into the standoffs below.</li>
-<li>Install the next 2x20 receptacle with extended leads onto the leads of the previous 2x20 receptacle by pressing the female portion of the new receptacle onto the previous receptacle leads, being careful not to bend the leads of either receptacle.</li>
-<li>Install the appropriate address jumpers onto address header locations A0-A2 of the new HAT board. The recommended addressing method is to have the addresses increment from 0 as the boards are installed, i.e. 0, 1, 2, and so forth.  <strong>There must always be a board at address 0.</strong> The jumpers are installed in this manner (install jumpers where “Y” appears):</li>
+<li><p><strong>Connect all desired field wiring to the installed board - the screw terminals will not be accessible once additional boards are installed above it.</strong></p></li>
+<li><p>Install the standoffs of the additional board by inserting the male threaded portions through the 4 corner holes of the installed HAT board and threading them into the standoffs below.</p></li>
+<li><p>Install the next 2x20 receptacle with extended leads onto the leads of the previous 2x20 receptacle by pressing the female portion of the new receptacle onto the previous receptacle leads, being careful not to bend the leads of either receptacle.</p></li>
+<li><p>Install the appropriate address jumpers onto address header locations A0-A2 of the new HAT board. The recommended addressing method is to have the addresses increment from 0 as the boards are installed, i.e. 0, 1, 2, and so forth.  <strong>There must always be a board at address 0.</strong> The jumpers are installed in this manner (install jumpers where “Y” appears):</p></li>
 </ol>
-<table border="1" class="docutils">
-<colgroup>
-<col width="21%" />
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="45%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>Address</strong></td>
-<td><strong>A0</strong></td>
-<td><strong>A1</strong></td>
-<td><strong>A2</strong></td>
-<td><strong>Jumper Setting</strong></td>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Address</strong></p></td>
+<td><p><strong>A0</strong></p></td>
+<td><p><strong>A1</strong></p></td>
+<td><p><strong>A2</strong></p></td>
+<td><p><strong>Jumper Setting</strong></p></td>
 </tr>
-<tr class="row-even"><td>0</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td><a class="first last reference internal image-reference" href="_images/a0.png"><img alt="_images/a0.png" src="_images/a0.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-even"><td><p>0</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td><a class="reference internal image-reference" href="_images/a0.png"><img alt="_images/a0.png" src="_images/a0.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-odd"><td>1</td>
-<td>Y</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td><a class="first last reference internal image-reference" href="_images/a1.png"><img alt="_images/a1.png" src="_images/a1.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td></td>
+<td><a class="reference internal image-reference" href="_images/a1.png"><img alt="_images/a1.png" src="_images/a1.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-even"><td>2</td>
-<td>&#160;</td>
-<td>Y</td>
-<td>&#160;</td>
-<td><a class="first last reference internal image-reference" href="_images/a2.png"><img alt="_images/a2.png" src="_images/a2.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-even"><td><p>2</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td></td>
+<td><a class="reference internal image-reference" href="_images/a2.png"><img alt="_images/a2.png" src="_images/a2.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-odd"><td>3</td>
-<td>Y</td>
-<td>Y</td>
-<td>&#160;</td>
-<td><a class="first last reference internal image-reference" href="_images/a3.png"><img alt="_images/a3.png" src="_images/a3.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><a class="reference internal image-reference" href="_images/a3.png"><img alt="_images/a3.png" src="_images/a3.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-even"><td>4</td>
-<td>&#160;</td>
-<td>&#160;</td>
-<td>Y</td>
-<td><a class="first last reference internal image-reference" href="_images/a4.png"><img alt="_images/a4.png" src="_images/a4.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-even"><td><p>4</p></td>
+<td></td>
+<td></td>
+<td><p>Y</p></td>
+<td><a class="reference internal image-reference" href="_images/a4.png"><img alt="_images/a4.png" src="_images/a4.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-odd"><td>5</td>
-<td>Y</td>
-<td>&#160;</td>
-<td>Y</td>
-<td><a class="first last reference internal image-reference" href="_images/a5.png"><img alt="_images/a5.png" src="_images/a5.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>Y</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td><a class="reference internal image-reference" href="_images/a5.png"><img alt="_images/a5.png" src="_images/a5.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-even"><td>6</td>
-<td>&#160;</td>
-<td>Y</td>
-<td>Y</td>
-<td><a class="first last reference internal image-reference" href="_images/a6.png"><img alt="_images/a6.png" src="_images/a6.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-even"><td><p>6</p></td>
+<td></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><a class="reference internal image-reference" href="_images/a6.png"><img alt="_images/a6.png" src="_images/a6.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
-<tr class="row-odd"><td>7</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td><a class="first last reference internal image-reference" href="_images/a7.png"><img alt="_images/a7.png" src="_images/a7.png" style="width: 115.5px; height: 106.0px;" /></a>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><p>Y</p></td>
+<td><a class="reference internal image-reference" href="_images/a7.png"><img alt="_images/a7.png" src="_images/a7.png" style="width: 115.5px; height: 106.0px;" /></a>
 </td>
 </tr>
 </tbody>
 </table>
 <ol class="arabic simple" start="5">
-<li>Insert the new HAT board onto the leads of the 2x20 receptacle so that the leads go into the holes on the bottom of the HAT board and come out through the 2x20 connector on the top of the HAT board.  The 4 mounting holes in the corners of the HAT board must line up with the standoffs.  Slide the HAT board down until it rests on the standoffs.</li>
-<li>Repeat steps 1-5 for each board to be added.</li>
-<li>Insert the included screws through the mounting holes on the top HAT board into the threaded holes in the standoffs and lightly tighten them.</li>
+<li><p>Insert the new HAT board onto the leads of the 2x20 receptacle so that the leads go into the holes on the bottom of the HAT board and come out through the 2x20 connector on the top of the HAT board.  The 4 mounting holes in the corners of the HAT board must line up with the standoffs.  Slide the HAT board down until it rests on the standoffs.</p></li>
+<li><p>Repeat steps 1-5 for each board to be added.</p></li>
+<li><p>Insert the included screws through the mounting holes on the top HAT board into the threaded holes in the standoffs and lightly tighten them.</p></li>
 </ol>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="install.html" class="btn btn-neutral float-right" title="Installing and Using the Library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="overview.html" class="btn btn-neutral" title="Hardware Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="Hardware Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="install.html" class="btn btn-neutral float-right" title="Installing and Using the Library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2020, Measurement Computing.
-
-    </p>
+    <p>&#169; Copyright 2020, Measurement Computing.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.4.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });

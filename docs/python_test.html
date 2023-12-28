@@ -1,89 +1,51 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Python Test Function Reference &mdash; MCC DAQ HAT Library 1.4.0 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Test Function Reference &mdash; MCC DAQ HAT Library 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e0a75244"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            MCC DAQ HAT Library
           </a>
-
-          
-            
-            
               <div class="version">
-                1.4.0
+                1.5.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
@@ -92,272 +54,218 @@
 <li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MCC DAQ HAT Library</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Python Test Function Reference</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python Test Function Reference</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/python_test.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="python-test-function-reference">
-<h1>Python Test Function Reference<a class="headerlink" href="#python-test-function-reference" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="python-test-function-reference">
+<h1>Python Test Function Reference<a class="headerlink" href="#python-test-function-reference" title="Link to this heading"></a></h1>
 <p>These functions are included for manufacturing test and not targeted for the end user.</p>
-<div class="section" id="mcc-118-test-methods">
-<h2>MCC 118 test methods<a class="headerlink" href="#mcc-118-test-methods" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc118</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span></dt>
+<section id="mcc-118-test-methods">
+<h2>MCC 118 test methods<a class="headerlink" href="#mcc-118-test-methods" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc118</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>The class for an MCC 118 board.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt>
-<code class="descname">test_clock</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span></dt>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board did not respond or was of an incorrect type</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_clock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Test the sample clock pin (CLK).</p>
 <p>This function exercises the CLK pin in output mode and returns the value
 read at the pin for input testing.  Return the mode to input after
 testing the pin.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mode</strong> (<em>int</em>) – The CLK pin mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>int</em>) – The CLK pin mode</p>
 <ul class="simple">
-<li>0 = input</li>
-<li>1 = output low</li>
-<li>2 = output high</li>
-<li>3 = output 1 kHz square wave</li>
+<li><p>0 = input</p></li>
+<li><p>1 = output low</p></li>
+<li><p>2 = output high</p></li>
+<li><p>3 = output 1 kHz square wave</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value read at the CLK pin after applying the mode (0 or 1.)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</li>
-<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – the mode is invalid.</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value read at the CLK pin after applying the mode (0 or 1.)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p></li>
+<li><p><strong>ValueError</strong> – the mode is invalid.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt>
-<code class="descname">test_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Test the external trigger pin (TRIG).</p>
 <p>This value read at the pin for input testing.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The value read at the TRIG pin (0 or 1.)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The value read at the TRIG pin (0 or 1.)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="mcc-128-test-methods">
-<h2>MCC 128 test methods<a class="headerlink" href="#mcc-128-test-methods" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc128</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span></dt>
+</section>
+<section id="mcc-128-test-methods">
+<h2>MCC 128 test methods<a class="headerlink" href="#mcc-128-test-methods" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>The class for an MCC 128 board.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt>
-<code class="descname">test_clock</code><span class="sig-paren">(</span><em>mode</em><span class="sig-paren">)</span></dt>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board did not respond or was of an incorrect type</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_clock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Test the sample clock pin (CLK).</p>
 <p>This function exercises the CLK pin in output mode and returns the value
 read at the pin for input testing.  Return the mode to input after
 testing the pin.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mode</strong> (<em>int</em>) – The CLK pin mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>int</em>) – The CLK pin mode</p>
 <ul class="simple">
-<li>0 = input</li>
-<li>1 = output low</li>
-<li>2 = output high</li>
-<li>3 = output 1 kHz square wave</li>
+<li><p>0 = input</p></li>
+<li><p>1 = output low</p></li>
+<li><p>2 = output high</p></li>
+<li><p>3 = output 1 kHz square wave</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value read at the CLK pin after applying the mode (0 or 1.)</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</li>
-<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – the mode is invalid.</li>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value read at the CLK pin after applying the mode (0 or 1.)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p></li>
+<li><p><strong>ValueError</strong> – the mode is invalid.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt>
-<code class="descname">test_trigger</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Test the external trigger pin (TRIG).</p>
 <p>This value read at the pin for input testing.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The value read at the TRIG pin (0 or 1.)</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The value read at the TRIG pin (0 or 1.)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="mcc-172-test-methods">
-<h2>MCC 172 test methods<a class="headerlink" href="#mcc-172-test-methods" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt>
-<em class="property">class </em><code class="descclassname">daqhats.</code><code class="descname">mcc172</code><span class="sig-paren">(</span><em>address=0</em><span class="sig-paren">)</span></dt>
+</section>
+<section id="mcc-172-test-methods">
+<h2>MCC 172 test methods<a class="headerlink" href="#mcc-172-test-methods" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc172</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>The class for an MCC 172 board.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board did not respond or was of an incorrect type</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt>
-<code class="descname">test_signals_read</code><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>address</strong> (<em>int</em>) – board address, must be 0-7.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board did not respond or was of an incorrect type</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_signals_read</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span></dt>
 <dd><p>Read the state of shared signals for testing.</p>
 <p>This function reads the state of the ADC clock, sync, and trigger
 signals. Use it in conjunction with <a class="reference internal" href="python.html#daqhats.mcc172.a_in_clock_config_write" title="daqhats.mcc172.a_in_clock_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_clock_config_write()</span></code></a>
 and <a class="reference internal" href="python.html#daqhats.mcc172.trigger_config" title="daqhats.mcc172.trigger_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">trigger_config()</span></code></a> to put the signals into slave mode then
 set values on the signals using the Raspberry Pi GPIO pins. This method
 will return the values present on those signals.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A namedtuple containing the following field names:<ul class="simple">
-<li><strong>clock</strong> (int): The current value of the clock signal (0 or 1).</li>
-<li><strong>sync</strong> (int): The current value of the sync signal (0 or 1).</li>
-<li><strong>trigger</strong> (int): The current value of the trigger signal
-(0 or 1).</li>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A namedtuple containing the following field names:</p>
+<ul class="simple">
+<li><p><strong>clock</strong> (int): The current value of the clock signal (0 or 1).</p></li>
+<li><p><strong>sync</strong> (int): The current value of the sync signal (0 or 1).</p></li>
+<li><p><strong>trigger</strong> (int): The current value of the trigger signal
+(0 or 1).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">namedtuple</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</td>
-</tr>
-</tbody>
-</table>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>namedtuple</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
-<dt>
-<code class="descname">test_signals_write</code><span class="sig-paren">(</span><em>mode</em>, <em>clock</em>, <em>sync</em><span class="sig-paren">)</span></dt>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">test_signals_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sync</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Write values to shared signals for testing.</p>
 <p>This function puts the shared signals into test mode and sets them to
 the specified state. The signal levels can then be read on the Raspberry
@@ -366,85 +274,50 @@ testing is complete.</p>
 <p>ADC conversions will not occur while in test mode. The ADCs require
 synchronization after exiting test mode, so use
 <a class="reference internal" href="python.html#daqhats.mcc172.a_in_clock_config_write" title="daqhats.mcc172.a_in_clock_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_clock_config_write()</span></code></a> to perform synchronization.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>mode</strong> (<em>int</em>) – Set to 1 for test mode or 0 for normal mode.</li>
-<li><strong>clock</strong> (<em>int</em>) – The value to write to the clock signal in test mode
-(0 or 1).</li>
-<li><strong>sync</strong> (<em>int</em>) – The value to write to the sync signal in test mode
-(0 or 1).</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>int</em>) – Set to 1 for test mode or 0 for normal mode.</p></li>
+<li><p><strong>clock</strong> (<em>int</em>) – The value to write to the clock signal in test mode
+(0 or 1).</p></li>
+<li><p><strong>sync</strong> (<em>int</em>) – The value to write to the sync signal in test mode
+(0 or 1).</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">HatError</span></code></a> – the board is not initialized, does not respond, or
-responds incorrectly.</p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="python.html#daqhats.HatError" title="daqhats.HatError"><strong>HatError</strong></a> – the board is not initialized, does not respond, or
+    responds incorrectly.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2020, Measurement Computing.
-
-    </p>
+    <p>&#169; Copyright 2020, Measurement Computing.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.4.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });

@@ -1,91 +1,53 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.4.0 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardware Overview &mdash; MCC DAQ HAT Library 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e0a75244"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Installing the DAQ HAT board" href="hardware.html" />
     <link rel="prev" title="MCC DAQ HAT Library documentation" href="index.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            MCC DAQ HAT Library
           </a>
-
-          
-            
-            
               <div class="version">
-                1.4.0
+                1.5.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Hardware Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hardware-compatibility">Hardware Compatibility</a></li>
@@ -190,77 +152,39 @@
 <li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MCC DAQ HAT Library</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Hardware Overview</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Hardware Overview</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="hardware-overview">
-<h1>Hardware Overview<a class="headerlink" href="#hardware-overview" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="hardware-overview">
+<h1>Hardware Overview<a class="headerlink" href="#hardware-overview" title="Link to this heading"></a></h1>
 <p>The MCC DAQ HATs are Raspberry Pi add-on boards (Hardware Attached on Top). They adhere
 to the Raspberry Pi HAT specification, but also extend it to allow stacking up to
 8 MCC boards on a single Raspberry Pi.</p>
 <p>C and Python libraries, documentation, and examples are provided to allow you to
 develop your own applications.</p>
-<div class="section" id="hardware-compatibility">
-<h2>Hardware Compatibility<a class="headerlink" href="#hardware-compatibility" title="Permalink to this headline">¶</a></h2>
+<section id="hardware-compatibility">
+<h2>Hardware Compatibility<a class="headerlink" href="#hardware-compatibility" title="Link to this heading"></a></h2>
 <p>The MCC DAQ HATs are compatible with all Raspberry Pi models with the 40-pin
 GPIO header (not the original Pi 1 A or B with the 26-pin header.) They are
 generally not compatible with any other brand of Raspberry Pi HAT or add-on board
@@ -273,67 +197,67 @@ GPIO header display with your Raspberry Pi then consult your display hardware
 documentation for how to remove the driver.</p>
 <p>The specific pins used by each DAQ HAT are documented in the electrical
 specifications for that device.</p>
-</div>
-<div class="section" id="mcc-118">
-<h2>MCC 118<a class="headerlink" href="#mcc-118" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="mcc-118">
+<h2>MCC 118<a class="headerlink" href="#mcc-118" title="Link to this heading"></a></h2>
 <p>The MCC 118 is an 8-channel analog voltage input board with the following features:</p>
 <ul class="simple">
-<li>12-bit, 100 kS/s A/D converter</li>
-<li>±10 V single-ended analog inputs</li>
-<li>Factory calibration with ±20.8 mV input accuracy</li>
-<li>Bidirectional scan clock</li>
-<li>Onboard sample buffers</li>
-<li>Digital trigger input</li>
+<li><p>12-bit, 100 kS/s A/D converter</p></li>
+<li><p>±10 V single-ended analog inputs</p></li>
+<li><p>Factory calibration with ±20.8 mV input accuracy</p></li>
+<li><p>Bidirectional scan clock</p></li>
+<li><p>Onboard sample buffers</p></li>
+<li><p>Digital trigger input</p></li>
 </ul>
 <img alt="MCC 118 circuit board" class="align-center" src="_images/mcc118-web.jpg" />
-<div class="section" id="board-components">
-<h3>Board components<a class="headerlink" href="#board-components" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="screw-terminals">
-<h4>Screw terminals<a class="headerlink" href="#screw-terminals" title="Permalink to this headline">¶</a></h4>
+<section id="board-components">
+<h3>Board components<a class="headerlink" href="#board-components" title="Link to this heading"></a></h3>
+<section id="screw-terminals">
+<h4>Screw terminals<a class="headerlink" href="#screw-terminals" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>CH 0 In</strong> to <strong>CH 7 In</strong> (CHx): Single-ended analog input terminals.</li>
-<li><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
-Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</li>
-<li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software configurable for edge or level sensitive,
-rising or falling edge, high or low level.</li>
-<li><strong>AGND</strong> (GND): Common ground for the analog input terminals.</li>
-<li><strong>DGND</strong> (GND): Common ground for the clock and trigger terminals.</li>
+<li><p><strong>CH 0 In</strong> to <strong>CH 7 In</strong> (CHx): Single-ended analog input terminals.</p></li>
+<li><p><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
+Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</p></li>
+<li><p><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software configurable for edge or level sensitive,
+rising or falling edge, high or low level.</p></li>
+<li><p><strong>AGND</strong> (GND): Common ground for the analog input terminals.</p></li>
+<li><p><strong>DGND</strong> (GND): Common ground for the clock and trigger terminals.</p></li>
 </ul>
-</div>
-<div class="section" id="address-jumpers">
-<h4>Address jumpers<a class="headerlink" href="#address-jumpers" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="address-jumpers">
+<h4>Address jumpers<a class="headerlink" href="#address-jumpers" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</li>
+<li><p><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</p></li>
 </ul>
-</div>
-<div class="section" id="status-led">
-<h4>Status LED<a class="headerlink" href="#status-led" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="status-led">
+<h4>Status LED<a class="headerlink" href="#status-led" title="Link to this heading"></a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external power applied and flashes when communicating
 with the board. The LED may be blinked by the user.</p>
-</div>
-<div class="section" id="header-connector">
-<h4>Header connector<a class="headerlink" href="#header-connector" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="header-connector">
+<h4>Header connector<a class="headerlink" href="#header-connector" title="Link to this heading"></a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
-</div>
-</div>
-<div class="section" id="functional-block-diagram">
-<h3>Functional block diagram<a class="headerlink" href="#functional-block-diagram" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="functional-block-diagram">
+<h3>Functional block diagram<a class="headerlink" href="#functional-block-diagram" title="Link to this heading"></a></h3>
 <img alt="MCC 118 block diagram" class="align-center" src="_images/mcc118-diag-web.jpg" />
-</div>
-<div class="section" id="functional-details">
-<h3>Functional details<a class="headerlink" href="#functional-details" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="scan-clock">
-<h4>Scan clock<a class="headerlink" href="#scan-clock" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="functional-details">
+<h3>Functional details<a class="headerlink" href="#functional-details" title="Link to this heading"></a></h3>
+<section id="scan-clock">
+<h4>Scan clock<a class="headerlink" href="#scan-clock" title="Link to this heading"></a></h4>
 <p>The clock input / output (terminal CLK) is used to output the internal scan clock or apply an external scan clock to the device. The clock input signal may be a 3.3V or 5V TTL or CMOS logic signal, and the output will be 3.3V LVCMOS. A scan occurs for each rising edge of the clock, acquiring one sample from each of the selected channels in the scan. For example, when scanning channels 0, 1, and 2 the conversion activity will be:</p>
 <img alt="MCC 118 clock mode" class="align-center" src="_images/mcc118-clock-web.png" />
-</div>
-<div class="section" id="trigger">
-<h4>Trigger<a class="headerlink" href="#trigger" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="trigger">
+<h4>Trigger<a class="headerlink" href="#trigger" title="Link to this heading"></a></h4>
 <p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog input scan until the desired condition is met at the trigger input.  The trigger input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition may be rising edge, falling edge, high level, or low level.</p>
-</div>
-</div>
-<div class="section" id="firmware-updates">
-<h3>Firmware updates<a class="headerlink" href="#firmware-updates" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="firmware-updates">
+<h3>Firmware updates<a class="headerlink" href="#firmware-updates" title="Link to this heading"></a></h3>
 <p>Use the firmware update tool to update the firmware on your MCC 118 board(s).
 The “0” in the example below is the board address. Repeat the command for each
 MCC 118 address in your board stack. This example demonstrates how to update the
@@ -341,99 +265,99 @@ firmware on the MCC 118 that is installed at address 0:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="mcc-118-oem">
-<h3>MCC 118-OEM<a class="headerlink" href="#mcc-118-oem" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="mcc-118-oem">
+<h3>MCC 118-OEM<a class="headerlink" href="#mcc-118-oem" title="Link to this heading"></a></h3>
 <p>An OEM version is available that is designed with (unpopulated) header connectors
 instead of screw terminals. The board accepts 1x6 and 1x10 0.1” spacing header connectors.
 The MCC 118-OEM is functionally equivalent to the standard version. Refer to the
 Electrical Specifications for connector information.</p>
 <img alt="MCC 118-OEM circuit board" class="align-center" src="_images/mcc118oem-web.jpg" />
-</div>
-<div class="section" id="specifications">
-<h3>Specifications<a class="headerlink" href="#specifications" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="specifications">
+<h3>Specifications<a class="headerlink" href="#specifications" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="_static/esmcc118.pdf">MCC 118 Electrical Specifications</a></p>
-</div>
-</div>
-<div class="section" id="mcc-128">
-<h2>MCC 128<a class="headerlink" href="#mcc-128" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="mcc-128">
+<h2>MCC 128<a class="headerlink" href="#mcc-128" title="Link to this heading"></a></h2>
 <p>The MCC 128 is an analog voltage input board with the following features:</p>
 <ul class="simple">
-<li>16-bit, 100 kS/s A/D converter</li>
-<li>Single-ended and differential input modes</li>
-<li>4 differential or 8 single-ended channels</li>
-<li>±10 V, ±5V, ±2V, and ±1V input ranges</li>
-<li>Factory calibration</li>
-<li>Bidirectional scan clock</li>
-<li>Onboard sample buffers</li>
-<li>Digital trigger input</li>
+<li><p>16-bit, 100 kS/s A/D converter</p></li>
+<li><p>Single-ended and differential input modes</p></li>
+<li><p>4 differential or 8 single-ended channels</p></li>
+<li><p>±10 V, ±5V, ±2V, and ±1V input ranges</p></li>
+<li><p>Factory calibration</p></li>
+<li><p>Bidirectional scan clock</p></li>
+<li><p>Onboard sample buffers</p></li>
+<li><p>Digital trigger input</p></li>
 </ul>
-<div class="section" id="single-ended-input-configuration">
-<h3>Single Ended Input configuration<a class="headerlink" href="#single-ended-input-configuration" title="Permalink to this headline">¶</a></h3>
+<section id="single-ended-input-configuration">
+<h3>Single Ended Input configuration<a class="headerlink" href="#single-ended-input-configuration" title="Link to this heading"></a></h3>
 <img alt="MCC 128 circuit board" class="align-center" src="_images/mcc128_se.jpg" />
-</div>
-<div class="section" id="differential-input-configuration">
-<h3>Differential Input Configuration<a class="headerlink" href="#differential-input-configuration" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="differential-input-configuration">
+<h3>Differential Input Configuration<a class="headerlink" href="#differential-input-configuration" title="Link to this heading"></a></h3>
 <img alt="MCC 128 circuit board" class="align-center" src="_images/mcc128_diff.jpg" />
-</div>
-<div class="section" id="id1">
-<h3>Board components<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id2">
-<h4>Screw terminals<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id1">
+<h3>Board components<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id2">
+<h4>Screw terminals<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (CHx): Analog input terminals.</li>
-<li><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
-Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</li>
-<li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software
+<li><p><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (CHx): Analog input terminals.</p></li>
+<li><p><strong>Clock</strong> (CLK): Bidirectional terminal for scan clock input / output. Set the direction with software.
+Set for input to clock the scans with an external clock signal, or output to use the internal scan clock.</p></li>
+<li><p><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode is software
 configurable for edge or level sensitive,
-rising or falling edge, high or low level.</li>
-<li><strong>AGND</strong> (GND): Common ground for the analog input terminals.</li>
-<li><strong>DGND</strong> (GND): Common ground for the clock and trigger terminals.</li>
+rising or falling edge, high or low level.</p></li>
+<li><p><strong>AGND</strong> (GND): Common ground for the analog input terminals.</p></li>
+<li><p><strong>DGND</strong> (GND): Common ground for the clock and trigger terminals.</p></li>
 </ul>
-</div>
-<div class="section" id="id3">
-<h4>Address jumpers<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id3">
+<h4>Address jumpers<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected
+<li><p><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected
 to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board
 to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended
-addressing method.</li>
+addressing method.</p></li>
 </ul>
-</div>
-<div class="section" id="id4">
-<h4>Status LED<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id4">
+<h4>Status LED<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external power applied and flashes when communicating
 with the board. The LED may be blinked by the user.</p>
-</div>
-<div class="section" id="id5">
-<h4>Header connector<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id5">
+<h4>Header connector<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the
 header connector.</p>
-</div>
-</div>
-<div class="section" id="id6">
-<h3>Functional block diagram<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id6">
+<h3>Functional block diagram<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <img alt="MCC 128 block diagram" class="align-center" src="_images/mcc128-diag.png" />
-</div>
-<div class="section" id="id7">
-<h3>Functional details<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id8">
-<h4>Scan clock<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id7">
+<h3>Functional details<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<section id="id8">
+<h4>Scan clock<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
 <p>The clock input / output (terminal CLK) is used to output the internal scan clock or apply an external scan clock
 to the device. The clock input signal may be a 3.3V or 5V TTL or CMOS logic signal, and the output will be 3.3V
 LVCMOS. A scan occurs for each rising edge of the clock, acquiring one sample from each of the selected channels
 in the scan. For example, when scanning channels 0, 1, and 2 the conversion activity will be:</p>
 <img alt="MCC 128 clock mode" class="align-center" src="_images/mcc128-clock.png" />
-</div>
-<div class="section" id="id9">
-<h4>Trigger<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id9">
+<h4>Trigger<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
 <p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog input scan until the desired
 condition is met at the trigger input.  The trigger input signal may be a 3.3V or 5V TTL or CMOS logic signal.
 The input condition may be rising edge, falling edge, high level, or low level.</p>
-</div>
-</div>
-<div class="section" id="id10">
-<h3>Firmware updates<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id10">
+<h3>Firmware updates<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
 <p>Use the firmware update tool to update the firmware on your MCC 128 board(s).
 The “0” in the example below is the board address. Repeat the command for each
 MCC 128 address in your board stack. This example demonstrates how to update the
@@ -441,62 +365,62 @@ firmware on the MCC 128 that is installed at address 0:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc128_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_128</span><span class="o">.</span><span class="n">fw</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="mcc-128-oem">
-<h3>MCC 128-OEM<a class="headerlink" href="#mcc-128-oem" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="mcc-128-oem">
+<h3>MCC 128-OEM<a class="headerlink" href="#mcc-128-oem" title="Link to this heading"></a></h3>
 <p>An OEM version is available that is designed with (unpopulated) header connectors
 instead of screw terminals. The board accepts 1x6 and 1x10 0.1” spacing header connectors.
 The MCC 128-OEM is functionally equivalent to the standard version. Refer to the
 Electrical Specifications for connector information.</p>
 <img alt="MCC 128-OEM circuit board" class="align-center" src="_images/mcc128oem-web.jpg" />
-</div>
-<div class="section" id="id11">
-<h3>Specifications<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id11">
+<h3>Specifications<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="_static/esmcc128.pdf">MCC 128 Electrical Specifications</a></p>
-</div>
-</div>
-<div class="section" id="mcc-134">
-<h2>MCC 134<a class="headerlink" href="#mcc-134" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="mcc-134">
+<h2>MCC 134<a class="headerlink" href="#mcc-134" title="Link to this heading"></a></h2>
 <p>The MCC 134 is a 4-channel thermocouple input board with the following features:</p>
 <ul class="simple">
-<li>24-bit A/D converter</li>
-<li>Onboard sensor for cold junction compensation</li>
-<li>Linearization for J, K, R, S, T, N, E, B type thermocouples</li>
-<li>Open thermocouple detection</li>
-<li>Thermocouple inputs are electrically isolated from the Raspberry Pi for use in harsh environments</li>
+<li><p>24-bit A/D converter</p></li>
+<li><p>Onboard sensor for cold junction compensation</p></li>
+<li><p>Linearization for J, K, R, S, T, N, E, B type thermocouples</p></li>
+<li><p>Open thermocouple detection</p></li>
+<li><p>Thermocouple inputs are electrically isolated from the Raspberry Pi for use in harsh environments</p></li>
 </ul>
 <img alt="MCC 134 circuit board" class="align-center" src="_images/mcc134-web.jpg" />
-<div class="section" id="id12">
-<h3>Board components<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id13">
-<h4>Screw terminals<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<section id="id12">
+<h3>Board components<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id13">
+<h4>Screw terminals<a class="headerlink" href="#id13" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (+x-): Differential thermocouple input terminals.</li>
+<li><p><strong>CH0H/CH0L</strong> to <strong>CH3H/CH3L</strong> (+x-): Differential thermocouple input terminals.</p></li>
 </ul>
-</div>
-<div class="section" id="id14">
-<h4>Address jumpers<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id14">
+<h4>Address jumpers<a class="headerlink" href="#id14" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</li>
+<li><p><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended addressing method.</p></li>
 </ul>
-</div>
-<div class="section" id="id15">
-<h4>Status LED<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id15">
+<h4>Status LED<a class="headerlink" href="#id15" title="Link to this heading"></a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external power applied.</p>
-</div>
-<div class="section" id="id16">
-<h4>Header connector<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id16">
+<h4>Header connector<a class="headerlink" href="#id16" title="Link to this heading"></a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
-</div>
-</div>
-<div class="section" id="id17">
-<h3>Functional block diagram<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id17">
+<h3>Functional block diagram<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <img alt="MCC 134 block diagram" class="align-center" src="_images/mcc134-diag-web.jpg" />
-</div>
-<div class="section" id="id18">
-<h3>Functional details<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="best-practices-for-accurate-thermocouple-measurements">
-<h4>Best practices for accurate thermocouple measurements<a class="headerlink" href="#best-practices-for-accurate-thermocouple-measurements" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id18">
+<h3>Functional details<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<section id="best-practices-for-accurate-thermocouple-measurements">
+<h4>Best practices for accurate thermocouple measurements<a class="headerlink" href="#best-practices-for-accurate-thermocouple-measurements" title="Link to this heading"></a></h4>
 <p>The MCC 134 should achieve results within the maximum thermocouple
 accuracy specifications when operating within the documented environmental
 conditions. Operating in conditions with excessive temperature transients or
@@ -504,101 +428,103 @@ airflow may affect results. In most cases, the MCC 134 will achieve the
 typical specifications. To achieve the most accurate thermocouple readings,
 MCC recommends the following practices:</p>
 <ul class="simple">
-<li><em>Reduce the load on the Raspberry Pi processor.</em> Running a program that fully
+<li><p><em>Reduce the load on the Raspberry Pi processor.</em> Running a program that fully
 loads all 4 cores on the Raspberry Pi processor can raise the temperature
 of the processor above 70 °C. Running a program that only loads 1 core will
-operate approximately 20 °C cooler.</li>
-<li><em>Minimize environmental temperature variations.</em> Place the MCC 134 away from
+operate approximately 20 °C cooler.</p></li>
+<li><p><em>Minimize environmental temperature variations.</em> Place the MCC 134 away from
 heat or cooling sources that cycle on and off. Sudden environmental changes
-may lead to increased errors.</li>
-<li><em>Provide a steady airflow, such as from a fan.</em> A steady airflow can
-dissipate heat and reduce errors.</li>
-<li><em>When configuring multiple MCC DAQ Hats in a stack, position the MCC 134
+may lead to increased errors.</p></li>
+<li><p><em>Provide a steady airflow, such as from a fan.</em> A steady airflow can
+dissipate heat and reduce errors.</p></li>
+<li><p><em>When configuring multiple MCC DAQ Hats in a stack, position the MCC 134
 farthest from the Raspberry Pi board.</em> Since the Raspberry Pi is a
 significant heat source, placing the MCC 134 farthest from the Pi will
-increase accuracy.</li>
+increase accuracy.</p></li>
 </ul>
 <p>For additional information, refer to the <a class="reference external" href="https://www.mccdaq.com/TechTips/TechTip-11.aspx">Measuring Thermocouples with Raspberry Pi
 and the MCC 134</a> Tech Tip.</p>
-</div>
-</div>
-<div class="section" id="id19">
-<h3>Specifications<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id19">
+<h3>Specifications<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="_static/esmcc134.pdf">MCC 134 Electrical Specifications</a></p>
-</div>
-</div>
-<div class="section" id="mcc-152">
-<h2>MCC 152<a class="headerlink" href="#mcc-152" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="mcc-152">
+<h2>MCC 152<a class="headerlink" href="#mcc-152" title="Link to this heading"></a></h2>
 <p>The MCC 152 is an analog output / digital I/O board with the following features:</p>
 <ul class="simple">
-<li>2 analog outputs<ul>
-<li>12-bit D/A converter</li>
-<li>0 - 5 V outputs</li>
-<li>5 mA output drive, sourcing</li>
-<li>Simultaneous update capability</li>
+<li><p>2 analog outputs</p>
+<ul>
+<li><p>12-bit D/A converter</p></li>
+<li><p>0 - 5 V outputs</p></li>
+<li><p>5 mA output drive, sourcing</p></li>
+<li><p>Simultaneous update capability</p></li>
 </ul>
 </li>
-<li>8 digital I/O<ul>
-<li>5 V / 3.3 V supply voltage, jumper-selectable</li>
-<li>Bit-configurable for input (power on default) or output</li>
-<li>Outputs may be set to push-pull or open-drain (port-configurable)</li>
-<li>Programmable pull-up/pull-down resistors (disconnected on outputs when set to open-drain)</li>
-<li>10 mA source/25 mA sink per output</li>
-<li>Interrupt on input state change</li>
+<li><p>8 digital I/O</p>
+<ul>
+<li><p>5 V / 3.3 V supply voltage, jumper-selectable</p></li>
+<li><p>Bit-configurable for input (power on default) or output</p></li>
+<li><p>Outputs may be set to push-pull or open-drain (port-configurable)</p></li>
+<li><p>Programmable pull-up/pull-down resistors (disconnected on outputs when set to open-drain)</p></li>
+<li><p>10 mA source/25 mA sink per output</p></li>
+<li><p>Interrupt on input state change</p></li>
 </ul>
 </li>
 </ul>
 <img alt="MCC 152 circuit board" class="align-center" src="_images/mcc152-web.jpg" />
-<div class="section" id="id20">
-<h3>Board components<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="id21">
-<h4>Screw terminals<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h4>
+<section id="id20">
+<h3>Board components<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id21">
+<h4>Screw terminals<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>AO0</strong> to <strong>AO1</strong> (AOx): Analog output terminals.</li>
-<li><strong>DIO0</strong> to <strong>DIO7</strong> (DIOx): Digital input/output terminals.</li>
-<li><strong>VIO</strong> (VIO): Digital I/O supply voltage (5 V or 3.3 V, selectable
-with jumper W3.)</li>
-<li><strong>AGND</strong> (AGND): Common ground for the analog output terminals.</li>
-<li><strong>DGND</strong> (DGND): Common ground for the digital I/O terminals.</li>
+<li><p><strong>AO0</strong> to <strong>AO1</strong> (AOx): Analog output terminals.</p></li>
+<li><p><strong>DIO0</strong> to <strong>DIO7</strong> (DIOx): Digital input/output terminals.</p></li>
+<li><p><strong>VIO</strong> (VIO): Digital I/O supply voltage (5 V or 3.3 V, selectable
+with jumper W3.)</p></li>
+<li><p><strong>AGND</strong> (AGND): Common ground for the analog output terminals.</p></li>
+<li><p><strong>DGND</strong> (DGND): Common ground for the digital I/O terminals.</p></li>
 </ul>
-</div>
-<div class="section" id="id22">
-<h4>Address jumpers<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id22">
+<h4>Address jumpers<a class="headerlink" href="#id22" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each DAQ HAT when multiple boards are
+<li><p><strong>A0</strong> to <strong>A2</strong>: Used to identify each DAQ HAT when multiple boards are
 connected. The first DAQ HAT connected to the Raspberry Pi must be at address 0
 (no jumper). Install jumpers on each additional connected board to set the
 desired address. Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about
-the recommended addressing method.</li>
+the recommended addressing method.</p></li>
 </ul>
-</div>
-<div class="section" id="dio-power-jumper-w3">
-<h4>DIO Power jumper (W3)<a class="headerlink" href="#dio-power-jumper-w3" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="dio-power-jumper-w3">
+<h4>DIO Power jumper (W3)<a class="headerlink" href="#dio-power-jumper-w3" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>5V</strong> and <strong>3.3V</strong>: Selects the DIO voltage; the factory&nbsp;default is 5 V.
+<li><p><strong>5V</strong> and <strong>3.3V</strong>: Selects the DIO voltage; the factory default is 5 V.
 Refer to <a class="reference internal" href="#mixing-3-3v-and-5v-digital-inputs">Mixing 3.3V and 5V digital inputs</a> for more information about
-the DIO supply voltage.</li>
+the DIO supply voltage.</p></li>
 </ul>
-</div>
-<div class="section" id="id23">
-<h4>Status LED<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id23">
+<h4>Status LED<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external power
 applied.</p>
-</div>
-<div class="section" id="id24">
-<h4>Header connector<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id24">
+<h4>Header connector<a class="headerlink" href="#id24" title="Link to this heading"></a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a>
 for more information about the header connector.</p>
-</div>
-</div>
-<div class="section" id="id25">
-<h3>Functional block diagram<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id25">
+<h3>Functional block diagram<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
 <img alt="MCC 152 block diagram" class="align-center" src="_images/mcc152-diag-web.jpg" />
-</div>
-<div class="section" id="id26">
-<h3>Functional details<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="mixing-3-3v-and-5v-digital-inputs">
-<h4>Mixing 3.3V and 5V digital inputs<a class="headerlink" href="#mixing-3-3v-and-5v-digital-inputs" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id26">
+<h3>Functional details<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<section id="mixing-3-3v-and-5v-digital-inputs">
+<h4>Mixing 3.3V and 5V digital inputs<a class="headerlink" href="#mixing-3-3v-and-5v-digital-inputs" title="Link to this heading"></a></h4>
 <p>The MCC 152 digital inputs are tolerant of 5V signals when the DIO is set to 3.3V
 operation with jumper W3.  However, current can flow into the MCC 152 from the 5V
 signal, so the user must limit this current to avoid raising the voltage of the
@@ -606,84 +532,84 @@ digital power supply rail (VIO) and possibly damaging components. MCC recommends
 using a series resistor of 700 ohms or larger.</p>
 <p>Example:</p>
 <img alt="MCC 152 resistor example" class="align-center" src="_images/mcc152-resistor-example-web.png" />
-</div>
-</div>
-<div class="section" id="id27">
-<h3>Specifications<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id27">
+<h3>Specifications<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="_static/esmcc152.pdf">MCC 152 Electrical Specifications</a></p>
-</div>
-</div>
-<div class="section" id="mcc-172">
-<h2>MCC 172<a class="headerlink" href="#mcc-172" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="mcc-172">
+<h2>MCC 172<a class="headerlink" href="#mcc-172" title="Link to this heading"></a></h2>
 <p>The MCC 172 is a 2-channel analog voltage input board with the following features:</p>
 <ul class="simple">
-<li>Two 24-bit, 51.2 kS/s A/D converters (one per channel)</li>
-<li>±5 V AC coupled differential analog inputs</li>
-<li>IEPE sensor support</li>
-<li>10-32 and screw terminal connectors for the analog inputs</li>
-<li>ADC conversions can be synchronized between multiple boards</li>
-<li>Onboard sample buffers</li>
-<li>Digital trigger input</li>
+<li><p>Two 24-bit, 51.2 kS/s A/D converters (one per channel)</p></li>
+<li><p>±5 V AC coupled differential analog inputs</p></li>
+<li><p>IEPE sensor support</p></li>
+<li><p>10-32 and screw terminal connectors for the analog inputs</p></li>
+<li><p>ADC conversions can be synchronized between multiple boards</p></li>
+<li><p>Onboard sample buffers</p></li>
+<li><p>Digital trigger input</p></li>
 </ul>
 <img alt="MCC 172 circuit board" class="align-center" src="_images/mcc172-web.jpg" />
-<div class="section" id="id28">
-<h3>Board components<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="coaxial-connectors">
-<h4>10-32 coaxial connectors<a class="headerlink" href="#coaxial-connectors" title="Permalink to this headline">¶</a></h4>
+<section id="id28">
+<h3>Board components<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<section id="coaxial-connectors">
+<h4>10-32 coaxial connectors<a class="headerlink" href="#coaxial-connectors" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>CH0</strong> and <strong>CH1</strong> (CHx): Analog input connectors (do not connect an input source
-to the 10-32 connectors and screw terminals at the same time).</li>
+<li><p><strong>CH0</strong> and <strong>CH1</strong> (CHx): Analog input connectors (do not connect an input source
+to the 10-32 connectors and screw terminals at the same time).</p></li>
 </ul>
-</div>
-<div class="section" id="id29">
-<h4>Screw terminals<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id29">
+<h4>Screw terminals<a class="headerlink" href="#id29" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>CH0+/CH0-</strong> and <strong>CH1+/CH1-</strong> (CHx+/CHx-): Analog input terminals (do not connect
-an input source to the 10-32 connectors and screw terminals at the same time).</li>
-<li><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode
+<li><p><strong>CH0+/CH0-</strong> and <strong>CH1+/CH1-</strong> (CHx+/CHx-): Analog input terminals (do not connect
+an input source to the 10-32 connectors and screw terminals at the same time).</p></li>
+<li><p><strong>Trigger</strong> (TRIG): External digital trigger input terminal. The trigger mode
 is software configurable for edge or level sensitive, rising or falling edge,
-high or low level.</li>
-<li><strong>DGND</strong> (GND): Digital ground for the trigger terminal.</li>
+high or low level.</p></li>
+<li><p><strong>DGND</strong> (GND): Digital ground for the trigger terminal.</p></li>
 </ul>
-</div>
-<div class="section" id="id30">
-<h4>Address jumpers<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id30">
+<h4>Address jumpers<a class="headerlink" href="#id30" title="Link to this heading"></a></h4>
 <ul class="simple">
-<li><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected.
+<li><p><strong>A0</strong> to <strong>A2</strong>: Used to identify each HAT when multiple boards are connected.
 The first HAT connected to the Raspberry Pi must be at address 0 (no jumper).
 Install jumpers on each additional connected board to set the desired address.
 Refer to the <a class="reference internal" href="hardware.html#multiple"><span class="std std-ref">Installing multiple boards</span></a> topic for more information about the recommended
-addressing method.</li>
+addressing method.</p></li>
 </ul>
-</div>
-<div class="section" id="id31">
-<h4>Status LED<a class="headerlink" href="#id31" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id31">
+<h4>Status LED<a class="headerlink" href="#id31" title="Link to this heading"></a></h4>
 <p>The LED turns on when the board is connected to a Raspberry Pi with external
 power applied and flashes when communicating with the board. The LED may be
 blinked by the user.</p>
-</div>
-<div class="section" id="id32">
-<h4>Header connector<a class="headerlink" href="#id32" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id32">
+<h4>Header connector<a class="headerlink" href="#id32" title="Link to this heading"></a></h4>
 <p>The board header is used to connect with the Raspberry Pi. Refer to
 <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a> for more information about the header connector.</p>
-</div>
-</div>
-<div class="section" id="id33">
-<h3>Functional block diagram<a class="headerlink" href="#id33" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id33">
+<h3>Functional block diagram<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
 <img alt="MCC 172 block diagram" class="align-center" src="_images/mcc172-diag-web.jpg" />
-</div>
-<div class="section" id="id34">
-<h3>Functional details<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="adc-clock">
-<h4>ADC clock<a class="headerlink" href="#adc-clock" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id34">
+<h3>Functional details<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<section id="adc-clock">
+<h4>ADC clock<a class="headerlink" href="#adc-clock" title="Link to this heading"></a></h4>
 <p>The ADCs on a board share the same clock and are synchronized to start
 conversions at the same time for synchronous data.  The clock and synchronize
 signals may also be shared across the Raspberry Pi GPIO header to synchronize
 multiple MCC 172s.  The clock is programmable for various sampling rates between
 51.2 kS/s and 200 S/s.</p>
-</div>
-<div class="section" id="id35">
-<h4>Trigger<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="id35">
+<h4>Trigger<a class="headerlink" href="#id35" title="Link to this heading"></a></h4>
 <p>The trigger input (terminal TRIG) is used to hold off the beginning of an analog
 input scan until the desired condition is met at the trigger input.  The trigger
 input signal may be a 3.3V or 5V TTL or CMOS logic signal.  The input condition
@@ -695,19 +621,19 @@ an input delay of 39 samples, so the data coming from the converters at any time
 is delayed by 39 samples from the current time.  This is most noticeable when
 using a trigger - there will be approximately 39 samples prior to the trigger
 event in the captured data.</p>
-</div>
-<div class="section" id="alias-rejection">
-<h4>Alias Rejection<a class="headerlink" href="#alias-rejection" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="alias-rejection">
+<h4>Alias Rejection<a class="headerlink" href="#alias-rejection" title="Link to this heading"></a></h4>
 <p>At low sampling rates, certain high frequency signals (at multiples of 128 * the
 sampling rate) can fall below the cutoff frequency of the fixed analog
 anti-aliasing filter and create aliasing in the data.  Using transducers with
 a bandwidth lower than 100 kHz should not affect measurement results.
 Sampling at 10.24 kHz or higher will also ensure that the anti-aliasing filter
 suppresses all signals that could alias into the data.</p>
-</div>
-</div>
-<div class="section" id="id36">
-<h3>Firmware updates<a class="headerlink" href="#id36" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="id36">
+<h3>Firmware updates<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
 <p>Use the firmware update tool to update the firmware on your MCC 172 board(s).
 The “0” in the example below is the board address. Repeat the command for each
 MCC 172 address in your board stack. This example demonstrates how to update the
@@ -715,76 +641,39 @@ firmware on the MCC 172 that is installed at address 0:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc172_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_172</span><span class="o">.</span><span class="n">fw</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="id37">
-<h3>Specifications<a class="headerlink" href="#id37" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="id37">
+<h3>Specifications<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="_static/esmcc172.pdf">MCC 172 Electrical Specifications</a></p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="hardware.html" class="btn btn-neutral float-right" title="Installing the DAQ HAT board" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="MCC DAQ HAT Library documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="MCC DAQ HAT Library documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hardware.html" class="btn btn-neutral float-right" title="Installing the DAQ HAT board" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2020, Measurement Computing.
-
-    </p>
+    <p>&#169; Copyright 2020, Measurement Computing.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.4.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
