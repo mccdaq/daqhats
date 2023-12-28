@@ -4,7 +4,7 @@ import sys
 from setuptools import setup
 
 __project__ = 'daqhats'
-__version__ = '1.4.1.0'
+__version__ = '1.5.0.0'
 __description__ = 'MCC DAQ HAT Python Library'
 __packages__ = ['daqhats']
 __author__ = 'Measurement Computing Corp.'
