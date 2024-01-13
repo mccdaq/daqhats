@@ -23,22 +23,32 @@ void show_message_dialog(const char* title, const char* message, gpointer parent
 
 /// \brief Runs a shell command and returns the output as a single string.
 ///        The string must be freed by the caller.
-char* get_command_output(const char* command)
+/// \param command - the command to run
+/// \param msg - returns the command output
+/// \return 0 on success, nonzero on failure
+int get_command_output(const char* command, char** msg)
 {
    FILE* fp;
    char* buffer;
    const size_t max_length = 10240;
    
+   if (NULL == msg)
+   {
+      return -1;
+   }
+   *msg = NULL;
+   
    buffer = (char*)malloc(max_length);
    if (NULL == buffer)
    {
-      return NULL;
+      return -2;
    }
    
    fp = popen(command, "r");
    if (NULL == fp)
    {
-      return NULL;
+      free(buffer);
+      return -3;
    }
    
    size_t read_length = 0;
@@ -50,18 +60,35 @@ char* get_command_output(const char* command)
       ptr+= length;
    }
    
-   pclose(fp);
+   int status = WEXITSTATUS(pclose(fp));
    
-   return buffer;
+   if (0 == read_length)
+   {
+      free(buffer);
+      buffer = NULL;
+   }
+   *msg = buffer;
+   return status;
 }
 
 /// \brief Callback for the List Devices button
 void pressed_list_button(GtkWidget* wid, gpointer ptr)
 {
    // List devices button pressed
-   char* msg = get_command_output("daqhats_list_boards");
-   show_message_dialog("List Devices", msg, ptr);
-   free(msg);
+   char* msg = NULL;
+   int result = get_command_output("daqhats_list_boards", &msg);
+   if (0 == result)
+   {
+      show_message_dialog("List Devices", msg, ptr);
+   }
+   else
+   {
+      show_message_dialog("List Devices", "Error running command", ptr);
+   }
+   if (NULL != msg)
+   {
+      free(msg);
+   }
 }
 
 /// \brief Callback for the Read EEPROMs button
@@ -69,13 +96,35 @@ void pressed_read_button(GtkWidget* wid, gpointer ptr)
 {
    // Read EEPROMs button pressed
    // daqhats_read_eeproms must be run as root
-   char* msg = get_command_output("pkexec daqhats_read_eeproms");
-   if (NULL == msg)
+   char* msg = NULL;
+   int result = get_command_output("pkexec daqhats_read_eeproms 2>/dev/null", &msg);
+   if (127 == result)
    {
-      msg = get_command_output("gksudo daqhats_read_eeproms");
+      // command not found, so try gksudo
+      if (NULL != msg)
+      {
+         free(msg);
+         msg = NULL;
+      }
+      result = get_command_output("gksudo daqhats_read_eeproms 2>/dev/null", &msg);
    }
-   show_message_dialog("Read EEPROMs", msg, ptr);
-   free(msg);
+
+   switch (result)
+   {
+   case 0:     // success
+      show_message_dialog("Read EEPROMs", msg, ptr);
+      break;
+   case 126:   // user canceled
+      break;
+   case 127:   // command not found
+   default:
+      show_message_dialog("Read EEPROMs", "Error running command", ptr);
+      break;
+   }
+   if (NULL != msg)
+   {
+      free(msg);
+   }
 }
 
 /// \brief Callback for the MCC 118 button
