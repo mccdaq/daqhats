@@ -5,12 +5,12 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
-# Ensure libgpiod is installed
-apt satisfy gpiod libgpiod-dev -y 2> /dev/null
+# Ensure required libraries are installed
+apt satisfy gpiod libgpiod-dev libgtk-3-dev -y 2> /dev/null
 if [ $? -ne 0 ]; then
-   apt install gpiod libgpiod-dev -y
+   apt install gpiod libgpiod-dev libgtk-3-dev -y
    if [ $? -ne 0 ]; then
-      echo "Error installing libgpiod"
+      echo "Error installing required libraries"
       exit 1
    fi
 fi
@@ -19,7 +19,15 @@ fi
 echo "Building and installing library"
 echo
 make -C lib all
+if [ $? -ne 0 ]; then
+   echo "Library build failed"
+   exit 1
+fi
 make -C lib install
+if [ $? -ne 0 ]; then
+   echo "Library install failed"
+   exit 1
+fi
 make -C lib clean
 
 echo
@@ -28,7 +36,15 @@ echo
 echo "Building and installing tools"
 echo
 make -C tools all
+if [ $? -ne 0 ]; then
+   echo "Tools build failed"
+   exit 1
+fi
 make -C tools install
+if [ $? -ne 0 ]; then
+   echo "Tools install failed"
+   exit 1
+fi
 make -C tools clean
 
 echo
@@ -37,6 +53,10 @@ echo
 echo "Building examples"
 echo
 make -C examples/c all
+if [ $? -ne 0 ]; then
+   echo "Examples build failed"
+   exit 1
+fi
 
 echo
 
