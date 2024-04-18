@@ -1,5 +1,3 @@
-**Note: The daqhats library does not currently work with the Raspberry Pi 5 due to changes to the GPIO hardware on the new model. We are actively working on this issue and hope to have an updated library soon.**
-
 # MCC DAQ HAT Library for Raspberry Pi
 <table>
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with
