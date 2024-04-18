@@ -27,18 +27,33 @@ Installation
     cd ~
     git clone https://github.com/mccdaq/daqhats.git
     
-7. Build and install the shared library and optional Python support.  The installer will ask if you want to install Python 2 and Python 3 support.  It will also detect the HAT board EEPROMs and save the contents if needed::
+7. Build and install the shared library and tools.  The installer will detect the HAT board EEPROMs and save the contents if needed::
 
     cd ~/daqhats
     sudo ./install.sh
+    
+8. To use the daqhats library with Python install the python library. It may be installed system-wide with::
+
+    sudo pip install daqhats
+    
+   Recent versions of Python discourage system-wide installation, so you may have to append ``--break-system-packages``. 
+   To install in a virtual environment (venv), create the venv and install the package (replace ``<path_to_venv>`` with the 
+   desired location of the venv)::
+    
+    python -m venv <path_to_venv>
+    <path_to_venv>/bin/pip install daqhats
     
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot, 
 then repeat steps 5 - 7.
     
+if ioctl errors are seen when running on a Raspberry Pi 5, update the kernel with::
+
+    sudo rpi-update
+
 You can now run the example programs under ~/daqhats/examples and create your own programs.
 
-If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
+If you are using the Raspberry Pi OS desktop interface, the DAQ HAT Manager utility will be
 available under the Accessories start menu. This utility will allow you to list the
 detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
 control applications for each DAQ HAT to perform simple operations. The code for these

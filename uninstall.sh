@@ -28,23 +28,5 @@ echo "Removing EEPROM images"
 rm -rf /etc/mcc/hats
 echo
 
-# Remove the Python packages
-command -v pip2 >/dev/null 2>&1
-if [ "$?" -eq 0 ]; then
-    num=$(pip2 show daqhats | wc -l)
-    if [ "$num" -ne 0 ]; then
-        echo "Removing Python 2 package"
-        pip2 uninstall daqhats -y --break-system-packages
-        echo
-    fi
-fi
-
-num=$(pip3 show daqhats | wc -l)
-if [ "$num" -ne 0 ]; then
-    echo "Removing Python 3 package"
-    export PIP_BREAK_SYSTEM_PACKAGES=1
-    pip3 uninstall daqhats -y
-    echo
-fi
-
-echo "Uninstall complete. Remove this folder to completely remove daqhats."
+echo "Shared library uninstall complete."
+echo "The Python library is not automatically uninstalled. See README.md for instructions to uninstall the Python library."

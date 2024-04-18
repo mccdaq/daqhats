@@ -587,7 +587,8 @@ class mcc128(Hat): # pylint: disable=invalid-name, too-many-public-methods
           data. Certain methods like :py:func:`a_in_read` will return an error
           because the device is busy.
 
-        The scan options that may be used are:
+        The scan options that may be used are below. Multiple options can be 
+        combined with OR (|).
 
         * :py:const:`OptionFlags.DEFAULT`: Return scaled and calibrated data,
           internal scan clock, no trigger, and finite operation. Any other flags

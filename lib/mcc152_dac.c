@@ -57,7 +57,7 @@ static int _mcc152_spi_transfer(uint8_t device, uint8_t address, void* tx_data,
         (address >= MAX_NUMBER_HATS))       // check address failed
     {
         return RESULT_BAD_PARAMETER;
-    }    
+    }
 
     if (spi_fd[device] == -1)
     {
@@ -72,11 +72,12 @@ static int _mcc152_spi_transfer(uint8_t device, uint8_t address, void* tx_data,
     }
 
     _set_address(address);
-    
+
     // check spi mode and change if necessary
     ret = ioctl(spi_fd[device], SPI_IOC_RD_MODE, &temp);
     if (ret == -1)
     {
+        _free_address();
         _release_lock(lock_fd);
         return RESULT_COMMS_FAILURE;
     }
@@ -85,6 +86,7 @@ static int _mcc152_spi_transfer(uint8_t device, uint8_t address, void* tx_data,
         ret = ioctl(spi_fd[device], SPI_IOC_WR_MODE, &spi_mode);
         if (ret == -1)
         {
+            _free_address();
             _release_lock(lock_fd);
             return RESULT_COMMS_FAILURE;
         }
@@ -109,12 +111,14 @@ static int _mcc152_spi_transfer(uint8_t device, uint8_t address, void* tx_data,
         ret = RESULT_SUCCESS;
     }
 
+    _free_address();
+
     // clear the SPI lock
     _release_lock(lock_fd);
 
     return ret;
 }
-    
+
 /******************************************************************************
   Write a single analog output channel.
  *****************************************************************************/
@@ -123,15 +127,15 @@ int _mcc152_dac_write(uint8_t device, uint8_t address, uint8_t channel,
 {
     uint8_t data[3];
     uint16_t value;
-    
+
     if ((device > 1) ||                         // invalid SPI device
         (address >= MAX_NUMBER_HATS) ||         // check address failed
         (channel > MAX_CHANNEL) ||              // bad channel
         (code > MAX_CODE))                      // bad DAC code
     {
         return RESULT_BAD_PARAMETER;
-    }    
-    
+    }
+
     if (channel == 0)
     {
         data[0] = DACCMD_WRITE_LOAD | DAC_A;
@@ -143,7 +147,7 @@ int _mcc152_dac_write(uint8_t device, uint8_t address, uint8_t channel,
     value = code << 4;
     data[1] = (uint8_t)(value >> 8);
     data[2] = (uint8_t)value;
-    
+
     return _mcc152_spi_transfer(device, address, data, 3);
 }
 
@@ -156,14 +160,14 @@ int _mcc152_dac_write_both(uint8_t device, uint8_t address, uint16_t code0,
     uint8_t data[3];
     uint16_t value;
     int result;
-    
+
     if ((device > 1) ||                             // invalid SPI device
         (address >= MAX_NUMBER_HATS) ||             // check address failed
         (code0 > MAX_CODE) || (code1 > MAX_CODE))   // bad DAC code
     {
         return RESULT_BAD_PARAMETER;
-    }    
-    
+    }
+
     data[0] = DACCMD_WRITE | DAC_A;
     value = code0 << 4;
     data[1] = (uint8_t)(value >> 8);
@@ -173,12 +177,12 @@ int _mcc152_dac_write_both(uint8_t device, uint8_t address, uint16_t code0,
     {
         return result;
     }
-    
+
     data[0] = DACCMD_WRITE_LOAD_ALL | DAC_B;
     value = code1 << 4;
     data[1] = (uint8_t)(value >> 8);
     data[2] = (uint8_t)value;
-    return _mcc152_spi_transfer(device, address, data, 3);    
+    return _mcc152_spi_transfer(device, address, data, 3);
 }
 
 /******************************************************************************
@@ -187,12 +191,12 @@ int _mcc152_dac_write_both(uint8_t device, uint8_t address, uint16_t code0,
 int _mcc152_dac_init(uint8_t device, uint8_t address)
 {
     uint8_t data[3];
-    
+
     if ((address >= MAX_NUMBER_HATS) ||     // check address failed
         (device > 1))                       // invalid SPI device
     {
         return RESULT_BAD_PARAMETER;
-    }    
+    }
 
     if (spi_fd[device] == -1)
     {
@@ -205,19 +209,19 @@ int _mcc152_dac_init(uint8_t device, uint8_t address)
         {
             spi_fd[device] = open(SPI_DEVICE_1, O_RDWR);
         }
-        
+
         if (spi_fd[device] < 0)
         {
             return RESULT_RESOURCE_UNAVAIL;
         }
     }
-    
+
     // the DAC defaults to external reference so switch it to the internal
     // reference
     data[0] = DACCMD_REF_MODE;
     data[1] = 0;
     data[2] = 1;
     int result = _mcc152_spi_transfer(device, address, data, 3);
-    
+
     return result;
 }

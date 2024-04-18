@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=MCC DAQ HAT Manager
+Comment=Manage and control MCC DAQ HATs
+Exec=/usr/share/mcc/daqhats/daqhats_manager
+Type=Application
+Categories=Utility
+StartupNotify=false
+Terminal=false
+Icon=mcc_daqhats

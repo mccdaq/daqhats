@@ -448,15 +448,11 @@ int mcc172_trigger_config(uint8_t address, uint8_t source, uint8_t mode);
 *   \b samples_per_channel or the value in the following table, whichever is
 *   greater
 *
-*   \verbatim embed:rst:leading-asterisk
-*   =====================      =========================
-*   Sample Rate                Buffer Size (per channel)
-*   =====================      =========================
-*   200-1024 S/s                 1 kS
-*   1280-10.24 kS/s             10 kS
-*   12.8, 25.6, 51.2 kS/s      100 kS
-*   =====================      =========================
-*   \endverbatim
+*   Sample Rate            | Buffer Size (per channel)
+*   ---------------------- | -------------------------
+*   200-1024 S/s           |     1 kS
+*   1280-10.24 kS/s        |    10 kS
+*   12.8, 25.6, 51.2 kS/s  |   100 kS
 *
 *   Specifying a very large value for \b samples_per_channel could use too much
 *   of the Raspberry Pi memory. If the memory allocation fails, the function

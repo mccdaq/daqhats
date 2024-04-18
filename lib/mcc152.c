@@ -17,7 +17,6 @@
 #include "daqhats.h"
 #include "util.h"
 #include "cJSON.h"
-#include "gpio.h"
 #include "mcc152_dac.h"
 #include "mcc152_dio.h"
 

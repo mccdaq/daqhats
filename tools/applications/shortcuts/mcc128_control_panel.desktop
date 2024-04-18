@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=MCC 128 Control Panel
+Comment=Test MCC 128
+Exec=/usr/share/mcc/daqhats/mcc128_control_panel
+Type=Application
+Categories=Utility
+StartupNotify=false
+Terminal=false
+Icon=mcc_daqhats
+NoDisplay=true

@@ -1,91 +1,53 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Installing and Using the Library &mdash; MCC DAQ HAT Library 1.4.0 documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installing and Using the Library &mdash; MCC DAQ HAT Library 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e0a75244"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="C Library Reference" href="c.html" />
     <link rel="prev" title="Installing the DAQ HAT board" href="hardware.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
+        <div class="wy-side-nav-search" >
 
           
-            <a href="index.html" class="icon icon-home"> MCC DAQ HAT Library
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            MCC DAQ HAT Library
           </a>
-
-          
-            
-            
               <div class="version">
-                1.4.0
+                1.5.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Hardware Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hardware.html">Installing the DAQ HAT board</a></li>
@@ -103,103 +65,75 @@
 <li class="toctree-l1"><a class="reference internal" href="python.html">Python Library Reference</a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MCC DAQ HAT Library</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Installing and Using the Library</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installing and Using the Library</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/install.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="installing-and-using-the-library">
-<h1>Installing and Using the Library<a class="headerlink" href="#installing-and-using-the-library" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="installing-and-using-the-library">
+<h1>Installing and Using the Library<a class="headerlink" href="#installing-and-using-the-library" title="Link to this heading"></a></h1>
 <p>The project is hosted at <a class="reference external" href="https://github.com/mccdaq/daqhats">https://github.com/mccdaq/daqhats</a>.</p>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <ol class="arabic">
-<li><p class="first">Power off the Raspberry Pi then attach one or more HAT boards (see <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a>).</p>
-</li>
-<li><p class="first">Power on the Pi and log in.  Open a terminal window if using the graphical interface.</p>
-</li>
-<li><p class="first">Update your package list:</p>
+<li><p>Power off the Raspberry Pi then attach one or more HAT boards (see <a class="reference internal" href="hardware.html#install"><span class="std std-ref">Installing the DAQ HAT board</span></a>).</p></li>
+<li><p>Power on the Pi and log in.  Open a terminal window if using the graphical interface.</p></li>
+<li><p>Update your package list:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">update</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first"><strong>Optional:</strong> Update your installed packages and reboot:</p>
+<li><p><strong>Optional:</strong> Update your installed packages and reboot:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">full</span><span class="o">-</span><span class="n">upgrade</span>
 <span class="n">sudo</span> <span class="n">reboot</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install git (if not installed):</p>
+<li><p>Install git (if not installed):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span> <span class="n">install</span> <span class="n">git</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Download this package to your user folder with git:</p>
+<li><p>Download this package to your user folder with git:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~</span>
 <span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mccdaq</span><span class="o">/</span><span class="n">daqhats</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Build and install the shared library and optional Python support.  The installer will ask if you want to install Python 2 and Python 3 support.  It will also detect the HAT board EEPROMs and save the contents if needed:</p>
+<li><p>Build and install the shared library and tools.  The installer will detect the HAT board EEPROMs and save the contents if needed:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">~/</span><span class="n">daqhats</span>
 <span class="n">sudo</span> <span class="o">./</span><span class="n">install</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+</li>
+<li><p>To use the daqhats library with Python install the python library. It may be installed system-wide with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">daqhats</span>
+</pre></div>
+</div>
+<p>Recent versions of Python discourage system-wide installation, so you may have to append <code class="docutils literal notranslate"><span class="pre">--break-system-packages</span></code>.
+To install in a virtual environment (venv), create the venv and install the package (replace <code class="docutils literal notranslate"><span class="pre">&lt;path_to_venv&gt;</span></code> with the
+desired location of the venv):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="o">&lt;</span><span class="n">path_to_venv</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">path_to_venv</span><span class="o">&gt;/</span><span class="nb">bin</span><span class="o">/</span><span class="n">pip</span> <span class="n">install</span> <span class="n">daqhats</span>
 </pre></div>
 </div>
 </li>
@@ -207,8 +141,12 @@
 <p><strong>Note:</strong> If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.</p>
+<p>if ioctl errors are seen when running on a Raspberry Pi 5, update the kernel with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">rpi</span><span class="o">-</span><span class="n">update</span>
+</pre></div>
+</div>
 <p>You can now run the example programs under ~/daqhats/examples and create your own programs.</p>
-<p>If you are using the Raspbian desktop interface, the DAQ HAT Manager utility will be
+<p>If you are using the Raspberry Pi OS desktop interface, the DAQ HAT Manager utility will be
 available under the Accessories start menu. This utility will allow you to list the
 detected DAQ HATs, update the EEPROM files if you change your board stack, and launch
 control applications for each DAQ HAT to perform simple operations. The code for these
@@ -233,11 +171,11 @@ You can use the DAQ HAT Manager or the command:</p>
 <span class="n">sudo</span> <span class="o">./</span><span class="n">uninstall</span><span class="o">.</span><span class="n">sh</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="firmware-updates">
-<h2>Firmware Updates<a class="headerlink" href="#firmware-updates" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="mcc-118">
-<h3>MCC 118<a class="headerlink" href="#mcc-118" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="firmware-updates">
+<h2>Firmware Updates<a class="headerlink" href="#firmware-updates" title="Link to this heading"></a></h2>
+<section id="mcc-118">
+<h3>MCC 118<a class="headerlink" href="#mcc-118" title="Link to this heading"></a></h3>
 <p>Use the firmware update tool to update the firmware on your MCC 118 board(s).
 The “0” in the example below is the board address. Repeat the command for each
 MCC 118 address in your board stack. This example demonstrates how to update the
@@ -245,87 +183,50 @@ firmware on the MCC 118 that is installed at address 0:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mcc118_firmware_update</span> <span class="mi">0</span> <span class="o">~/</span><span class="n">daqhats</span><span class="o">/</span><span class="n">tools</span><span class="o">/</span><span class="n">MCC_118</span><span class="o">.</span><span class="n">hex</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="creating-a-c-program">
-<h2>Creating a C program<a class="headerlink" href="#creating-a-c-program" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="creating-a-c-program">
+<h2>Creating a C program<a class="headerlink" href="#creating-a-c-program" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li>The daqhats headers are installed in /usr/local/include/daqhats.  Add the compiler option <code class="code docutils literal notranslate"><span class="pre">-I/usr/local/include</span></code> in order to find the header files when compiling, and the include line <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;daqhats/daqhats.h&gt;</span></code> to your source code.</li>
-<li>The shared library, libdaqhats.so, is installed in /usr/local/lib.  Add the linker option <code class="code docutils literal notranslate"><span class="pre">-ldaqhats</span></code> to include this library.</li>
-<li>Study the example programs, example makefile, and library documentation for more information.</li>
+<li><p>The daqhats headers are installed in /usr/local/include/daqhats.  Add the compiler option <code class="code docutils literal notranslate"><span class="pre">-I/usr/local/include</span></code> in order to find the header files when compiling, and the include line <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;daqhats/daqhats.h&gt;</span></code> to your source code.</p></li>
+<li><p>The shared library, libdaqhats.so, is installed in /usr/local/lib.  Add the linker option <code class="code docutils literal notranslate"><span class="pre">-ldaqhats</span></code> to include this library.</p></li>
+<li><p>Study the example programs, example makefile, and library documentation for more information.</p></li>
 </ul>
-</div>
-<div class="section" id="creating-a-python-program">
-<h2>Creating a Python program<a class="headerlink" href="#creating-a-python-program" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="creating-a-python-program">
+<h2>Creating a Python program<a class="headerlink" href="#creating-a-python-program" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li>The Python package is named <em>daqhats</em>.  Use it in your code with <code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">daqhats</span></code>.</li>
-<li>Study the example programs and library documentation for more information.</li>
+<li><p>The Python package is named <em>daqhats</em>.  Use it in your code with <code class="code docutils literal notranslate"><span class="pre">import</span> <span class="pre">daqhats</span></code>.</p></li>
+<li><p>Study the example programs and library documentation for more information.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="c.html" class="btn btn-neutral float-right" title="C Library Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="hardware.html" class="btn btn-neutral" title="Installing the DAQ HAT board" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hardware.html" class="btn btn-neutral float-left" title="Installing the DAQ HAT board" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="c.html" class="btn btn-neutral float-right" title="C Library Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2020, Measurement Computing.
-
-    </p>
+    <p>&#169; Copyright 2020, Measurement Computing.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1.4.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });

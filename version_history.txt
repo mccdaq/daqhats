@@ -1,3 +1,9 @@
+1.5.0.0:
+    - Added support for Raspberry Pi 5 by switching to libgpiod for the GPIO functions.
+    - No longer install the Python library during install, allowing the user to install in 
+      a venv if desired
+    - Control panel apps were ported to C to remove dependency on system-wide Python library
+
 1.4.0.8:
     - Fixed install / uninstall scripts to allow installing the local Python library 
       on a system running Bookworm.

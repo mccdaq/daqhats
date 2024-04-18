@@ -1,6 +1,6 @@
 MAJOR = 1
-MINOR = 4
-SUB   = 0.8
+MINOR = 5
+SUB   = 0.0
 NAME = daqhats
 VERSION = $(MAJOR).$(MINOR).$(SUB)
 INSTALL_DIR = /usr/local/lib
@@ -9,7 +9,7 @@ BUILD_DIR = ./build
 CC = gcc
 CFLAGS = -I../include -I/opt/vc/include -I/usr/include -fPIC -Wall -Wextra -g -O2 -DENABLE_LOCALES=Off
 LDFLAGS = -L/opt/vc/lib -zdefs -shared -pthread -Wl,-soname,lib$(NAME).so.$(MAJOR)
-DEPLIBS = -lm -lbcm_host
+DEPLIBS = -lm -lgpiod
 RM = rm -f
 TARGET_LIB = lib$(NAME).so.$(VERSION)
 

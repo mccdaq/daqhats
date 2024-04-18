@@ -699,7 +699,8 @@ class mcc172(Hat): # pylint: disable=invalid-name, too-many-public-methods
           data. Certain methods like :py:func:`a_in_clock_config_write` will
           return an error because the device is busy.
 
-        The scan options that may be used are:
+        The scan options that may be used are below. Multiple options can be 
+        combined with OR (|).
 
         * :py:const:`OptionFlags.DEFAULT`: Return scaled and calibrated data,
           do not use a trigger, and finite operation. Any other flags will
