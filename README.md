@@ -94,7 +94,6 @@ and save the contents, if needed.
    python -m venv <path_to_venv>
    <path_to_venv>/bin/pip install daqhats
    ```
-   
 **Note:** If you encounter any errors during steps 5 - 7 then uininstall the daqhats
 library (if installed), go back to step 4, update your installed packages and reboot,
 then repeat steps 5 - 7.
@@ -186,6 +185,12 @@ following formats:
 
 Refer to the README.md file in each example folder for more information.
 
+To run the Python examples when you have installed the library in a virtual environment
+you must explicitly call the venv Python binary in this manner:
+```sh
+cd ~/daqhats/examples/python/mcc128
+<path_to_venv>/bin/python finite_scan.py
+```
 ## Usage
 The following is a basic Python example demonstrating how to read MCC 118 voltage
 inputs and display channel values.
