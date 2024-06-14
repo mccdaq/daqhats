@@ -221,8 +221,8 @@ for entry in board_list:
 ```
 
 ## Support/Feedback
-The **daqhats** library is supported by MCC. Contact technical support through
-our [support page](https://www.mccdaq.com/support/support_form.aspx).
+The **daqhats** library is supported by MCC. Obtain technical support through
+our [support forum](https://forum.digilent.com/forum/39-measurement-computing-mcc/).
 
 ## Documentation
 Documentation for the daqhats library is available at
