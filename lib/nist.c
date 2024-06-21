@@ -685,17 +685,18 @@ const NIST_Table_type TypeCTables[] =
 
 const double TypeCReverse[] =
 {
-	-2.344710E-01,
-     7.190027E-03,
-     3.956443E-06,
-    -1.842722E-09,
-     3.471851E-13,
-    -2.616792E-17
+	 0.00000E00,
+     1.33300E-02,
+     1.25261E-05,
+    -1.08382E-08,
+     3.70800E-12,
+    -4.64562E-16,
+    -1.35135E-20
 };
 
 const NIST_Reverse_type TypeCReverseTable =
 {
-	6,						// nCoefficients
+	7,						// nCoefficients
 	TypeCReverse
 };
 
