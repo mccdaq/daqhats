@@ -49,6 +49,8 @@ enum TcTypes
     TC_TYPE_B   = 6,
     /// N type
     TC_TYPE_N   = 7,
+    /// C type
+    TC_TYPE_C   = 8,
     /// Input disabled
     TC_DISABLED = 0xFF
 };
