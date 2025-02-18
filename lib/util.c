@@ -1056,6 +1056,8 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
         else
         {
             // no board info found
+            if (eeprom_fd != 1)
+                close(eeprom_fd);
             return RESULT_BAD_PARAMETER;
         }
 
@@ -1077,7 +1079,10 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
         {
             *pSize = custom_size + 1;   // add room for null
         }
+        if (eeprom_fd != -1)
+            close(eeprom_fd);
     }
+    
 
     return RESULT_SUCCESS;
 }
