@@ -62,7 +62,11 @@ if [ "$rc" != 0 ]; then
    exit $rc
 fi
 
+# /sys/class/i2c-adapter is deprecated since 2009
 SYS=/sys/class/i2c-adapter/i2c-$BUS
+if [ ! -d "$SYS" ]; then
+	SYS=/sys/bus/i2c/devices/i2c-$BUS
+fi
 
 rm -f /etc/mcc/hats/*.bin
 
