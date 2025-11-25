@@ -955,7 +955,10 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
             }
         }
         if (eeprom_fd != -1)
+        {
             close(eeprom_fd);
+            eeprom_fd = -1;
+        }
     }
 
     if (!found_vendor)
@@ -1077,6 +1080,11 @@ int _hat_info(uint8_t address, struct HatInfo* entry, char* pData,
         {
             *pSize = custom_size + 1;   // add room for null
         }
+    }
+
+    if (eeprom_fd != -1)
+    {
+        close(eeprom_fd);
     }
 
     return RESULT_SUCCESS;
