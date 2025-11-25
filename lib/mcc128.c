@@ -1636,7 +1636,7 @@ int mcc128_a_in_scan_queue_start(uint8_t address, uint8_t queue_count,
     }
 
     dev->scan_info = (struct mcc128ScanThreadInfo*)calloc(
-        sizeof(struct mcc128ScanThreadInfo), 1);
+        1, sizeof(struct mcc128ScanThreadInfo));
     if (dev->scan_info == NULL)
     {
         return RESULT_RESOURCE_UNAVAIL;

@@ -1516,7 +1516,7 @@ int mcc118_a_in_scan_start(uint8_t address, uint8_t channel_mask,
     }
 
     dev->scan_info = (struct mcc118ScanThreadInfo*)calloc(
-        sizeof(struct mcc118ScanThreadInfo), 1);
+        1, sizeof(struct mcc118ScanThreadInfo));
     if (dev->scan_info == NULL)
     {
         return RESULT_RESOURCE_UNAVAIL;
