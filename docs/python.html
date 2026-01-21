@@ -1,24 +1,22 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Python Library Reference &mdash; MCC DAQ HAT Library 1.5.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b76e3c8a" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=e0a75244"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=e0a75244"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -36,9 +34,6 @@
           <a href="index.html" class="icon icon-home">
             MCC DAQ HAT Library
           </a>
-              <div class="version">
-                1.5.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -336,41 +331,41 @@ interrupt:</p>
 <h4>Hat IDs<a class="headerlink" href="#hat-ids" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.HatIDs">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">HatIDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatIDs" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">HatIDs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatIDs" title="Link to this definition"></a></dt>
 <dd><p>Known MCC HAT IDs.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.ANY">
-<span class="sig-name descname"><span class="pre">ANY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.HatIDs.ANY" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ANY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.HatIDs.ANY" title="Link to this definition"></a></dt>
 <dd><p>Match any MCC ID in <a class="reference internal" href="#daqhats.hat_list" title="daqhats.hat_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">hat_list()</span></code></a></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.MCC_118">
-<span class="sig-name descname"><span class="pre">MCC_118</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">322</span></em><a class="headerlink" href="#daqhats.HatIDs.MCC_118" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MCC_118</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">322</span></span><a class="headerlink" href="#daqhats.HatIDs.MCC_118" title="Link to this definition"></a></dt>
 <dd><p>MCC 118 ID</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.MCC_128">
-<span class="sig-name descname"><span class="pre">MCC_128</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">326</span></em><a class="headerlink" href="#daqhats.HatIDs.MCC_128" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MCC_128</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">326</span></span><a class="headerlink" href="#daqhats.HatIDs.MCC_128" title="Link to this definition"></a></dt>
 <dd><p>MCC 128 ID</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.MCC_134">
-<span class="sig-name descname"><span class="pre">MCC_134</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">323</span></em><a class="headerlink" href="#daqhats.HatIDs.MCC_134" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MCC_134</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">323</span></span><a class="headerlink" href="#daqhats.HatIDs.MCC_134" title="Link to this definition"></a></dt>
 <dd><p>MCC 134 ID</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.MCC_152">
-<span class="sig-name descname"><span class="pre">MCC_152</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">324</span></em><a class="headerlink" href="#daqhats.HatIDs.MCC_152" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MCC_152</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">324</span></span><a class="headerlink" href="#daqhats.HatIDs.MCC_152" title="Link to this definition"></a></dt>
 <dd><p>MCC 152 ID</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.HatIDs.MCC_172">
-<span class="sig-name descname"><span class="pre">MCC_172</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">325</span></em><a class="headerlink" href="#daqhats.HatIDs.MCC_172" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MCC_172</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">325</span></span><a class="headerlink" href="#daqhats.HatIDs.MCC_172" title="Link to this definition"></a></dt>
 <dd><p>MCC 172 ID</p>
 </dd></dl>
 
@@ -381,29 +376,29 @@ interrupt:</p>
 <h4>Trigger modes<a class="headerlink" href="#trigger-modes" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.TriggerModes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">TriggerModes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.TriggerModes" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">TriggerModes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.TriggerModes" title="Link to this definition"></a></dt>
 <dd><p>Scan trigger input modes.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TriggerModes.RISING_EDGE">
-<span class="sig-name descname"><span class="pre">RISING_EDGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.TriggerModes.RISING_EDGE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">RISING_EDGE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.TriggerModes.RISING_EDGE" title="Link to this definition"></a></dt>
 <dd><p>Start the scan on a rising edge of TRIG.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TriggerModes.FALLING_EDGE">
-<span class="sig-name descname"><span class="pre">FALLING_EDGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.TriggerModes.FALLING_EDGE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">FALLING_EDGE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.TriggerModes.FALLING_EDGE" title="Link to this definition"></a></dt>
 <dd><p>Start the scan on a falling edge of TRIG.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TriggerModes.ACTIVE_HIGH">
-<span class="sig-name descname"><span class="pre">ACTIVE_HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_HIGH" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ACTIVE_HIGH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_HIGH" title="Link to this definition"></a></dt>
 <dd><p>Start the scan any time TRIG is high.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TriggerModes.ACTIVE_LOW">
-<span class="sig-name descname"><span class="pre">ACTIVE_LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_LOW" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">ACTIVE_LOW</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#daqhats.TriggerModes.ACTIVE_LOW" title="Link to this definition"></a></dt>
 <dd><p>Start the scan any time TRIG is low.</p>
 </dd></dl>
 
@@ -414,48 +409,48 @@ interrupt:</p>
 <h4>Scan / read option flags<a class="headerlink" href="#scan-read-option-flags" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.OptionFlags">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">OptionFlags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.OptionFlags" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">OptionFlags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.OptionFlags" title="Link to this definition"></a></dt>
 <dd><p>Scan / read option flags. See individual methods for detailed
 descriptions.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.DEFAULT">
-<span class="sig-name descname"><span class="pre">DEFAULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.OptionFlags.DEFAULT" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.OptionFlags.DEFAULT" title="Link to this definition"></a></dt>
 <dd><p>Use default behavior.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.NOSCALEDATA">
-<span class="sig-name descname"><span class="pre">NOSCALEDATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.OptionFlags.NOSCALEDATA" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">NOSCALEDATA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.OptionFlags.NOSCALEDATA" title="Link to this definition"></a></dt>
 <dd><p>Read / write unscaled data.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.NOCALIBRATEDATA">
-<span class="sig-name descname"><span class="pre">NOCALIBRATEDATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">NOCALIBRATEDATA</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.OptionFlags.NOCALIBRATEDATA" title="Link to this definition"></a></dt>
 <dd><p>Read / write uncalibrated data.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.EXTCLOCK">
-<span class="sig-name descname"><span class="pre">EXTCLOCK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#daqhats.OptionFlags.EXTCLOCK" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">EXTCLOCK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#daqhats.OptionFlags.EXTCLOCK" title="Link to this definition"></a></dt>
 <dd><p>Use an external clock source.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.EXTTRIGGER">
-<span class="sig-name descname"><span class="pre">EXTTRIGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#daqhats.OptionFlags.EXTTRIGGER" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">EXTTRIGGER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></span><a class="headerlink" href="#daqhats.OptionFlags.EXTTRIGGER" title="Link to this definition"></a></dt>
 <dd><p>Use an external trigger source.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.CONTINUOUS">
-<span class="sig-name descname"><span class="pre">CONTINUOUS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#daqhats.OptionFlags.CONTINUOUS" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">CONTINUOUS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></span><a class="headerlink" href="#daqhats.OptionFlags.CONTINUOUS" title="Link to this definition"></a></dt>
 <dd><p>Run until explicitly stopped.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.OptionFlags.TEMPERATURE">
-<span class="sig-name descname"><span class="pre">TEMPERATURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></em><a class="headerlink" href="#daqhats.OptionFlags.TEMPERATURE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TEMPERATURE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">32</span></span><a class="headerlink" href="#daqhats.OptionFlags.TEMPERATURE" title="Link to this definition"></a></dt>
 <dd><p>Return temperature (MCC 134)</p>
 </dd></dl>
 
@@ -467,7 +462,7 @@ descriptions.</p>
 <h3>HatError class<a class="headerlink" href="#haterror-class" title="Link to this heading"></a></h3>
 <dl class="py exception">
 <dt class="sig sig-object py" id="daqhats.HatError">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">HatError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatError" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">HatError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.HatError" title="Link to this definition"></a></dt>
 <dd><p>Exceptions raised for MCC DAQ HAT specific errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -487,7 +482,7 @@ descriptions.</p>
 <h3>Methods<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.mcc118">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc118</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc118</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118" title="Link to this definition"></a></dt>
 <dd><p>The class for an MCC 118 board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -561,7 +556,7 @@ descriptions.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc118.info">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.info" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc118.info" title="Link to this definition"></a></dt>
 <dd><p>Return constant information about this type of device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -839,7 +834,8 @@ another scan may not be started.</p></li>
 data. Certain methods like <a class="reference internal" href="#daqhats.mcc118.a_in_read" title="daqhats.mcc118.a_in_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_read()</span></code></a> will return an error
 because the device is busy.</p></li>
 </ul>
-<p>The scan options that may be used are:</p>
+<p>The scan options that may be used are below. Multiple options can be
+combined with OR (|).</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return scaled and calibrated data,
 internal scan clock, no trigger, and finite operation. Any other flags
@@ -1149,7 +1145,7 @@ background scan and make it possible to start another scan with
 <h3>Methods<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.mcc128">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128" title="Link to this definition"></a></dt>
 <dd><p>The class for an MCC 128 board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1235,7 +1231,7 @@ background scan and make it possible to start another scan with
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc128.info">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.info" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc128.info" title="Link to this definition"></a></dt>
 <dd><p>Return constant information about this type of device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1592,7 +1588,8 @@ another scan may not be started.</p></li>
 data. Certain methods like <a class="reference internal" href="#daqhats.mcc128.a_in_read" title="daqhats.mcc128.a_in_read"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_read()</span></code></a> will return an error
 because the device is busy.</p></li>
 </ul>
-<p>The scan options that may be used are:</p>
+<p>The scan options that may be used are below. Multiple options can be
+combined with OR (|).</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return scaled and calibrated data,
 internal scan clock, no trigger, and finite operation. Any other flags
@@ -1901,17 +1898,17 @@ background scan and make it possible to start another scan with
 <h4>Analog input modes<a class="headerlink" href="#analog-input-modes" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.AnalogInputMode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">AnalogInputMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.AnalogInputMode" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">AnalogInputMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.AnalogInputMode" title="Link to this definition"></a></dt>
 <dd><p>Analog input modes.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputMode.SE">
-<span class="sig-name descname"><span class="pre">SE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.AnalogInputMode.SE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.AnalogInputMode.SE" title="Link to this definition"></a></dt>
 <dd><p>Single-ended mode.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputMode.DIFF">
-<span class="sig-name descname"><span class="pre">DIFF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.AnalogInputMode.DIFF" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DIFF</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.AnalogInputMode.DIFF" title="Link to this definition"></a></dt>
 <dd><p>Differential mode.</p>
 </dd></dl>
 
@@ -1922,29 +1919,29 @@ background scan and make it possible to start another scan with
 <h4>Analog input ranges<a class="headerlink" href="#analog-input-ranges" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.AnalogInputRange">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">AnalogInputRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.AnalogInputRange" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">AnalogInputRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.AnalogInputRange" title="Link to this definition"></a></dt>
 <dd><p>Analog input ranges.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputRange.BIP_10V">
-<span class="sig-name descname"><span class="pre">BIP_10V</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_10V" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">BIP_10V</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_10V" title="Link to this definition"></a></dt>
 <dd><p>+/- 10V input range.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputRange.BIP_5V">
-<span class="sig-name descname"><span class="pre">BIP_5V</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_5V" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">BIP_5V</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_5V" title="Link to this definition"></a></dt>
 <dd><p>+/- 5V input range.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputRange.BIP_2V">
-<span class="sig-name descname"><span class="pre">BIP_2V</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_2V" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">BIP_2V</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_2V" title="Link to this definition"></a></dt>
 <dd><p>+/- 2V input range.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.AnalogInputRange.BIP_1V">
-<span class="sig-name descname"><span class="pre">BIP_1V</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_1V" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">BIP_1V</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#daqhats.AnalogInputRange.BIP_1V" title="Link to this definition"></a></dt>
 <dd><p>+/- 1V input range</p>
 </dd></dl>
 
@@ -1959,7 +1956,7 @@ background scan and make it possible to start another scan with
 <h3>Methods<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.mcc134">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc134</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc134" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc134</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc134" title="Link to this definition"></a></dt>
 <dd><p>The class for an MCC 134 board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2018,25 +2015,25 @@ background scan and make it possible to start another scan with
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.mcc134.OPEN_TC_VALUE">
-<span class="sig-name descname"><span class="pre">OPEN_TC_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-9999.0</span></em><a class="headerlink" href="#daqhats.mcc134.OPEN_TC_VALUE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OPEN_TC_VALUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-9999.0</span></span><a class="headerlink" href="#daqhats.mcc134.OPEN_TC_VALUE" title="Link to this definition"></a></dt>
 <dd><p>Return value for an open thermocouple.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.mcc134.OVERRANGE_TC_VALUE">
-<span class="sig-name descname"><span class="pre">OVERRANGE_TC_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-8888.0</span></em><a class="headerlink" href="#daqhats.mcc134.OVERRANGE_TC_VALUE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OVERRANGE_TC_VALUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-8888.0</span></span><a class="headerlink" href="#daqhats.mcc134.OVERRANGE_TC_VALUE" title="Link to this definition"></a></dt>
 <dd><p>Return value for thermocouple voltage outside the valid range.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.mcc134.COMMON_MODE_TC_VALUE">
-<span class="sig-name descname"><span class="pre">COMMON_MODE_TC_VALUE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-7777.0</span></em><a class="headerlink" href="#daqhats.mcc134.COMMON_MODE_TC_VALUE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">COMMON_MODE_TC_VALUE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-7777.0</span></span><a class="headerlink" href="#daqhats.mcc134.COMMON_MODE_TC_VALUE" title="Link to this definition"></a></dt>
 <dd><p>Return value for thermocouple input outside the common-mode range.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc134.info">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc134.info" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc134.info" title="Link to this definition"></a></dt>
 <dd><p>Return constant information about this type of device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -2376,59 +2373,59 @@ returned in degress C.</p>
 <h4>Thermocouple types<a class="headerlink" href="#thermocouple-types" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.TcTypes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">TcTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.TcTypes" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">TcTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.TcTypes" title="Link to this definition"></a></dt>
 <dd><p>Thermocouple types.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_J">
-<span class="sig-name descname"><span class="pre">TYPE_J</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_J" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_J</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_J" title="Link to this definition"></a></dt>
 <dd><p>Type J</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_K">
-<span class="sig-name descname"><span class="pre">TYPE_K</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_K" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_K</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_K" title="Link to this definition"></a></dt>
 <dd><p>Type K</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_T">
-<span class="sig-name descname"><span class="pre">TYPE_T</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_T" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_T</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_T" title="Link to this definition"></a></dt>
 <dd><p>Type T</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_E">
-<span class="sig-name descname"><span class="pre">TYPE_E</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_E" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_E</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_E" title="Link to this definition"></a></dt>
 <dd><p>Type E</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_R">
-<span class="sig-name descname"><span class="pre">TYPE_R</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_R" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_R</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_R" title="Link to this definition"></a></dt>
 <dd><p>Type R</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_S">
-<span class="sig-name descname"><span class="pre">TYPE_S</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_S" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_S</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_S" title="Link to this definition"></a></dt>
 <dd><p>Type S</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_B">
-<span class="sig-name descname"><span class="pre">TYPE_B</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_B" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_B</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_B" title="Link to this definition"></a></dt>
 <dd><p>Type B</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.TYPE_N">
-<span class="sig-name descname"><span class="pre">TYPE_N</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#daqhats.TcTypes.TYPE_N" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">TYPE_N</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></span><a class="headerlink" href="#daqhats.TcTypes.TYPE_N" title="Link to this definition"></a></dt>
 <dd><p>Type N</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.TcTypes.DISABLED">
-<span class="sig-name descname"><span class="pre">DISABLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">255</span></em><a class="headerlink" href="#daqhats.TcTypes.DISABLED" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DISABLED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">255</span></span><a class="headerlink" href="#daqhats.TcTypes.DISABLED" title="Link to this definition"></a></dt>
 <dd><p>Disabled</p>
 </dd></dl>
 
@@ -2443,7 +2440,7 @@ returned in degress C.</p>
 <h3>Methods<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.mcc152">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc152</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc152</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152" title="Link to this definition"></a></dt>
 <dd><p>The class for an MCC 152 board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2535,7 +2532,7 @@ returned in degress C.</p>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc152.info">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.info" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc152.info" title="Link to this definition"></a></dt>
 <dd><p>Return constant information about this type of device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -3434,47 +3431,47 @@ where 0 in a value enables the interrupt and 1 disables it.</p></li>
 <h4>DIO Config Items<a class="headerlink" href="#dio-config-items" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">DIOConfigItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.DIOConfigItem" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">DIOConfigItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.DIOConfigItem" title="Link to this definition"></a></dt>
 <dd><p>Digital I/O Configuration Items.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.DIRECTION">
-<span class="sig-name descname"><span class="pre">DIRECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.DIRECTION" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">DIRECTION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.DIRECTION" title="Link to this definition"></a></dt>
 <dd><p>Configure channel direction</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.PULL_CONFIG">
-<span class="sig-name descname"><span class="pre">PULL_CONFIG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">PULL_CONFIG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_CONFIG" title="Link to this definition"></a></dt>
 <dd><p>Configure pull-up/down resistor</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.PULL_ENABLE">
-<span class="sig-name descname"><span class="pre">PULL_ENABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">PULL_ENABLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.PULL_ENABLE" title="Link to this definition"></a></dt>
 <dd><p>Enable pull-up/down resistor</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.INPUT_INVERT">
-<span class="sig-name descname"><span class="pre">INPUT_INVERT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INPUT_INVERT</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_INVERT" title="Link to this definition"></a></dt>
 <dd><p>Configure input inversion</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.INPUT_LATCH">
-<span class="sig-name descname"><span class="pre">INPUT_LATCH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INPUT_LATCH</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.INPUT_LATCH" title="Link to this definition"></a></dt>
 <dd><p>Configure input latching</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.OUTPUT_TYPE">
-<span class="sig-name descname"><span class="pre">OUTPUT_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">OUTPUT_TYPE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.OUTPUT_TYPE" title="Link to this definition"></a></dt>
 <dd><p>Configure output type</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.DIOConfigItem.INT_MASK">
-<span class="sig-name descname"><span class="pre">INT_MASK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#daqhats.DIOConfigItem.INT_MASK" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">INT_MASK</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a class="headerlink" href="#daqhats.DIOConfigItem.INT_MASK" title="Link to this definition"></a></dt>
 <dd><p>Configure interrupt mask</p>
 </dd></dl>
 
@@ -3489,7 +3486,7 @@ where 0 in a value enables the interrupt and 1 disables it.</p></li>
 <h3>Methods<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.mcc172">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc172</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">mcc172</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172" title="Link to this definition"></a></dt>
 <dd><p>The class for an MCC 172 board.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3578,7 +3575,7 @@ where 0 in a value enables the interrupt and 1 disables it.</p></li>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc172.info">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.info" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.info" title="Link to this definition"></a></dt>
 <dd><p>Return constant information about this type of device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -3996,7 +3993,7 @@ the slave to trigger on the falling edge.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="daqhats.mcc172.a_in_scan_actual_rate">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">a_in_scan_actual_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate_per_channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_scan_actual_rate" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">a_in_scan_actual_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate_per_channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.mcc172.a_in_scan_actual_rate" title="Link to this definition"></a></dt>
 <dd><p>Calculate the actual sample rate per channel for a requested sample
 rate.</p>
 <p>The scan clock is generated from a 51.2 KHz clock source divided by an
@@ -4046,7 +4043,8 @@ another scan may not be started.</p></li>
 data. Certain methods like <a class="reference internal" href="#daqhats.mcc172.a_in_clock_config_write" title="daqhats.mcc172.a_in_clock_config_write"><code class="xref py py-func docutils literal notranslate"><span class="pre">a_in_clock_config_write()</span></code></a> will
 return an error because the device is busy.</p></li>
 </ul>
-<p>The scan options that may be used are:</p>
+<p>The scan options that may be used are below. Multiple options can be
+combined with OR (|).</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#daqhats.OptionFlags.DEFAULT" title="daqhats.OptionFlags.DEFAULT"><code class="xref py py-const docutils literal notranslate"><span class="pre">OptionFlags.DEFAULT</span></code></a>: Return scaled and calibrated data,
 do not use a trigger, and finite operation. Any other flags will
@@ -4345,23 +4343,23 @@ background scan and make it possible to start another scan with
 <h4>Source types<a class="headerlink" href="#source-types" title="Link to this heading"></a></h4>
 <dl class="py class">
 <dt class="sig sig-object py" id="daqhats.SourceType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">SourceType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.SourceType" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">daqhats.</span></span><span class="sig-name descname"><span class="pre">SourceType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#daqhats.SourceType" title="Link to this definition"></a></dt>
 <dd><p>Clock / trigger source options.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.SourceType.LOCAL">
-<span class="sig-name descname"><span class="pre">LOCAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#daqhats.SourceType.LOCAL" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">LOCAL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#daqhats.SourceType.LOCAL" title="Link to this definition"></a></dt>
 <dd><p>Use a local-only source.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.SourceType.MASTER">
-<span class="sig-name descname"><span class="pre">MASTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#daqhats.SourceType.MASTER" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">MASTER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#daqhats.SourceType.MASTER" title="Link to this definition"></a></dt>
 <dd><p>Use a local source and set it as master.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="daqhats.SourceType.SLAVE">
-<span class="sig-name descname"><span class="pre">SLAVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#daqhats.SourceType.SLAVE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">SLAVE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></span><a class="headerlink" href="#daqhats.SourceType.SLAVE" title="Link to this definition"></a></dt>
 <dd><p>Use a master source from another MCC 172.</p>
 </dd></dl>
 

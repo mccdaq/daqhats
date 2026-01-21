@@ -7,7 +7,7 @@ The MCC 134 is a 4-channel thermocouple input board with the following features:
 - Onboard sensor for cold junction compensation
 - Linearization for J, K, R, S, T, N, E, B type thermocouples
 - Open thermocouple detection
-- Thermocouple inputs are electrically isolated from the Raspberry Pi for use in harsh environments
+- Thermocouple inputs are functionally isolated from the Raspberry Pi for use in harsh environments
 
 .. only:: html
 

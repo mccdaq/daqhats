@@ -1,6 +1,7 @@
 1.5.0.1:
     - Added support for libgpiod v2 in Trixie and above
     - Fixed issue with daqhats_read_eeproms on newer versions of Raspberry Pi OS
+    - Updated MCC 134 documentation
 
 1.5.0.0:
     - Added support for Raspberry Pi 5 by switching to libgpiod for the GPIO functions
