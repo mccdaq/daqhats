@@ -7,7 +7,8 @@ The MCC 134 is a 4-channel thermocouple input board with the following features:
 - Onboard sensor for cold junction compensation
 - Linearization for J, K, R, S, T, N, E, B type thermocouples
 - Open thermocouple detection
-- Thermocouple inputs are functionally isolated from the Raspberry Pi for use in harsh environments
+- Thermocouple inputs are functionally isolated from the Raspberry Pi for use in 
+  harsh environments
 
 .. only:: html
 
@@ -30,15 +31,21 @@ Screw terminals
 
 Address jumpers
 ^^^^^^^^^^^^^^^
-- **A0** to **A2**: Used to identify each HAT when multiple boards are connected. The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). Install jumpers on each additional connected board to set the desired address. Refer to the :ref:`multiple` topic for more information about the recommended addressing method.
+- **A0** to **A2**: Used to identify each HAT when multiple boards are connected. 
+  The first HAT connected to the Raspberry Pi must be at address 0 (no jumper). 
+  Install jumpers on each additional connected board to set the desired address. 
+  Refer to the :ref:`multiple` topic for more information about the recommended 
+  addressing method.
 
 Status LED
 ^^^^^^^^^^
-The LED turns on when the board is connected to a Raspberry Pi with external power applied. 
+The LED turns on when the board is connected to a Raspberry Pi with external 
+power applied. 
 
 Header connector
 ^^^^^^^^^^^^^^^^
-The board header is used to connect with the Raspberry Pi. Refer to :ref:`install` for more information about the header connector.
+The board header is used to connect with the Raspberry Pi. Refer to :ref:`install` 
+for more information about the header connector.
 
 Functional block diagram
 ------------------------
@@ -82,7 +89,8 @@ MCC recommends the following practices:
   increase accuracy.
 
 For additional information, refer to the `Measuring Thermocouples with Raspberry Pi
-and the MCC 134 <https://www.mccdaq.com/TechTips/TechTip-11.aspx>`_ Tech Tip.
+and the MCC 134 
+<https://digilent.com/reference/daq-and-datalogging/documents/measuring-thermocouples-with-raspberry-pi>`_ Tech Tip.
 
 Specifications
 --------------
