@@ -972,7 +972,7 @@ int mcc134_tc_type_write(uint8_t address, uint8_t channel, uint8_t type)
 
     if (!_check_addr(address) ||
         (channel >= NUM_TC_CHANNELS) ||
-        ((type > TC_TYPE_N) && (type != TC_DISABLED)))
+        ((type > TC_TYPE_C) && (type != TC_DISABLED)))
     {
         return RESULT_BAD_PARAMETER;
     }

@@ -4,6 +4,8 @@
 *   brief This file contains NIST thermocouple linearization functions.
 *
 *   date 1 Feb 2018
+*
+*   14 Jun 2024 Added C Type TC (Ovidio Y. Pena Rodriguez)
 */
 #include <math.h>
 #include "nist.h"
@@ -12,7 +14,7 @@
 //
 // The following types are supported:
 //
-//	J, K, R, S, T, N, E, B
+//	J, K, R, S, T, N, E, B, C
 enum tcTypes
 {
     TC_TYPE_J = 0,
@@ -22,7 +24,8 @@ enum tcTypes
     TC_TYPE_R,
     TC_TYPE_S,
     TC_TYPE_B,
-    TC_TYPE_N
+    TC_TYPE_N,
+    TC_TYPE_C
 };
 
 
@@ -641,10 +644,66 @@ const NIST_Reverse_type TypeBReverseTable =
 	TypeBReverse
 };
 
+// ****************************************************************************
+// Type C data
+
+const double TypeCTable0[] =
+{
+	 0.0000000E+00,
+     7.4411468E+01,
+    -4.5680255E+00,
+     6.0972079E-01,
+    -5.5888380E-02,
+     2.9645590E-03,
+    -6.5745000E-05
+};
+
+const double TypeCTable1[] =
+{
+	 4.1102500E+02,
+    -6.1463789E+01,
+     1.4651879E+01,
+    -9.9683382E-01,
+     3.7141869E-02,
+    -7.0836000E-04,
+     5.5012700E-06
+};
+
+const NIST_Table_type TypeCTables[] =
+{
+	{
+		7,
+		0.0,
+		TypeCTable0
+	},
+	{
+		7,
+		11.3,
+		TypeCTable1
+	}
+};
+
+const double TypeCReverse[] =
+{
+	 0.00000E00,
+     1.33300E-02,
+     1.25261E-05,
+    -1.08382E-08,
+     3.70800E-12,
+    -4.64562E-16,
+    -1.35135E-20
+};
+
+const NIST_Reverse_type TypeCReverseTable =
+{
+	7,						// nCoefficients
+	TypeCReverse
+};
+
 
 // ****************************************************************************
 
-const Thermocouple_Data_type ThermocoupleData[8] =
+const Thermocouple_Data_type ThermocoupleData[9] =
 {
 	{
 		3, 							// nTables
@@ -685,6 +744,11 @@ const Thermocouple_Data_type ThermocoupleData[8] =
 		3, 							// nTables
 		&TypeNReverseTable, 		// Reverse Table
 		TypeNTables					// Tables
+	},
+	{
+		2, 							// nTables
+		&TypeCReverseTable, 		// Reverse Table
+		TypeCTables					// Tables
 	}
 };
 
@@ -696,9 +760,9 @@ double NISTCalcVoltage(unsigned int type, double temp)
 	double fTemp;
 	double fExtra = 0.0;
 
-	if (type > TC_TYPE_N)
+	if (type > TC_TYPE_C)
     {
-        type = TC_TYPE_N;
+        type = TC_TYPE_C;
     }
 	
 	// select appropriate NIST table data
@@ -740,9 +804,9 @@ double NISTCalcTemperature(unsigned int type, double voltage)
 	double fVoltage;
 	double fResult;
 	
-	if (type > TC_TYPE_N)
+	if (type > TC_TYPE_C)
 	{
-		type = TC_TYPE_N;
+		type = TC_TYPE_C;
 	}
 
 	// determine which temp range table to use with the threshold V
