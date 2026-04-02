@@ -1,3 +1,16 @@
 **/build/*
 **/daqhats.egg-info/*
 dist/*
+
+# Compiled files
+*.o
+*.exe
+*.out
+#*.bin
+
+# CSV data files
+#*.csv
+
+# Temporary files
+*~
+#*.part
