@@ -284,6 +284,11 @@ static bool _parse_buffer(uint8_t* buffer, uint16_t length,
             }
             else
             {
+                // clamp data_count
+                if (data_count > (MAX_SPI_TRANSFER - MSG_RX_HEADER_SIZE))
+                {
+                    data_count = (MAX_SPI_TRANSFER - MSG_RX_HEADER_SIZE);
+                }
                 _remaining = data_count;// + 1;
                 parse_state++;
             }
@@ -460,6 +465,10 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
                 }
             }
         }
+        else
+        {
+            usleep(1);
+        }
 
         clock_gettime(CLOCK_MONOTONIC, &current_time);
         diff = _difftime_us(&start_time, &current_time);
@@ -479,24 +488,26 @@ static int _spi_transfer(uint8_t address, uint8_t command, void* tx_data,
         {
             tr.rx_buf = (uintptr_t)&dev->rx_buffer[read_start];
             tr.len = read_amount;
-
-            if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
+            if ((read_amount + read_start) < MAX_SPI_TRANSFER)
             {
-                total_read += read_amount;
-                read_start += read_amount;
+                if ((ret = ioctl(dev->spi_fd, SPI_IOC_MESSAGE(1), &tr)) >= 1)
+                {
+                    total_read += read_amount;
+                    read_start += read_amount;
 
-                // parse the reply
-                got_reply = _parse_buffer(dev->rx_buffer, total_read,
-                    &frame_start, &frame_length, &remaining);
-            }
-            else
-            {
-                usleep(300);
-            }
+                    // parse the reply
+                    got_reply = _parse_buffer(dev->rx_buffer, total_read,
+                        &frame_start, &frame_length, &remaining);
+                }
+                else
+                {
+                    usleep(300);
+                }
 
-            clock_gettime(CLOCK_MONOTONIC, &current_time);
-            diff = _difftime_us(&start_time, &current_time);
-            timeout = (diff > reply_timeout_us);
+                clock_gettime(CLOCK_MONOTONIC, &current_time);
+                diff = _difftime_us(&start_time, &current_time);
+                timeout = (diff > reply_timeout_us);
+            }
         } while (!got_reply && !timeout &&
                  ((read_start + read_amount) < MAX_SPI_TRANSFER));
     }
@@ -959,18 +970,14 @@ static void* _scan_thread(void* arg)
 
                         pthread_mutex_lock(&_devices[address]->scan_mutex);
                         info->buffer_depth += read_count;
-                        pthread_mutex_unlock(&_devices[address]->scan_mutex);
-
                         if (info->buffer_depth > info->buffer_size)
                         {
-                            pthread_mutex_lock(&_devices[address]->scan_mutex);
                             info->buffer_overrun = true;
                             info->scan_running = false;
-                            pthread_mutex_unlock(
-                                &_devices[address]->scan_mutex);
                             done = true;
                         }
                         info->samples_transferred += read_count;
+                        pthread_mutex_unlock(&_devices[address]->scan_mutex);
                     }
 
                     // adaptive sleep time to minimize processor usage
@@ -1126,7 +1133,12 @@ int mcc172_open(uint8_t address)
                 "values\n", address);
         }
 
-        pthread_mutex_init(&dev->scan_mutex, NULL);
+        // use a robust mutex
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_setrobust(&attr, PTHREAD_MUTEX_ROBUST);
+
+        pthread_mutex_init(&dev->scan_mutex, &attr);
 
         // open the SPI device handle
         dev->spi_fd = open(spi_device, O_RDWR);
@@ -2177,7 +2189,24 @@ int mcc172_a_in_scan_cleanup(uint8_t address)
         free(_devices[address]->scan_info);
         _devices[address]->scan_info = NULL;
 
-        pthread_mutex_unlock(&_devices[address]->scan_mutex);
+        // check for mutex left locked
+        int rc = pthread_mutex_trylock(&_devices[address]->scan_mutex);
+        if (rc == 0)
+        {
+            // It was unlocked — we now hold it, unlock immediately
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
+        }
+        else if (rc == EBUSY)
+        {
+            // It is currently locked
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
+        }
+        else if (rc == EOWNERDEAD)
+        {
+            // Owner died holding it (robust mutex only)
+            pthread_mutex_consistent(&_devices[address]->scan_mutex);
+            pthread_mutex_unlock(&_devices[address]->scan_mutex);
+        }
     }
 
     return RESULT_SUCCESS;
