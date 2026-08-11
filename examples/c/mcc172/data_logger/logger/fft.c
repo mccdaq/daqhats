@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
-#include "kiss_fft/kiss_fftr.h"
+#include <kissfft/kiss_fftr.h>
 #include "fft.h"
 
 #define USE_WINDOW

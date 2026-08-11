@@ -25,7 +25,7 @@
 *****************************************************************************/
 #include "../../daqhats_utils.h"
 #include <math.h>
-#include "kiss_fftr.h"
+#include <kissfft/kiss_fftr.h>
 
 #define USE_WINDOW
 
