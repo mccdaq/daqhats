@@ -19,7 +19,7 @@ Install required packages:
 Install **Kiss FFT**:
   ```sh
   cd ~
-  git clone  https://github.com/mborgerding/kissfft.git
+  git clone --branch 131.2.0 --depth 1 https://github.com/mborgerding/kissfft.git
   cd kissfft
   make; sudo make install
   ```
@@ -28,6 +28,7 @@ Install **GTKDatabox**:
   cd ~
   git clone https://github.com/erikd/gtkdatabox.git
   cd gtkdatabox
+  git checkout 7fc24b295e163018024da9ce040f194170a409f2
   ./autogen.sh
   ./configure
   sudo make install

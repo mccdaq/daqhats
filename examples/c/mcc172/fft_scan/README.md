@@ -11,7 +11,7 @@ perform FFTs on the data, and find the peaks and harmonics.
 Install **Kiss FFT**:
   ```sh
   cd ~
-  git clone https://github.com/mborgerding/kissfft.git
+  git clone --branch 131.2.0 --depth 1 https://github.com/mborgerding/kissfft.git
   cd kissfft
   make; sudo make install
   ```
