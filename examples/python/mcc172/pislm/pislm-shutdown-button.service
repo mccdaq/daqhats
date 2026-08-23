@@ -1,0 +1,53 @@
+[Unit]
+Description=PiSLM physical shutdown button + optional UPS low-battery shutdown
+# Deliberately does NOT depend on pislm.service or the network -- the
+# button must keep working to cleanly power off the Pi even if the
+# acquisition service has crashed or the network is down.
+
+[Service]
+Type=simple
+# Runs as root: needed to issue `systemctl poweroff`, to drive the GPIO
+# LED pin, and (fallback only) to write the onboard status LED's sysfs
+# brightness/trigger files.
+User=root
+WorkingDirectory=/home/pi/daqhats/examples/python/mcc172/pislm
+# Point this at the interpreter that has gpiod/RPi.GPIO (and, for UPS
+# monitoring, smbus2) installed. On Trixie (PEP 668) that is the virtual
+# environment created in INSTALL.md section 8; the system python will NOT
+# have them unless installed with --break-system-packages.
+ExecStart=/home/pi/pislm-venv/bin/python /home/pi/daqhats/examples/python/mcc172/pislm/shutdown_button.py
+
+# Override the GPIO pins or hold time without editing the script:
+#Environment=PISLM_SHUTDOWN_GPIO_PIN=27
+#Environment=PISLM_SHUTDOWN_LED_GPIO_PIN=24
+#Environment=PISLM_SHUTDOWN_HOLD_SECONDS=3.0
+
+# UPS battery monitoring (optional -- an INA219-based UPS HAT; needs
+# `pip install smbus2` in the venv). Auto-disables itself if no chip
+# answers at the configured bus/address, so these are safe to leave at
+# their defaults even with no UPS attached:
+#Environment=PISLM_UPS_ENABLED=1
+#Environment=PISLM_UPS_I2C_BUS=1
+#Environment=PISLM_UPS_I2C_ADDRESS=0x41
+# Bus voltage at 0%/100% -- MUST match your actual pack's series cell
+# count, or the percentage silently clamps to a meaningless 0%/100% (this
+# happened in the field: default 6.0/8.4 assumes 2S, but a 3S pack is
+# really 9.0/12.6). See INSTALL.md 14.1.
+#Environment=PISLM_UPS_V_MIN=6.0
+#Environment=PISLM_UPS_V_MAX=8.4
+# Voltage-based percentage is a linear approximation, not true state of
+# charge (real Li-ion discharge curves are S-shaped) -- leave some
+# margin rather than cutting this close to 0.
+#Environment=PISLM_UPS_LOW_PERCENT=10.0
+#Environment=PISLM_UPS_LOW_HOLD_SECONDS=30.0
+#Environment=PISLM_UPS_POLL_SECONDS=10.0
+#Environment=PISLM_UPS_STATUS_FILE=/run/pislm-ups-status.json
+
+Restart=always
+RestartSec=3
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

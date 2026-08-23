@@ -1,0 +1,35 @@
+[Unit]
+Description=MCC 172 PiSLM (IEPE acquisition + TCP raw waveform stream)
+# Wait for the network so the TCP server can bind and be reachable at boot.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# --- USER AND PATHS: see INSTALL.md section 13 ------------------------
+# Run as the login user that installed daqhats, not root, so the SPI /
+# EEPROM / USB access matches the interactive install. Raspberry Pi OS no
+# longer creates a default "pi" account, so the name and home below are
+# placeholders -- INSTALL.md section 13 rewrites them to your actual user.
+User=pi
+WorkingDirectory=/home/pi/daqhats/examples/python/mcc172/pislm
+# Point this at the interpreter that has daqhats/uldaq installed. On Trixie
+# (PEP 668) that is the virtual environment created in INSTALL.md section 8;
+# the system python will NOT have them.
+ExecStart=/home/pi/pislm-venv/bin/python /home/pi/daqhats/examples/python/mcc172/pislm/pislm.py
+# ---------------------------------------------------------------------
+
+# Location of config.ini (optional; defaults to the script's directory).
+Environment=PISLM_CONFIG=/home/pi/daqhats/examples/python/mcc172/pislm/config.ini
+
+# Keep the monitor alive: if the HAT is not ready yet at boot, or the
+# process exits for any reason, systemd retries after 3 seconds.
+Restart=always
+RestartSec=3
+
+# Send stdout/stderr to the journal (view with: journalctl -u pislm).
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
