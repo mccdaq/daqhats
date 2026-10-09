@@ -3,21 +3,20 @@
 ## About
 The Python web server example demonstrates a simple web server that displays 
 data acquired from the MCC 118 HAT. This example is intended to run on a 
-single client.  
+single client.
 
 ## Dependencies
 - Dash: Python framework for building Web-based applications
 - Plotly: an interactive, browser-based graphing library for Python
 
-Enter the following commands to create a Python virtual environment and install the 
-dependencies and daqhats library. 
+Enter the following commands from this directory to create a Python virtual environment
+and install the dependencies and daqhats library (assumes daqhats is installed in
+~/daqhats, modify the code if you use another location). 
 
    ```
-   cd ~
-   python -m venv ./webvenv
-   ./webvenv/bin/pip install dash  
-   cd ~/daqhats
-   sudo ./webvenv/bin/python setup.py install
+   python -m venv ~/webvenv
+   ~/webvenv/bin/pip install ~/daqhats
+   ~/webvenv/bin/pip install -r requirements.txt
    ```
 
 ## Start the web server
