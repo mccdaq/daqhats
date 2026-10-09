@@ -2,7 +2,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "master", "nwright-mcc-patch-1" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
   schedule:
