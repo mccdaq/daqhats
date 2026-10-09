@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/examples/python/**"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
