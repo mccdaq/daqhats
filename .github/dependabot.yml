@@ -13,3 +13,11 @@ updates:
       # Raspberry Pi OS bookworm (Python 3.11).
       - dependency-name: "numpy"
         versions: [">=2.5"]
+
+  # GitHub Actions used in .github/workflows (CodeQL)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
