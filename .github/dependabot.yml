@@ -8,3 +8,8 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 7
+    ignore:
+      # numpy 2.5+ requires Python 3.12; stay on 2.4.x while supporting
+      # Raspberry Pi OS bookworm (Python 3.11).
+      - dependency-name: "numpy"
+        versions: [">=2.5"]
