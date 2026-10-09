@@ -28,10 +28,6 @@ gets a channel and value from the user and updates the specified output.
 - **digital_output_write_port**: sets all of the digital I/O to outputs, then
  gets user values and updates all outputs in a single call.
 
-- **ifttt/ifttt_trigger**: Uses the IFTTT web service to send an email when a
-change occurs on digital I/O channel 0. See the README in the ifttt folder for
-more information.
-
 ## Running an Example
 To run an example, open a terminal window in the folder where the example is 
 located (the default path is /daqhats/examples/python/mcc152/) and enter the 
