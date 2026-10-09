@@ -9,9 +9,10 @@ Installing the dependencies:
 The daqhats Python library and the packages listed in requirements.txt must be
 installed in the same Python environment.  To create a virtual environment
 (venv) and install them, run the following commands from this example's
-directory (replace <path_to_venv> with the desired location of the venv):
+directory (replace <path_to_venv> with the desired location of the venv and
+<path_to_daqhats> with the daqhats location):
    $ python -m venv <path_to_venv>
-   $ <path_to_venv>/bin/pip install <path_to_daqhats>/daqhats
+   $ <path_to_venv>/bin/pip install <path_to_daqhats>
    $ <path_to_venv>/bin/pip install -r requirements.txt
 
 Running this example:

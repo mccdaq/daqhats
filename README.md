@@ -180,7 +180,6 @@ following formats:
 - console-based (C/C++ and Python)
 - User interface
   - Web server (Python)
-  - IFTTT (If This Then That) trigger service (Python)
   - Data logger (C/C++)
 
 Refer to the README.md file in each example folder for more information.

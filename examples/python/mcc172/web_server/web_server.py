@@ -5,18 +5,20 @@ This example demonstrates a simple web server providing visualization of data
 from a MCC 172 DAQ HAT device for a single client.  It makes use of the Dash
 Python framework for web-based interfaces and a plotly graph.
 
+Installing the dependencies:
 The daqhats Python library and the packages listed in requirements.txt must be
 installed in the same Python environment.  To create a virtual environment
 (venv) and install them, run the following commands from this example's
-directory (replace <path_to_venv> with the desired location of the venv):
+directory (replace <path_to_venv> with the desired location of the venv and
+<path_to_daqhats> with the daqhats location):
    $ python -m venv <path_to_venv>
-   $ <path_to_venv>/bin/pip install <path_to_daqhats>/daqhats
+   $ <path_to_venv>/bin/pip install <path_to_daqhats>
    $ <path_to_venv>/bin/pip install -r requirements.txt
 
 Running this example:
 1. Start the server by running the web_server.py module in a terminal using the
    venv Python:
-   $ <path_to_venv>/bin/python/web_server.py
+   $ <path_to_venv>/bin/python web_server.py
 2. Open a web browser on a device on the same network as the host device and
    enter http://<host>:8080 in the address bar,
    replacing <host> with the IP Address or hostname of the host device.

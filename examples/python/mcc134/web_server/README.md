@@ -24,7 +24,7 @@ and install the dependencies and daqhats library (assumes daqhats is installed i
 following commands: 
 
    ```sh
-   ~/webvenv/bin/python ~/daqhats/examples/python/mcc134/web_server.py
+   ~/webvenv/bin/python ~/daqhats/examples/python/mcc134/web_server/web_server.py
    ```
 
 2. Open a web browser on a device on the same network as the host device and
