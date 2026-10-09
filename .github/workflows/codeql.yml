@@ -9,6 +9,7 @@ on:
     # Weekly scan (Mondays 06:00 UTC) so new CodeQL queries run even
     # when the code hasn't changed.
     - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
