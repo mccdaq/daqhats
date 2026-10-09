@@ -226,3 +226,8 @@ our [support forum](https://forum.digilent.com/forum/39-measurement-computing-mc
 ## Documentation
 Documentation for the daqhats library is available at
 https://mccdaq.github.io/daqhats/index.html.
+
+## Contributing
+We do not accept pull requests from outside contributors. To report a bug or
+request a feature, please open an issue. To report a security vulnerability,
+see [SECURITY.md](SECURITY.md).
