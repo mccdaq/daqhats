@@ -2,7 +2,7 @@
 
 ## About
 The Python FFT scan example demonstrates acquiring blocks of analog input data from 
-both datas, performing FFTs on the data, finding the peak frequency and harmonics,
+both channels, performing FFTs on the data, finding the peak frequency and harmonics,
 and saving the data and FFT to CSV files in the current directory
 (fft_scan_<channel>.csv).
 
@@ -11,12 +11,12 @@ and saving the data and FFT to CSV files in the current directory
 
 Enter the following commands from this directory to create a Python virtual environment
 and install the dependencies and daqhats library (assumes daqhats is installed in
-~/daqhats, modify the code if you use another location).
+~/daqhats, modify the command if you use another location).
 
    ```
-   python -m venv ~/webvenv
-   ~/webvenv/bin/pip install ~/daqhats
-   ~/webvenv/bin/pip install -r requirements.txt
+   python -m venv ~/daqhats-venv
+   ~/daqhats-venv/bin/pip install ~/daqhats
+   ~/daqhats-venv/bin/pip install -r requirements.txt
    ```
 
 ## Running an Example
@@ -25,7 +25,7 @@ located (the default path is ~/daqhats/examples/python/mcc172/fft_scan) and ente
 following command:
 
 ```
-~/webvenv/bin/python ~/daqhats/examples/python/mcc172/fft_scan/fft_scan.py
+~/daqhats-venv/bin/python ~/daqhats/examples/python/mcc172/fft_scan/fft_scan.py
 ```
 
 ## Support/Feedback

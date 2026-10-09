@@ -20,6 +20,11 @@ examples are ready-to-run and can be customized to suit your needs.
   eight MCC 172 HATs using the shared clock and trigger scan.
   One MCC 172 HAT (**master** device) provides the clock for synchronous acquisition.
 
+- **fft_scan**: acquires blocks of analog data from both channels, performs
+  FFTs on the data, finds the peak frequency and harmonics, and saves the data
+  and FFT to CSV files. This example requires additional Python packages; see
+  [fft_scan/README.md](fft_scan/README.md).
+
   Wire the MCC 172 HATs as listed below to synchronously acquire data:
   * Stack the MCC 172 HATs onto the Pi per the documentation.
   * Connect an external trigger source to the **TRIG** terminal on the MCC 172
