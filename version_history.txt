@@ -1,3 +1,10 @@
+1.5.0.2:
+    - Updated web server examples for Dash 4.x and added requirements.txt files
+    - Moved MCC 172 fft_scan example to its own folder and added requirements.txt
+    - Removed IFTTT examples
+    - Added Renovate and Dependabot configuration for dependency updates
+    - Added CI workflow and CodeQL code scanning
+
 1.5.0.1:
     - Added support for libgpiod v2 in Trixie and above
     - Fixed issue with daqhats_read_eeproms on newer versions of Raspberry Pi OS

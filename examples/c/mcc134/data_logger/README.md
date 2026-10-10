@@ -20,6 +20,7 @@ Install **GTKDatabox**:
   cd ~
   git clone https://github.com/erikd/gtkdatabox.git
   cd gtkdatabox
+  git checkout 7fc24b295e163018024da9ce040f194170a409f2
   ./autogen.sh
   ./configure
   sudo make install
