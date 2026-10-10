@@ -2,7 +2,7 @@
 
 # Security
 
-NI views the security of our software products as an important part of our commitment to our users.  This includes source code repositories managed through the [NI](https://github.com/ni) GitHub organization.
+MCC views the security of our software products as an important part of our commitment to our users. This includes source code repositories managed through the [MCC](https://github.com/mccdaq) GitHub organization.
 
 ## Reporting Security Issues
 
