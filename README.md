@@ -3,7 +3,7 @@
     <tr><td>Info</td><td>Contains C and Python Libraries for interacting with
     Measurement Computing DAQ HAT boards.</td></tr>
     <tr><td>Author</td><td>Measurement Computing</td></tr>
-    <tr><td>Library Version<td>1.5.0.1</td></tr>
+    <tr><td>Library Version<td>1.5.0.2</td></tr>
 </table>
 
 ## About
@@ -180,7 +180,6 @@ following formats:
 - console-based (C/C++ and Python)
 - User interface
   - Web server (Python)
-  - IFTTT (If This Then That) trigger service (Python)
   - Data logger (C/C++)
 
 Refer to the README.md file in each example folder for more information.
@@ -227,3 +226,8 @@ our [support forum](https://forum.digilent.com/forum/39-measurement-computing-mc
 ## Documentation
 Documentation for the daqhats library is available at
 https://mccdaq.github.io/daqhats/index.html.
+
+## Contributing
+We do not accept pull requests from outside contributors. To report a bug or
+request a feature, please open an issue. To report a security vulnerability,
+see [SECURITY.md](SECURITY.md).

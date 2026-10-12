@@ -1,0 +1,65 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    # Weekly scan (Mondays 06:00 UTC) so new CodeQL queries run even
+    # when the code hasn't changed.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      # Required to upload code scanning results
+      security-events: write
+      # Required to read workflow run information
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # C library, tools, and C examples. Build-free extraction also
+          # covers the data logger examples, which need a source build of
+          # GtkDatabox to compile.
+          - language: c-cpp
+            build-mode: none
+          # Python library and Python examples
+          - language: python
+            build-mode: none
+          # GitHub Actions workflows in .github/workflows
+          - language: actions
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Build-free C/C++ analysis is more accurate when the headers the
+      # code includes are present on the runner.
+      - name: Install C dependency headers
+        if: matrix.language == 'c-cpp'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgpiod-dev libgtk-3-dev libgtkdatabox-dev
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"

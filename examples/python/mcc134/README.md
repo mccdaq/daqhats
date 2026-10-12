@@ -8,8 +8,6 @@ examples are ready-to-run and can be customized to suit your needs.
 ## Example Programs
 - **single_value_read**: reads and displays a single data value for each 
 channel on each iteration of a software timed loop.
-- **IFTTT examples**: logging and temperature alarm examples using the IFTTT
-web service.
 
 ## Running an Example
 To run an example, open a terminal window in the folder where the example is 
