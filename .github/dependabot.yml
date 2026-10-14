@@ -8,13 +8,17 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 7
+    # Only change a requirement when it doesn't already allow the latest
+    # version. Keeps minimum bounds like setuptools>=42 in pyproject.toml
+    # low, while exact pins (==) in requirements.txt still get updated.
+    versioning-strategy: increase-if-necessary
     ignore:
       # numpy 2.5+ requires Python 3.12; stay on 2.4.x while supporting
       # Raspberry Pi OS bookworm (Python 3.11).
       - dependency-name: "numpy"
         versions: [">=2.5"]
 
-  # GitHub Actions used in .github/workflows (CodeQL)
+  # GitHub Actions used in .github/workflows (CI, CodeQL)
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
